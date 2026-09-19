@@ -24,14 +24,18 @@
     overflow-x:hidden;
   }
 
-  /* ── Real Swiper.js, native mousewheel + parallax modules — the
-     actual mechanism confirmed on dsgninterior.se (direction:vertical,
-     effect:'slide', speed:500, mousewheel.enabled:true, parallax:true,
-     data-swiper-parallax on both media and title at different rates).
-     Swiper owns input handling entirely here; no custom scroll
-     listener driving it. Self-contained single-viewport carousel — no
-     scroll-runway wrapper needed, since mousewheel triggers Swiper's
-     own internal slide transitions rather than real page scroll. ── */
+  /* ── Real Swiper.js, native mousewheel module — the actual mechanism
+     confirmed on dsgninterior.se (direction:vertical, effect:'slide',
+     speed:500, mousewheel.enabled:true). Swiper owns input handling
+     entirely here; no custom scroll listener driving it. Self-contained
+     single-viewport carousel — no scroll-runway wrapper needed, since
+     mousewheel triggers Swiper's own internal slide transitions rather
+     than real page scroll. Parallax module deliberately not used: its
+     percentage is computed against the parallax element's OWN size, so
+     wrapping any element sized close to the slide height in
+     data-swiper-parallax produced a shift large enough to pull the next
+     slide into view at rest — happened twice under two different
+     specific setups. Not worth re-fighting for a decorative effect. ── */
   .stage{
     position:relative;
     width:100%;
@@ -113,16 +117,6 @@
   }
 
   /* ── Headline ── */
-  /* The slide itself centers its title vertically via flex; the title
-     wrapper is sized to its OWN content (not stretched to fill the
-     982px slide) so Swiper's parallax percentage — calculated against
-     the parallax element's own size — stays a modest, safe shift
-     instead of one large enough to cancel a whole slide's offset. That
-     stretched-to-fill-the-slide sizing was the real cause of the
-     "next slide visible at rest" bug: a 100% shift of an 982px-tall
-     element is 982px, exactly canceling the adjacent slide's own
-     off-screen position. Sized to content, 100% of ~115px is ~115px —
-     nowhere near enough to do that. */
   .swiper-slide{
     display:flex;
     align-items:center;
@@ -218,9 +212,7 @@
     .scroll-indicator{ right:20px; bottom:20px; }
   }
 
-  /* ── Project title — centered, parallax-driven same as the hero
-     title (data-swiper-parallax on the wrapper + inner span). Sized
-     to content for the same reason as .hero-title-wrap above. ── */
+  /* ── Project title — centered ── */
   .project-title-wrap{
     position:relative;
     z-index:2;
@@ -280,13 +272,13 @@
     <div class="swiper-wrapper">
 
       <div class="swiper-slide">
-        <div class="slide-media" data-swiper-parallax="60%">
+        <div class="slide-media">
           <video autoplay muted loop playsinline preload="auto">
             <source src="assets/marlow-hero.mp4" type="video/mp4">
           </video>
         </div>
-        <div class="hero-title-wrap" data-swiper-parallax="100%">
-          <div class="hero-content" data-swiper-parallax="-60">
+        <div class="hero-title-wrap">
+          <div class="hero-content">
             <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
             <div class="hero-title-line"><div class="hero-title">considered living</div></div>
           </div>
@@ -294,11 +286,11 @@
       </div>
 
       <div class="swiper-slide">
-        <div class="slide-media" data-swiper-parallax="60%">
+        <div class="slide-media">
           <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
         </div>
-        <div class="project-title-wrap" data-swiper-parallax="100%">
-          <h2 class="project-title" data-swiper-parallax="-60">Bayshore Residence</h2>
+        <div class="project-title-wrap">
+          <h2 class="project-title">Bayshore Residence</h2>
         </div>
       </div>
 
@@ -315,7 +307,6 @@
     direction: 'vertical',
     effect: 'slide',
     speed: 500,
-    parallax: true,
     mousewheel: {
       enabled: true
     }
@@ -323,6 +314,20 @@
 
   document.getElementById('scrollBtn').addEventListener('click', function(){
     heroSwiper.slideNext();
+  });
+
+  /* Swiper measures slide size/position once, at init. If layout shifts
+     afterward — the Poppins web font swapping in over the fallback font
+     (changes title width/height), or the hero <video> firing
+     loadedmetadata and settling its box — Swiper's cached offsets go
+     stale with nothing to trigger a recalc, so slides can sit at the
+     wrong position until the next manual update(). Force a recalc after
+     both of those specific async events settle. */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function(){ heroSwiper.update(); });
+  }
+  document.querySelectorAll('.hero-swiper video').forEach(function(v){
+    v.addEventListener('loadedmetadata', function(){ heroSwiper.update(); });
   });
 </script>
 
