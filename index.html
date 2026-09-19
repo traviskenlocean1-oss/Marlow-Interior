@@ -50,6 +50,20 @@
     min-height:560px;
     overflow:hidden;
     background:var(--bg-fallback);
+    /* transform (any non-none value) makes .stage the containing block
+       for position:fixed descendants — see .swiper-slide below. Purely
+       structural, no visual effect on its own. */
+    transform:translateZ(0);
+  }
+  /* Real, invisible scroll distance for the wheel-to-position mechanism
+     (Swiper's cssMode/mousewheel still needs a genuinely scrollable
+     wrapper) — 200vh, matching two slides' worth of travel, exactly as
+     before. Never rendered; the actual content lives in .swiper-slide
+     below, which is now taken out of scroll flow entirely. */
+  .scroll-spacer{
+    height:200vh;
+    flex-shrink:0;
+    pointer-events:none;
   }
   .hero-swiper{ width:100%; height:100%; }
   /* scroll-behavior stays auto (not smooth) — the click-to-advance JS
@@ -66,7 +80,18 @@
      right at the edges before springing back, which is the real source
      of the brown-background flash right at the ends of the scroll
      (belt-and-suspenders with the clamp in the JS render loop below). */
-  .hero-swiper .swiper-wrapper{ scroll-behavior:auto; overscroll-behavior:contain; }
+  /* transform:none overrides Swiper's own default
+     transform:translate3d(0,0,0) on .swiper-wrapper (a GPU-acceleration
+     hint from its non-cssMode rendering path, unused here since cssMode
+     positions content via real scrollTop, not a JS transform on the
+     wrapper). Removing it matters for a reason that has nothing to do
+     with scrolling itself: any non-none transform on an ancestor
+     becomes the containing block for position:fixed descendants, and
+     .swiper-wrapper sits closer to .swiper-slide in the DOM than
+     .stage — so with that transform left in place, "fixed" slides were
+     actually positioning relative to the scrolling wrapper itself, not
+     .stage, and scrolled right along with it exactly as before. */
+  .hero-swiper .swiper-wrapper{ scroll-behavior:auto; overscroll-behavior:contain; transform:none; }
   /* Graceful degradation: if Swiper's JS never runs for any reason
      (blocked script, network failure), Swiper never adds the
      "swiper-initialized" class it normally adds on init. In that
@@ -143,24 +168,29 @@
   }
 
   /* ── Headline ── */
-  /* overflow:hidden is load-bearing, not tidiness: .slide-media is
-     oversized on top/bottom (see below) so its parallax shift never
-     exposes a gap. Slides are genuine stacked document flow now (real
-     scroll), so without this, an adjacent slide's oversized background
-     physically pokes into view regardless of scroll position — this is
-     the third distinct way this same bug class has shown up. Confirmed
-     the reference does the same: its own .banner rule carries
-     overflow:hidden for exactly this reason. */
+  /* position:fixed;inset:0 (relative to .stage, via the transform set
+     on it above) takes both slides completely out of scroll flow. This
+     replaces an earlier approach that kept them in real document flow
+     and canceled their scroll-linked movement with an equal-and-
+     opposite counter-transform every frame — mathematically correct at
+     rest, but two independently-computed numbers (real scroll position
+     vs. the JS transform meant to cancel it) could still drift out of
+     sync by a hair under real trackpad input, from rounding, timing, or
+     overscroll physics, each showing up as a fresh flavor of the same
+     "brief gap/bounce" bug across several rounds of chasing it. With
+     position:fixed there is no natural scroll-linked position to cancel
+     in the first place — nothing for a second number to ever drift
+     against. overflow:hidden is still load-bearing for .slide-media's
+     oversized background (see below) and .swiper-slide:nth-child order
+     still needs its own explicit z-index below since fixed positioning
+     establishes its own stacking context too. */
   .swiper-slide{
+    position:fixed;
+    inset:0;
     display:flex;
     align-items:center;
     overflow:hidden;
   }
-  /* Explicit stacking order for the cover effect (see the scroll
-     listener in the script): the hero gets a transform applied to hold
-     it visually in place, and transform creates its own stacking
-     context, so DOM order alone can't be trusted to keep Bayshore
-     painting on top of it. */
   .swiper-slide:nth-child(1){ z-index:1; }
   .swiper-slide:nth-child(2){ z-index:2; }
   /* Centered to match the reference's .banner-title look (previously
@@ -360,6 +390,7 @@
         </div>
       </div>
 
+      <div class="scroll-spacer"></div>
     </div>
   </div>
 </section>
@@ -476,49 +507,36 @@
     smoothScrollToIndex(currentIndex() + 1, 1400);
   });
 
-  /* Reveal effect, not a cover effect: Travis clarified further — even
-     with the hero held static, Bayshore Residence itself still visibly
-     translated into place, which read as "the image is coming up/in".
-     What he actually wants is closer to a curtain lifting: Bayshore's
-     photo and title should sit in their final, already-composed
-     position the entire time and simply become visible as you scroll,
-     never sliding to get there.
-
-     The scroll mechanism itself is still completely untouched (real
-     scroll still drives everything the same way) — this only adds two
-     things per scroll event: the same equal-and-opposite counter-
-     transform as before, now applied to BOTH slides so NEITHER one's
-     content ever visibly moves, and a clip-path on Bayshore that grows
-     from fully hidden to fully shown as scroll progresses, revealing
-     its already-static composition rather than sliding it into frame.
-     data-swiper-parallax was removed from Bayshore's media/title in the
-     markup for the same reason — any independent internal motion there
-     would contradict "already there, just revealed". */
-  var heroSlideEl = heroSwiper.slides[0];
+  /* Reveal effect, not a cover effect: Bayshore's photo and title sit
+     in their final, already-composed position the entire time and
+     simply become visible as you scroll — never sliding or translating
+     to get there. That used to be built with both slides kept in real
+     document flow, each canceling its own scroll-linked movement with
+     an equal-and-opposite counter-transform every frame. That was
+     mathematically correct at rest, but it depended on two
+     independently-computed numbers (the browser's real scroll position
+     vs. the JS transform meant to cancel it) staying perfectly in sync,
+     and under real trackpad input they kept drifting apart by a hair —
+     rounding, timing, overscroll physics, Swiper's own freeMode
+     momentum — a new flavor of the same "brief gap/bounce" bug every
+     round. .swiper-slide is now position:fixed (see CSS) specifically
+     to remove that dependency: there is no natural scroll-linked
+     position left to cancel, so there's nothing for a second number to
+     ever drift against. The only thing this loop still needs to compute
+     is Bayshore's reveal amount. */
   var bayshoreSlideEl = heroSwiper.slides[1];
   var maxScroll = wrapperEl.scrollHeight - wrapperEl.clientHeight;
   var lastRenderedScroll = null;
   function renderReveal(){
-    /* Clamped to [0, maxScroll] — real trackpad/OS overscroll
-       (rubber-banding) can briefly report a scrollTop slightly below 0
-       or above maxScroll right at either end before it springs back.
-       Unclamped, that briefly fed an out-of-range value into the
-       transforms below, shifting hero/Bayshore just enough to expose a
-       sliver of the raw .stage background at exactly the top or bottom
-       edge — the brown flash Travis kept seeing specifically "when
-       scrolling up a little" or "back down", i.e. right at the ends,
-       never in the middle. Clamping means an overscrolled value renders
-       identically to the true boundary, so there's nothing left to leak
-       through. */
+    /* Clamped to [0, maxScroll] defensively (overscroll can briefly
+       report a value outside that range) — costs nothing to keep even
+       though position no longer depends on it at all. */
     var s = Math.min(Math.max(wrapperEl.scrollTop, 0), maxScroll);
-    /* Skip the DOM writes entirely when nothing changed — this loop
-       runs every frame forever, and touching style/transform on two
-       elements 60x/sec even at rest is wasted work for zero visual
-       benefit. */
+    /* Skip the DOM write entirely when nothing changed — this loop
+       runs every frame forever, and touching style even on one element
+       60x/sec at rest is wasted work for zero visual benefit. */
     if (s !== lastRenderedScroll){
       lastRenderedScroll = s;
-      heroSlideEl.style.transform = 'translateY(' + s + 'px)';
-      bayshoreSlideEl.style.transform = 'translateY(' + (s - wrapperEl.clientHeight) + 'px)';
       var progress = maxScroll > 0 ? s / maxScroll : 0;
       bayshoreSlideEl.style.clipPath = 'inset(' + ((1 - progress) * 100) + '% 0 0 0)';
     }
