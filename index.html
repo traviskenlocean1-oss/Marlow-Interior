@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marlow Interiors | Interior Design Studio</title>
+<meta name="description" content="Marlow Interiors — interior design studio creating quiet, considered spaces for homes and hospitality.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#f6f5f4;
+    --ink:#171310;
+    --bg-fallback:#3a2a22;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    background:var(--bg-fallback);
+    color:var(--ivory);
+    overflow-x:hidden;
+  }
+
+  .hero{
+    position:relative;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    min-height:560px;
+    overflow:hidden;
+    background:var(--bg-fallback);
+  }
+  .hero video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(
+      180deg,
+      rgba(20,14,10,0.35) 0%,
+      rgba(20,14,10,0.05) 28%,
+      rgba(20,14,10,0.10) 60%,
+      rgba(15,10,7,0.55) 100%
+    );
+    pointer-events:none;
+  }
+
+  /* ── Nav ── */
+  .hero-nav{
+    position:absolute;
+    top:0; left:0; right:0;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:28px clamp(20px, 4vw, 48px);
+  }
+  .hero-nav img{
+    height:34px;
+    width:auto;
+    display:block;
+  }
+  .hero-nav nav{
+    display:flex;
+    align-items:center;
+    gap:clamp(18px, 3vw, 40px);
+  }
+  .hero-nav nav a{
+    color:var(--ivory);
+    text-decoration:none;
+    font-size:15px;
+    font-weight:400;
+    letter-spacing:-0.02em;
+    opacity:0.88;
+    transition:opacity 0.2s ease;
+  }
+  .hero-nav nav a:hover{ opacity:1; }
+  @media (max-width:640px){
+    .hero-nav nav{ display:none; }
+  }
+
+  /* ── Headline ── */
+  .hero-content{
+    position:relative;
+    z-index:3;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:0 clamp(20px, 5vw, 64px);
+    padding-top:18px; /* clearance from top edge so tight line-height never clips ascenders */
+  }
+  .hero-title-line{
+    overflow:hidden;
+  }
+  .hero-title{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-weight:500;
+    font-size:clamp(46px, 8.45vw, 150px);
+    line-height:0.92;
+    letter-spacing:-0.047em;
+    color:var(--ivory);
+    white-space:nowrap;
+  }
+  @media (max-width:640px){
+    .hero-title{ line-height:1.05; white-space:normal; }
+  }
+
+  /* ── Contact block, bottom-left ── */
+  .hero-contact{
+    position:absolute;
+    left:clamp(20px, 4vw, 48px);
+    bottom:clamp(20px, 4vw, 40px);
+    z-index:4;
+    display:flex;
+    gap:clamp(28px, 4vw, 56px);
+  }
+  .hero-contact div p,
+  .hero-contact div a{
+    display:block;
+    color:var(--ivory);
+    font-size:15px;
+    font-weight:500;
+    letter-spacing:-0.01em;
+    text-decoration:none;
+    opacity:0.92;
+    line-height:1.5;
+  }
+  @media (max-width:640px){
+    .hero-contact{ display:none; }
+  }
+
+  /* ── Scroll indicator, bottom-right ── */
+  .scroll-indicator{
+    position:absolute;
+    right:clamp(20px, 4vw, 48px);
+    bottom:clamp(20px, 4vw, 40px);
+    z-index:4;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:var(--ivory);
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.02em;
+    opacity:0.9;
+  }
+  .scroll-indicator .ring{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid rgba(246,245,244,0.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .scroll-indicator .ring svg{
+    width:12px;
+    height:12px;
+    animation:bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob{
+    0%,100%{ transform:translateY(-2px); }
+    50%{ transform:translateY(2px); }
+  }
+  @media (max-width:640px){
+    .scroll-indicator span{ display:none; }
+    .scroll-indicator{ right:20px; bottom:20px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <video autoplay muted loop playsinline preload="auto">
+    <source src="assets/marlow-hero.mp4" type="video/mp4">
+  </video>
+
+  <div class="hero-nav">
+    <img src="assets/marlow-logo-white.png" alt="Marlow Interiors">
+    <nav>
+      <a href="#">Projects</a>
+      <a href="#">Studio</a>
+      <a href="#">Contact</a>
+    </nav>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
+    <div class="hero-title-line"><div class="hero-title">considered living</div></div>
+  </div>
+
+  <div class="hero-contact">
+    <div>
+      <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>
+      <a href="tel:+13055550148">+1 (305) 555-0148</a>
+    </div>
+    <div>
+      <p>140 NE 39th St</p>
+      <p>Miami, FL 33137</p>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll to explore</span>
+    <div class="ring">
+      <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 4L6 9L11 4" stroke="#f6f5f4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
