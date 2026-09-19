@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.css">
 <style>
   :root{
     --ivory:#f6f5f4;
@@ -23,11 +24,18 @@
     overflow-x:hidden;
   }
 
+  /* Swiper needs explicit height on the container + every slide for
+     vertical mode — html/body height:100% (already set above) plus
+     these makes the whole viewport one full-height slide at a time. */
+  .home-swiper, .home-swiper .swiper-slide{
+    height:100vh;
+    height:100dvh;
+  }
+
   .hero{
     position:relative;
     width:100%;
-    height:100vh;
-    height:100dvh;
+    height:100%;
     min-height:560px;
     overflow:hidden;
     background:var(--bg-fallback);
@@ -53,11 +61,12 @@
     pointer-events:none;
   }
 
-  /* ── Nav ── */
+  /* ── Nav — fixed globally, same as dsgninterior.se's header: it sits
+     above the swiper and never moves while slides change beneath it ── */
   .hero-nav{
-    position:absolute;
+    position:fixed;
     top:0; left:0; right:0;
-    z-index:5;
+    z-index:50;
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -118,12 +127,13 @@
     .hero-title{ line-height:1.05; white-space:normal; }
   }
 
-  /* ── Contact block, bottom-left ── */
+  /* ── Contact block, bottom-left — fixed globally, same as the
+     reference's footer, which sits fixed above the swiper too ── */
   .hero-contact{
-    position:absolute;
+    position:fixed;
     left:clamp(20px, 4vw, 48px);
     bottom:clamp(20px, 4vw, 40px);
-    z-index:4;
+    z-index:50;
     display:flex;
     gap:clamp(28px, 4vw, 56px);
   }
@@ -142,12 +152,12 @@
     .hero-contact{ display:none; }
   }
 
-  /* ── Scroll indicator, bottom-right ── */
+  /* ── Scroll indicator, bottom-right — fixed globally ── */
   .scroll-indicator{
-    position:absolute;
+    position:fixed;
     right:clamp(20px, 4vw, 48px);
     bottom:clamp(20px, 4vw, 40px);
-    z-index:4;
+    z-index:50;
     display:flex;
     align-items:center;
     gap:12px;
@@ -180,50 +190,111 @@
     .scroll-indicator span{ display:none; }
     .scroll-indicator{ right:20px; bottom:20px; }
   }
+
+  /* ── Project banner slide — same treatment as the hero, a full-bleed
+     photo + title, wrapped in a real link like the reference's own
+     banner-1/banner-2/etc slides ── */
+  .project-slide{
+    position:relative;
+    display:block;
+    width:100%; height:100%;
+    text-decoration:none;
+  }
+  .project-slide img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+  }
+  .project-slide::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(20,14,10,0.25) 0%, rgba(20,14,10,0.15) 40%, rgba(15,10,7,0.55) 100%);
+  }
+  .project-slide-title{
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    z-index:2;
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(36px, 6vw, 96px);
+    letter-spacing:-0.03em;
+    color:var(--ivory);
+    text-align:center;
+    white-space:nowrap;
+  }
+  @media (max-width:640px){
+    .project-slide-title{ white-space:normal; padding:0 24px; }
+  }
 </style>
 </head>
 <body>
 
-<section class="hero">
-  <video autoplay muted loop playsinline preload="auto">
-    <source src="assets/marlow-hero.mp4" type="video/mp4">
-  </video>
+<div class="hero-nav">
+  <img src="assets/marlow-logo-white.png" alt="Marlow Interiors">
+  <nav>
+    <a href="#">Projects</a>
+    <a href="#">Archive</a>
+    <a href="#">Studio</a>
+    <a href="#">Contact</a>
+  </nav>
+</div>
 
-  <div class="hero-nav">
-    <img src="assets/marlow-logo-white.png" alt="Marlow Interiors">
-    <nav>
-      <a href="#">Projects</a>
-      <a href="#">Archive</a>
-      <a href="#">Studio</a>
-      <a href="#">Contact</a>
-    </nav>
+<div class="hero-contact">
+  <div>
+    <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>
+    <a href="tel:+13055550148">+1 (305) 555-0148</a>
   </div>
-
-  <div class="hero-content">
-    <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
-    <div class="hero-title-line"><div class="hero-title">considered living</div></div>
+  <div>
+    <p>140 NE 39th St</p>
+    <p>Miami, FL 33137</p>
   </div>
+</div>
 
-  <div class="hero-contact">
-    <div>
-      <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>
-      <a href="tel:+13055550148">+1 (305) 555-0148</a>
+<button class="scroll-indicator" id="scrollBtn" style="background:none;border:none;cursor:pointer;font-family:inherit;">
+  <span>Scroll to explore</span>
+  <div class="ring">
+    <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 4L6 9L11 4" stroke="#f6f5f4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</button>
+
+<div class="swiper home-swiper">
+  <div class="swiper-wrapper">
+
+    <div class="swiper-slide">
+      <section class="hero">
+        <video autoplay muted loop playsinline preload="auto">
+          <source src="assets/marlow-hero.mp4" type="video/mp4">
+        </video>
+        <div class="hero-content">
+          <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
+          <div class="hero-title-line"><div class="hero-title">considered living</div></div>
+        </div>
+      </section>
     </div>
-    <div>
-      <p>140 NE 39th St</p>
-      <p>Miami, FL 33137</p>
-    </div>
-  </div>
 
-  <div class="scroll-indicator">
-    <span>Scroll to explore</span>
-    <div class="ring">
-      <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M1 4L6 9L11 4" stroke="#f6f5f4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <div class="swiper-slide">
+      <a href="#" class="project-slide">
+        <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+        <h2 class="project-slide-title">Bayshore Residence</h2>
+      </a>
     </div>
+
   </div>
-</section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.js"></script>
+<script>
+  const homeSwiper = new Swiper('.home-swiper', {
+    direction: 'vertical',
+    speed: 700,
+    mousewheel: true,
+    keyboard: true,
+  });
+  document.getElementById('scrollBtn').addEventListener('click', () => homeSwiper.slideNext());
+</script>
 
 </body>
 </html>
