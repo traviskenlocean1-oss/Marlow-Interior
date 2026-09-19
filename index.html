@@ -282,5 +282,63 @@
   <h2 class="project-slide-title">Bayshore Residence</h2>
 </a>
 
+<script>
+  /* Eased smooth-scroll, ported from The Altura Collection — this is
+     what actually makes the sticky-hero/next-section overlap read as
+     a deliberate animation instead of raw, mechanical native scroll.
+     Drives real window.scrollTo() (not a transformed wrapper), so
+     position:sticky keeps working untouched. Desktop wheel only —
+     touch scrolling on mobile is already smooth/inertial natively. */
+  (function(){
+    var isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    if (isCoarsePointer) return;
+
+    var current = window.scrollY;
+    var target = current;
+    var ease = 0.06;
+
+    function maxScroll(){
+      return document.documentElement.scrollHeight - window.innerHeight;
+    }
+    function clampTarget(v){
+      return Math.max(0, Math.min(maxScroll(), v));
+    }
+
+    var MAX_LEAD = window.innerHeight * 1.4;
+    window.addEventListener('wheel', function(e){
+      e.preventDefault();
+      var proposed = target + e.deltaY;
+      proposed = Math.max(current - MAX_LEAD, Math.min(current + MAX_LEAD, proposed));
+      target = clampTarget(proposed);
+    }, { passive: false });
+
+    document.querySelectorAll('a[href^="#"]:not([href="#"])').forEach(function(a){
+      a.addEventListener('click', function(e){
+        var el = document.querySelector(a.getAttribute('href'));
+        if (!el) return;
+        e.preventDefault();
+        target = Math.max(0, Math.min(maxScroll(), el.getBoundingClientRect().top + window.scrollY));
+      });
+    });
+
+    var lastSetScroll = current;
+    window.addEventListener('scroll', function(){
+      if (Math.abs(window.scrollY - lastSetScroll) > 2) {
+        current = window.scrollY;
+        target = current;
+      }
+    }, { passive: true });
+
+    function raf(){
+      current += (target - current) * ease;
+      if (Math.abs(target - current) < 0.05) current = target;
+      window.scrollTo(0, current);
+      lastSetScroll = window.scrollY;
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+  })();
+</script>
+
 </body>
 </html>
