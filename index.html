@@ -341,11 +341,11 @@
       </div>
 
       <div class="swiper-slide">
-        <div class="slide-media" data-swiper-parallax="60%">
+        <div class="slide-media">
           <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
         </div>
-        <div class="project-title-wrap" data-swiper-parallax="100%">
-          <h2 class="project-title" data-swiper-parallax="-60">Bayshore Residence</h2>
+        <div class="project-title-wrap">
+          <h2 class="project-title">Bayshore Residence</h2>
         </div>
       </div>
 
@@ -439,21 +439,36 @@
     smoothScrollToIndex(currentIndex() + 1, 1400);
   });
 
-  /* Cover effect: the hero should read as completely stationary while
-     Bayshore Residence slides up and over it, not as two slides moving
-     past each other in a filmstrip. The scroll mechanism itself is
-     untouched (Travis confirmed that part is right) — real scroll still
-     moves every slide's actual DOM position exactly as before, which is
-     still what's driving Bayshore's motion. Only the hero slide gets an
-     extra transform here, exactly equal and opposite to how far real
-     scroll has physically moved it, canceling that movement out so it
-     visually never budges. Bayshore needs nothing extra: its own
-     already-correct scroll-driven motion is exactly the "moving over"
-     look once the hero stops competing with it visually. */
+  /* Reveal effect, not a cover effect: Travis clarified further — even
+     with the hero held static, Bayshore Residence itself still visibly
+     translated into place, which read as "the image is coming up/in".
+     What he actually wants is closer to a curtain lifting: Bayshore's
+     photo and title should sit in their final, already-composed
+     position the entire time and simply become visible as you scroll,
+     never sliding to get there.
+
+     The scroll mechanism itself is still completely untouched (real
+     scroll still drives everything the same way) — this only adds two
+     things per scroll event: the same equal-and-opposite counter-
+     transform as before, now applied to BOTH slides so NEITHER one's
+     content ever visibly moves, and a clip-path on Bayshore that grows
+     from fully hidden to fully shown as scroll progresses, revealing
+     its already-static composition rather than sliding it into frame.
+     data-swiper-parallax was removed from Bayshore's media/title in the
+     markup for the same reason — any independent internal motion there
+     would contradict "already there, just revealed". */
   var heroSlideEl = heroSwiper.slides[0];
-  wrapperEl.addEventListener('scroll', function(){
-    heroSlideEl.style.transform = 'translateY(' + wrapperEl.scrollTop + 'px)';
-  });
+  var bayshoreSlideEl = heroSwiper.slides[1];
+  var maxScroll = wrapperEl.scrollHeight - wrapperEl.clientHeight;
+  function renderReveal(){
+    var s = wrapperEl.scrollTop;
+    heroSlideEl.style.transform = 'translateY(' + s + 'px)';
+    bayshoreSlideEl.style.transform = 'translateY(' + (s - wrapperEl.clientHeight) + 'px)';
+    var progress = maxScroll > 0 ? Math.min(Math.max(s / maxScroll, 0), 1) : 0;
+    bayshoreSlideEl.style.clipPath = 'inset(' + ((1 - progress) * 100) + '% 0 0 0)';
+  }
+  wrapperEl.addEventListener('scroll', renderReveal);
+  renderReveal();
 
   /* Click-to-advance on the hero itself. Deliberately not on <a>/
      <button> and no cursor:pointer anywhere — Travis wants this to
