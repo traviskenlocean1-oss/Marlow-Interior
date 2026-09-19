@@ -24,18 +24,24 @@
     overflow-x:hidden;
   }
 
-  /* ── Real Swiper.js, native mousewheel module — the actual mechanism
-     confirmed on dsgninterior.se (direction:vertical, effect:'slide',
-     speed:500, mousewheel.enabled:true). Swiper owns input handling
-     entirely here; no custom scroll listener driving it. Self-contained
-     single-viewport carousel — no scroll-runway wrapper needed, since
-     mousewheel triggers Swiper's own internal slide transitions rather
-     than real page scroll. Parallax module deliberately not used: its
-     percentage is computed against the parallax element's OWN size, so
-     wrapping any element sized close to the slide height in
-     data-swiper-parallax produced a shift large enough to pull the next
-     slide into view at rest — happened twice under two different
-     specific setups. Not worth re-fighting for a decorative effect. ── */
+  /* ── Real Swiper.js in cssMode — the actual mechanism confirmed by
+     pulling dsgninterior.se's own live CSS/JS bundles directly:
+     .swiper-wrapper carries scroll-snap-type:y mandatory, each
+     .swiper-slide carries scroll-snap-align:start, and their init call
+     passes cssMode:true (plus resistanceRatio:0, parallax:true). That
+     means the hero is a REAL native-scroll region — the browser's own
+     scroll physics move it continuously as you scroll, snapping to the
+     nearest slide when you stop — not a JS-transform carousel that
+     waits for a wheel tick then plays one canned animation regardless
+     of how much you actually scrolled. That distinction is exactly
+     what read as "just scrolling" / "not already moving" before: a
+     JS-transform Swiper can play a very smooth animation, but it will
+     never feel like real scroll, because it isn't driven by real
+     scroll. cssMode is real scroll, so it can't feel like anything
+     else. It also removes the entire bug class that hit this build
+     twice: with slides genuinely stacked in normal flow instead of
+     absolutely-positioned-then-transformed-off-screen, there's no
+     off-screen offset for a parallax shift to ever cancel out. ── */
   .stage{
     position:relative;
     width:100%;
@@ -55,10 +61,12 @@
   .hero-swiper:not(.swiper-initialized) .swiper-slide:not(:first-child){
     display:none;
   }
-  /* top/bottom extend 80px past the slide so the ±70px translateY the
-     progress-driven parallax applies (see the Swiper init script) never
-     exposes a gap at the edge — the classic oversized-background trick. */
-  .slide-media{ position:absolute; top:-80px; left:0; right:0; bottom:-80px; will-change:transform; }
+  /* Oversized on top/bottom (65% of the slide's own height each way)
+     so the 60% data-swiper-parallax shift on this element — see the
+     markup below — never exposes a gap at the slide's edge while it's
+     scrolled past. Matches the reference's own oversized background
+     media for the same reason. */
+  .slide-media{ position:absolute; top:-65%; left:0; right:0; bottom:-65%; }
   .slide-media video,
   .slide-media img{
     position:absolute;
@@ -120,9 +128,18 @@
   }
 
   /* ── Headline ── */
+  /* overflow:hidden is load-bearing, not tidiness: .slide-media is
+     oversized on top/bottom (see below) so its parallax shift never
+     exposes a gap. Slides are genuine stacked document flow now (real
+     scroll), so without this, an adjacent slide's oversized background
+     physically pokes into view regardless of scroll position — this is
+     the third distinct way this same bug class has shown up. Confirmed
+     the reference does the same: its own .banner rule carries
+     overflow:hidden for exactly this reason. */
   .swiper-slide{
     display:flex;
     align-items:center;
+    overflow:hidden;
   }
   .hero-title-wrap{
     position:relative;
@@ -275,13 +292,13 @@
     <div class="swiper-wrapper">
 
       <div class="swiper-slide">
-        <div class="slide-media">
+        <div class="slide-media" data-swiper-parallax="60%">
           <video autoplay muted loop playsinline preload="auto">
             <source src="assets/marlow-hero.mp4" type="video/mp4">
           </video>
         </div>
-        <div class="hero-title-wrap">
-          <div class="hero-content">
+        <div class="hero-title-wrap" data-swiper-parallax="100%">
+          <div class="hero-content" data-swiper-parallax="-60">
             <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
             <div class="hero-title-line"><div class="hero-title">considered living</div></div>
           </div>
@@ -289,11 +306,11 @@
       </div>
 
       <div class="swiper-slide">
-        <div class="slide-media">
+        <div class="slide-media" data-swiper-parallax="60%">
           <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
         </div>
-        <div class="project-title-wrap">
-          <h2 class="project-title">Bayshore Residence</h2>
+        <div class="project-title-wrap" data-swiper-parallax="100%">
+          <h2 class="project-title" data-swiper-parallax="-60">Bayshore Residence</h2>
         </div>
       </div>
 
@@ -303,68 +320,26 @@
 
 <script src="assets/vendor/swiper-bundle.min.js"></script>
 <script>
-  /* Real Swiper.js, native mousewheel-driven slide transitions — the
-     confirmed mechanism from dsgninterior.se. Swiper owns all input
-     handling; no custom scroll listener, no manual setProgress.
-
-     Media/title move at different rates during the transition (Swiper's
-     own parallax module twice caused the hidden-slide-visible-at-rest
-     bug, because it sizes its shift as a % of the parallax element's
-     OWN size — safe when that happens to be small, silently wrong
-     whenever it isn't). This does the same layered-motion job with a
-     fixed pixel offset driven directly off each slide's own `progress`
-     (-1 previous, 0 active, +1 next), which can never depend on element
-     size, so it can't reproduce that bug class. Without this, media and
-     title move as one rigid block and the transition reads as plain
-     browser scroll instead of a designed slide. */
+  /* cssMode + resistanceRatio:0 + parallax:true + mousewheel.forceToAxis
+     — pulled directly from dsgninterior.se's own live app bundle. This
+     hands slide positioning to the browser's native scroll-snap, so
+     Swiper's job here is just tracking index and driving the parallax
+     attributes; it never fights real scroll input with a canned
+     animation the way JS-transform mode did. */
   var heroSwiper = new Swiper('.hero-swiper', {
     direction: 'vertical',
-    effect: 'slide',
+    slidesPerView: 1,
     speed: 500,
-    watchSlidesProgress: true,
+    resistanceRatio: 0,
+    parallax: true,
+    cssMode: true,
     mousewheel: {
-      enabled: true
-    },
-    on: {
-      progress: function(swiper){
-        swiper.slides.forEach(function(slideEl){
-          var p = slideEl.progress;
-          var media = slideEl.querySelector('.slide-media');
-          var title = slideEl.querySelector('.hero-title-wrap, .project-title-wrap');
-          if (media) media.style.transform = 'translateY(' + (p * -70) + 'px)';
-          if (title) title.style.transform = 'translateY(' + (p * 130) + 'px)';
-        });
-      },
-      /* Swiper calls this right as it starts animating its own wrapper
-         over `duration` ms. Our progress handler above sets media/title
-         straight to their final value with no transition of its own, so
-         without this it snaps instead of easing — matching Swiper's own
-         duration here keeps the two motions visually in sync instead of
-         one sliding and the other teleporting. */
-      setTransition: function(swiper, duration){
-        document.querySelectorAll('.slide-media, .hero-title-wrap, .project-title-wrap').forEach(function(el){
-          el.style.transition = duration ? 'transform ' + duration + 'ms ease' : '';
-        });
-      }
+      forceToAxis: true
     }
   });
 
   document.getElementById('scrollBtn').addEventListener('click', function(){
     heroSwiper.slideNext();
-  });
-
-  /* Swiper measures slide size/position once, at init. If layout shifts
-     afterward — the Poppins web font swapping in over the fallback font
-     (changes title width/height), or the hero <video> firing
-     loadedmetadata and settling its box — Swiper's cached offsets go
-     stale with nothing to trigger a recalc, so slides can sit at the
-     wrong position until the next manual update(). Force a recalc after
-     both of those specific async events settle. */
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function(){ heroSwiper.update(); });
-  }
-  document.querySelectorAll('.hero-swiper video').forEach(function(v){
-    v.addEventListener('loadedmetadata', function(){ heroSwiper.update(); });
   });
 </script>
 
