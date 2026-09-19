@@ -269,12 +269,26 @@
   @media (max-width:640px){
     .project-title{ white-space:normal; }
   }
+
+  /* Logo click: cut to black and back, like a film cut, then reset to
+     the hero underneath. Plain opacity fade on a fixed full-screen
+     layer — no scroll/position math involved at all. */
+  .cut-transition{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+  }
 </style>
 </head>
 <body>
 
+<div class="cut-transition" id="cutTransition"></div>
+
 <div class="hero-nav">
-  <img src="assets/marlow-logo-white.png" alt="Marlow Interiors">
+  <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" id="logoHome" style="cursor:pointer;">
   <nav>
     <a href="#">Projects</a>
     <a href="#">Archive</a>
@@ -442,6 +456,24 @@
     requestAnimationFrame(renderReveal);
   }
   requestAnimationFrame(renderReveal);
+
+  /* Logo → home: cut to black, jump back to the hero underneath while
+     hidden, cut back in. A plain opacity fade on a fixed full-screen
+     layer, nothing to do with the scroll/reveal mechanism above — reset
+     is instant and happens while the screen is fully black, so there's
+     nothing to see happen regardless of how it's done underneath. */
+  document.getElementById('logoHome').addEventListener('click', function(){
+    var overlay = document.getElementById('cutTransition');
+    overlay.style.transition = 'opacity 0.18s ease';
+    overlay.style.opacity = '1';
+    setTimeout(function(){
+      targetProgress = 0;
+      displayProgress = 0;
+      setTimeout(function(){
+        overlay.style.opacity = '0';
+      }, 90);
+    }, 180);
+  });
 </script>
 
 </body>
