@@ -150,6 +150,13 @@
     align-items:center;
     overflow:hidden;
   }
+  /* Explicit stacking order for the cover effect (see the scroll
+     listener in the script): the hero gets a transform applied to hold
+     it visually in place, and transform creates its own stacking
+     context, so DOM order alone can't be trusted to keep Bayshore
+     painting on top of it. */
+  .swiper-slide:nth-child(1){ z-index:1; }
+  .swiper-slide:nth-child(2){ z-index:2; }
   /* Centered to match the reference's .banner-title look (previously
      only the project title was centered, hero was left-stacked, which
      read as inconsistent). NOT copying their exact position:absolute;
@@ -430,6 +437,22 @@
 
   document.getElementById('scrollBtn').addEventListener('click', function(){
     smoothScrollToIndex(currentIndex() + 1, 1400);
+  });
+
+  /* Cover effect: the hero should read as completely stationary while
+     Bayshore Residence slides up and over it, not as two slides moving
+     past each other in a filmstrip. The scroll mechanism itself is
+     untouched (Travis confirmed that part is right) — real scroll still
+     moves every slide's actual DOM position exactly as before, which is
+     still what's driving Bayshore's motion. Only the hero slide gets an
+     extra transform here, exactly equal and opposite to how far real
+     scroll has physically moved it, canceling that movement out so it
+     visually never budges. Bayshore needs nothing extra: its own
+     already-correct scroll-driven motion is exactly the "moving over"
+     look once the hero stops competing with it visually. */
+  var heroSlideEl = heroSwiper.slides[0];
+  wrapperEl.addEventListener('scroll', function(){
+    heroSlideEl.style.transform = 'translateY(' + wrapperEl.scrollTop + 'px)';
   });
 
   /* Click-to-advance on the hero itself. Deliberately not on <a>/
