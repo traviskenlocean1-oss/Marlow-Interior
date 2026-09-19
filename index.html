@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.css">
 <style>
   :root{
     --ivory:#f6f5f4;
@@ -23,12 +24,15 @@
     overflow-x:hidden;
   }
 
-  /* ── Pinned crossfade stage: text and background truly never travel.
-     A tall wrapper (scroll runway) holds a position:sticky stage; two
-     background layers and two text layers sit stacked at the exact
-     same fixed position and crossfade via opacity only, driven by
-     scroll progress through the wrapper. Nothing here ever slides or
-     translates up the page — only opacity changes. ── */
+  /* ── Real Swiper.js slide-travel + parallax, continuously bound to
+     scroll (not touch/wheel snap). A tall wrapper (scroll runway)
+     holds a position:sticky stage containing the actual Swiper
+     instance; on every scroll tick we call swiper.setProgress() with
+     our own 0-1 value, so Swiper computes the real slide transform
+     AND the per-layer parallax offsets (data-swiper-parallax, same
+     values as dsgninterior.se) continuously — no snapping, because
+     nothing ever jumps to a discrete slide index, it just tracks
+     scroll position 1:1 the whole way through. ── */
   .stage-wrap{
     position:relative;
     height:220vh;
@@ -44,16 +48,10 @@
     overflow:hidden;
     background:var(--bg-fallback);
   }
-  .stage-media{ position:absolute; inset:0; }
-  .stage-media-layer{
-    position:absolute;
-    inset:0;
-    opacity:0;
-    transition:opacity 0.05s linear; /* smooths the discrete scroll-tick updates */
-  }
-  .stage-media-layer.is-visible{ opacity:1; }
-  .stage-media-layer video,
-  .stage-media-layer img{
+  .hero-swiper{ width:100%; height:100%; }
+  .slide-media{ position:absolute; inset:0; }
+  .slide-media video,
+  .slide-media img{
     position:absolute;
     inset:0;
     width:100%;
@@ -74,14 +72,6 @@
     );
     pointer-events:none;
   }
-  .stage-text{ position:absolute; inset:0; z-index:2; }
-  .stage-text-layer{
-    position:absolute;
-    inset:0;
-    opacity:0;
-    transition:opacity 0.05s linear;
-  }
-  .stage-text-layer.is-visible{ opacity:1; }
 
   /* ── Nav — fixed globally, same as dsgninterior.se's header: it sits
      above the swiper and never moves while slides change beneath it ── */
@@ -121,6 +111,11 @@
   }
 
   /* ── Headline ── */
+  .hero-title-wrap{
+    position:absolute;
+    inset:0;
+    z-index:2;
+  }
   .hero-content{
     position:relative;
     height:100%;
@@ -212,12 +207,17 @@
     .scroll-indicator{ right:20px; bottom:20px; }
   }
 
-  /* ── Project title text layer — centered, same treatment as the
-     hero headline so the crossfade between them feels intentional. ── */
-  .project-title{
+  /* ── Project title — centered, parallax-driven same as the hero
+     title (data-swiper-parallax on the wrapper + inner span). ── */
+  .project-title-wrap{
     position:absolute;
-    left:50%; top:50%;
-    transform:translate(-50%,-50%);
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
+  }
+  .project-title{
     font-family:'Poppins', sans-serif;
     font-weight:500;
     font-size:clamp(36px, 6vw, 96px);
@@ -266,41 +266,56 @@
 
 <div class="stage-wrap" id="stageWrap">
   <section class="stage" id="stage">
-    <div class="stage-media">
-      <div class="stage-media-layer is-visible" id="heroMedia">
-        <video autoplay muted loop playsinline preload="auto">
-          <source src="assets/marlow-hero.mp4" type="video/mp4">
-        </video>
-      </div>
-      <div class="stage-media-layer" id="projectMedia">
-        <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
-      </div>
-    </div>
-    <div class="stage-text">
-      <div class="stage-text-layer is-visible" id="heroText">
-        <div class="hero-content">
-          <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
-          <div class="hero-title-line"><div class="hero-title">considered living</div></div>
+    <div class="hero-swiper swiper">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide">
+          <div class="slide-media" data-swiper-parallax="60%">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="assets/marlow-hero.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="hero-title-wrap" data-swiper-parallax="100%">
+            <div class="hero-content" data-swiper-parallax="-60">
+              <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
+              <div class="hero-title-line"><div class="hero-title">considered living</div></div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="stage-text-layer" id="projectText">
-        <h2 class="project-title">Bayshore Residence</h2>
+
+        <div class="swiper-slide">
+          <div class="slide-media" data-swiper-parallax="60%">
+            <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+          </div>
+          <div class="project-title-wrap" data-swiper-parallax="100%">
+            <h2 class="project-title" data-swiper-parallax="-60">Bayshore Residence</h2>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.js"></script>
 <script>
-  /* Scroll-linked crossfade — nothing here ever translates. Progress
-     0 to 1 across the stage-wrap's scroll runway toggles which media
-     layer and which text layer carries the .is-visible class (pure
-     opacity), with holds at both ends and the crossfade itself in the
-     middle third. */
+  /* Real Swiper.js, same parallax values as dsgninterior.se
+     (data-swiper-parallax="60%" on the media, "100%"/-60 on the
+     title), but instead of letting Swiper handle touch/wheel input
+     itself (which snaps per-tick), we disable its own input handling
+     entirely and drive swiper.setProgress() continuously from our own
+     scroll position — this keeps the real slide-travel + parallax
+     math (Swiper's own engine) but ties it 1:1 to scroll instead of
+     snapping, so every intermediate scroll position shows the real
+     intermediate transform/parallax state. */
   var stageWrap = document.getElementById('stageWrap');
-  var heroMedia = document.getElementById('heroMedia');
-  var projectMedia = document.getElementById('projectMedia');
-  var heroText = document.getElementById('heroText');
-  var projectText = document.getElementById('projectText');
+  var heroSwiper = new Swiper('.hero-swiper', {
+    direction: 'vertical',
+    parallax: true,
+    allowTouchMove: false,
+    simulateTouch: false,
+    speed: 0
+  });
 
   function stageProgress(){
     var rect = stageWrap.getBoundingClientRect();
@@ -311,19 +326,17 @@
   }
 
   function updateStage(){
-    var showProject = stageProgress() > 0.5;
-    heroMedia.classList.toggle('is-visible', !showProject);
-    heroText.classList.toggle('is-visible', !showProject);
-    projectMedia.classList.toggle('is-visible', showProject);
-    projectText.classList.toggle('is-visible', showProject);
+    heroSwiper.setProgress(stageProgress(), 0);
   }
 
   window.addEventListener('scroll', updateStage, { passive: true });
   updateStage();
 
   /* Click direction: a click on the stage only ever advances forward
-     (hero -> project), never reverses. Real native smooth scroll, no
-     custom easing layer — that's what actually broke last time. */
+     (hero -> project), never reverses. Real native smooth scroll —
+     the scroll listener above keeps driving setProgress continuously
+     throughout the animated scroll, so the click transition is just
+     as continuous as a manual scroll, not a teleport. */
   function scrollToProgress(p){
     var rect = stageWrap.getBoundingClientRect();
     var scrollable = rect.height - window.innerHeight;
