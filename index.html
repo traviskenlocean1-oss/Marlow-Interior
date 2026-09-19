@@ -52,11 +52,17 @@
     background:var(--bg-fallback);
   }
   .hero-swiper{ width:100%; height:100%; }
-  /* Once you stop scrolling mid-transition, scroll-snap-type:mandatory
-     forces a jump to the nearest slide; without this it's an instant
-     jump, which is its own small "cut". This eases that final settle
-     instead of snapping it there in one frame. */
-  .hero-swiper .swiper-wrapper{ scroll-behavior:smooth; }
+  /* scroll-behavior MUST stay auto, not smooth: the JS below drives
+     scrollTop itself every animation frame with its own easing curve,
+     and scroll-behavior:smooth would make the browser ALSO try to
+     smoothly animate every one of those per-frame assignments — two
+     competing animations chasing a constantly-moving target, which in
+     testing showed up as a long, laggy, compounding delay before any
+     visible motion at all. scroll-snap-type is switched off in JS below
+     for the same reason (own animation, not the browser's); this CSS
+     copy is just the fallback if JS never runs, so a mid-scroll release
+     still lands on a slide instead of half-between two of them. */
+  .hero-swiper .swiper-wrapper{ scroll-behavior:auto; }
   /* Graceful degradation: if Swiper's JS never runs for any reason
      (blocked script, network failure), Swiper never adds the
      "swiper-initialized" class it normally adds on init. In that
@@ -346,19 +352,82 @@
   var heroSwiper = new Swiper('.hero-swiper', {
     direction: 'vertical',
     slidesPerView: 1,
-    speed: 500,
+    speed: 1100,
     resistanceRatio: 0,
     parallax: true,
     cssMode: true,
     mousewheel: {
       enabled: true,
       forceToAxis: true,
-      sensitivity: 0.28
+      sensitivity: 0.14
     }
   });
 
+  /* Swiper's own slideNext()/slideTo() in cssMode turned out to just
+     call the browser's native scrollTo({behavior:'smooth'}) under the
+     hood — a fixed, non-configurable ~600ms curve Chrome picks on its
+     own. `speed` above has zero effect on it; measured this directly
+     (sampled scrollTop every frame) rather than assume. Same story for
+     the moment you release the wheel mid-transition: scroll-snap-type
+     hands that completion to the browser's own native snap, on its own
+     unconfigurable timing. Neither is tunable, and Travis wants both
+     controllably slower/smoother, so both are replaced here with one
+     manually-driven scrollTop animation on a real easing curve —
+     that's the only way to actually own the duration and feel. Setting
+     scrollTop directly still fires real scroll events, which is all
+     Swiper needs to keep activeIndex/parallax updating correctly, so
+     none of that logic changes. */
+  var wrapperEl = heroSwiper.wrapperEl;
+  wrapperEl.style.scrollSnapType = 'none';
+
+  function easeInOutCubic(t){
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function smoothScrollToIndex(index, duration){
+    var target = Math.max(0, Math.min(index, heroSwiper.slides.length - 1)) * wrapperEl.clientHeight;
+    var startTop = wrapperEl.scrollTop;
+    var delta = target - startTop;
+    if (Math.abs(delta) < 1) return;
+    var startTime = null;
+    function step(now){
+      if (startTime === null) startTime = now;
+      var progress = Math.min((now - startTime) / duration, 1);
+      wrapperEl.scrollTop = startTop + delta * easeInOutCubic(progress);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function currentIndex(){
+    return Math.round(wrapperEl.scrollTop / wrapperEl.clientHeight);
+  }
+
+  /* Wheel input still moves scrollTop in real time via Swiper's own
+     mousewheel handling (untouched) — this only takes over once it
+     stops, to finish the settle smoothly instead of an instant jump. */
+  var settleTimer = null;
+  wrapperEl.addEventListener('scroll', function(){
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(function(){
+      smoothScrollToIndex(currentIndex(), 900);
+    }, 120);
+  });
+
   document.getElementById('scrollBtn').addEventListener('click', function(){
-    heroSwiper.slideNext();
+    smoothScrollToIndex(currentIndex() + 1, 1400);
+  });
+
+  /* Click-to-advance on the hero itself. Deliberately not on <a>/
+     <button> and no cursor:pointer anywhere — Travis wants this to
+     stay looking like plain, non-interactive hero copy, just with a
+     click shortcut layered underneath, not something that visibly
+     invites clicking. .hero-nav/.hero-contact/scrollBtn are separate
+     fixed-position siblings of .stage, not descendants of it, so their
+     own clicks (nav links, mailto/tel, the scroll button) never reach
+     this listener regardless of visual overlap. */
+  document.getElementById('stage').addEventListener('click', function(){
+    smoothScrollToIndex(currentIndex() + 1, 1400);
   });
 </script>
 
