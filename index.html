@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.css">
+<link rel="stylesheet" href="assets/vendor/swiper-bundle.min.css">
 <style>
   :root{
     --ivory:#f6f5f4;
@@ -49,6 +49,15 @@
     background:var(--bg-fallback);
   }
   .hero-swiper{ width:100%; height:100%; }
+  /* Graceful degradation: if Swiper's JS never runs for any reason
+     (blocked script, network failure), Swiper never adds the
+     "swiper-initialized" class it normally adds on init. In that
+     case, hide every slide but the first so the page degrades to a
+     clean static hero instead of every slide dumping into normal
+     document flow and stacking/cutting off text. */
+  .hero-swiper:not(.swiper-initialized) .swiper-slide:not(:first-child){
+    display:none;
+  }
   .slide-media{ position:absolute; inset:0; }
   .slide-media video,
   .slide-media img{
@@ -297,7 +306,7 @@
   </section>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.js"></script>
+<script src="assets/vendor/swiper-bundle.min.js"></script>
 <script>
   /* Real Swiper.js, same parallax values as dsgninterior.se
      (data-swiper-parallax="60%" on the media, "100%"/-60 on the
