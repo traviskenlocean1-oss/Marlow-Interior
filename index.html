@@ -411,7 +411,22 @@
     speed: 1100,
     resistanceRatio: 0,
     cssMode: true,
-    freeMode: true,
+    /* freeMode:true (a bare boolean) turns on ALL of Swiper's default
+       freeMode physics, which includes momentum:true and
+       momentumBounce:true — inertia that keeps the scroll drifting
+       after input stops, and a deliberate spring-back overshoot at
+       either edge. That's Swiper itself adding motion on top of real
+       scroll input, driven directly via JS (not the browser's own
+       overscroll, which the scroll-position clamp and
+       overscroll-behavior:contain already covered) — a likely real
+       source of the residual "bounce" that persisted after those.
+       Explicitly disabling momentum keeps the "stays exactly where you
+       release it, zero auto-snap" behavior Travis wants, with none of
+       the extra drift/bounce that came bundled with it by default. */
+    freeMode: {
+      enabled: true,
+      momentum: false
+    },
     mousewheel: {
       enabled: true,
       forceToAxis: true,
