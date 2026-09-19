@@ -334,34 +334,50 @@
   /* No Swiper. Both .swiper-slide elements are plain
      position:absolute;inset:0 with zero transform ever applied to
      their position — see the CSS comment above .stage for the full
-     reasoning. One JS number (scrollProgress, 0 to MAX_SCROLL) is the
-     single source of truth for the whole transition; a wheel listener
-     is the only thing that changes it, and the render loop is the only
-     thing that reads it. Nothing else in this file ever touches
-     position, so there is nothing left for two independently-tracked
-     numbers to drift apart from. */
+     reasoning. Two JS numbers drive the whole transition: targetProgress
+     (what the wheel says the position should be, updated instantly,
+     can jump by a lot on high sensitivity) and displayProgress (what
+     actually gets rendered, eased toward the target every frame — the
+     standard "smooth scroll" technique, same idea Lenis uses). Splitting
+     these in two is specifically what fixes the "patchy/stitchy/lagging"
+     feel that showed up once sensitivity went up: without it, each
+     individual wheel tick was rendered as one big instant jump with
+     nothing interpolated in between, which reads as smooth when each
+     jump is tiny (low sensitivity) but reads as stepped/juddery once
+     each jump is big enough to actually see (higher sensitivity). The
+     render loop is the only thing that reads displayProgress, so
+     there's still nothing for a second, INDEPENDENTLY-tracked position
+     number to drift against — targetProgress and displayProgress are
+     two different views of the exact same one input, not two competing
+     sources of truth. */
   var stageEl = document.getElementById('stage');
   var slides = document.querySelectorAll('.swiper-slide');
   var bayshoreSlideEl = slides[1];
   var MAX_SCROLL = 1032;
-  /* Travis: took too many scrolls to get through the transition once
-     the bounce was gone — this is the one number that controls that,
-     tune it directly here (higher = fewer scrolls needed). */
+  /* How many scrolls it takes — tune directly (higher = fewer scrolls
+     needed). Independent of the smoothing factor below. */
   var WHEEL_SENSITIVITY = 0.35;
-  var scrollProgress = 0;
+  /* How eagerly displayProgress chases targetProgress each frame —
+     lower = smoother/more trailing lag, higher = snappier/closer to
+     instant. 1 would disable smoothing entirely (back to the patchy
+     feel). */
+  var SMOOTHING = 0.18;
+  var targetProgress = 0;
+  var displayProgress = 0;
 
   function clamp(v, lo, hi){
     return Math.min(Math.max(v, lo), hi);
   }
 
-  /* preventDefault + this file owning scrollProgress directly is the
-     entire mechanism — piece by piece, stays exactly where you release
-     it, zero auto-snap, exactly as before. No momentum, no bounce-back
-     at the edges: nothing here ever adds motion beyond what the wheel
-     itself just did. */
+  /* preventDefault + owning targetProgress directly is the entire
+     input mechanism — piece by piece, stays exactly where you release
+     it, zero auto-snap. No momentum, no bounce-back at the edges:
+     nothing here ever adds motion beyond what the wheel itself just
+     did (the easing below only smooths the render toward wherever the
+     wheel already put the target, it never moves the target itself). */
   stageEl.addEventListener('wheel', function(e){
     e.preventDefault();
-    scrollProgress = clamp(scrollProgress + e.deltaY * WHEEL_SENSITIVITY, 0, MAX_SCROLL);
+    targetProgress = clamp(targetProgress + e.deltaY * WHEEL_SENSITIVITY, 0, MAX_SCROLL);
   }, { passive: false });
 
   function easeInOutCubic(t){
@@ -369,25 +385,29 @@
   }
 
   /* Discrete click actions only (scrollBtn, click-to-advance) — not
-     tied to an ongoing wheel gesture, so animating scrollProgress
-     directly here has no competing input to fight. */
+     tied to an ongoing wheel gesture. Sets target and display to the
+     same value every step so the per-frame smoothing above has nothing
+     to chase during this animation (its own delta is always zero),
+     leaving this curve exactly as tuned and unaffected by it. */
   function smoothScrollToIndex(index, duration){
     var target = clamp(index, 0, 1) * MAX_SCROLL;
-    var start = scrollProgress;
+    var start = displayProgress;
     var delta = target - start;
     if (Math.abs(delta) < 1) return;
     var startTime = null;
     function step(now){
       if (startTime === null) startTime = now;
       var t = Math.min((now - startTime) / duration, 1);
-      scrollProgress = start + delta * easeInOutCubic(t);
+      var value = start + delta * easeInOutCubic(t);
+      displayProgress = value;
+      targetProgress = value;
       if (t < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
   }
 
   function currentIndex(){
-    return Math.round(scrollProgress / MAX_SCROLL);
+    return Math.round(displayProgress / MAX_SCROLL);
   }
 
   document.getElementById('scrollBtn').addEventListener('click', function(){
@@ -408,13 +428,15 @@
   /* Reveal effect: Bayshore's photo and title sit in their final,
      already-composed position permanently (plain CSS, no transform,
      see above) and a clip-path is the only thing that changes as
-     scrollProgress moves — growing from fully hidden to fully shown,
+     displayProgress moves — growing from fully hidden to fully shown,
      revealing what's already there rather than sliding it into frame. */
   var lastRendered = null;
   function renderReveal(){
-    if (scrollProgress !== lastRendered){
-      lastRendered = scrollProgress;
-      var progress = scrollProgress / MAX_SCROLL;
+    displayProgress += (targetProgress - displayProgress) * SMOOTHING;
+    if (Math.abs(targetProgress - displayProgress) < 0.05) displayProgress = targetProgress;
+    if (displayProgress !== lastRendered){
+      lastRendered = displayProgress;
+      var progress = displayProgress / MAX_SCROLL;
       bayshoreSlideEl.style.clipPath = 'inset(' + ((1 - progress) * 100) + '% 0 0 0)';
     }
     requestAnimationFrame(renderReveal);
