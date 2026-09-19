@@ -356,7 +356,9 @@
 <body>
 
 <header class="site-header">
-  <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" id="logoHome">
+  <a href="index.html" id="logoHome" style="display:block;">
+    <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" draggable="false" style="cursor:pointer;display:block;-webkit-user-drag:none;">
+  </a>
   <nav>
     <a href="index.html">Projects</a>
     <a href="index.html">Archive</a>
@@ -490,8 +492,18 @@
      that brought us here: scale+fade out, then navigate. Targets
      .page-content, not body — same containing-block reasoning as the
      CSS comment above it (this fires right before navigating away, so
-     it's brief, but there's no reason to reopen that risk at all). */
-  document.getElementById('logoHome').addEventListener('click', function(){
+     it's brief, but there's no reason to reopen that risk at all).
+
+     logoHome is a real <a href="index.html"> now — Travis reported the
+     logo sometimes did nothing at all. Likely cause: browsers can drop
+     the click event on an <img> if the mouse moves even slightly during
+     the click (reads as a native image-drag gesture instead); wrapping
+     it in a real link means a plain click still navigates even if this
+     handler doesn't fire for any reason. Modifier-clicks/middle-click
+     are let through un-hijacked so opening in a new tab still works. */
+  document.getElementById('logoHome').addEventListener('click', function(e){
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
     var pc = document.querySelector('.page-content');
     pc.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
     pc.style.transform = 'scale(1.06)';

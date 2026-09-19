@@ -293,7 +293,9 @@
 <div class="cut-transition" id="cutTransition"></div>
 
 <div class="hero-nav">
-  <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" id="logoHome" style="cursor:pointer;">
+  <a href="index.html" id="logoHome" style="display:block;">
+    <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" draggable="false" style="cursor:pointer;display:block;-webkit-user-drag:none;">
+  </a>
   <nav>
     <a href="#">Projects</a>
     <a href="#">Archive</a>
@@ -531,8 +533,21 @@
      is instant and happens while the screen is fully black, so there's
      nothing to see happen regardless of how it's done underneath.
      Slowed down (180ms/90ms -> 500ms/450ms) — Travis said the original
-     felt too quick/abrupt for what's meant to read as a smooth cut. */
-  document.getElementById('logoHome').addEventListener('click', function(){
+     felt too quick/abrupt for what's meant to read as a smooth cut.
+
+     logoHome is a real <a href="index.html"> now, not just a JS-only
+     click target on an <img> — Travis reported the logo sometimes
+     didn't do anything at all. Most likely cause: browsers can silently
+     drop the click event on an <img> if the mouse moves even slightly
+     during the click (it reads as a native "drag this image" gesture
+     instead) — draggable="false" on the image plus wrapping it in a
+     real link means even if that happens, or if this handler fails for
+     any other reason, an actual anchor click still navigates correctly
+     on its own. Ctrl/Cmd/Shift/middle-click are explicitly let through
+     un-hijacked so opening in a new tab still works normally. */
+  document.getElementById('logoHome').addEventListener('click', function(e){
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
     var overlay = document.getElementById('cutTransition');
     overlay.style.transition = 'opacity 0.5s ease';
     overlay.style.opacity = '1';

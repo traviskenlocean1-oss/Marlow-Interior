@@ -328,7 +328,9 @@
 <body>
 
 <header class="site-header">
-  <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" id="logoHome">
+  <a href="index.html" id="logoHome" style="display:block;">
+    <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" draggable="false" style="cursor:pointer;display:block;-webkit-user-drag:none;">
+  </a>
   <nav>
     <a href="index.html">Projects</a>
     <a href="index.html">Archive</a>
@@ -442,7 +444,14 @@
     btn.textContent = open ? 'Read less' : 'Read more';
   });
 
-  document.getElementById('logoHome').addEventListener('click', function(){
+  /* logoHome is a real <a href="index.html"> — a plain click still
+     navigates even if this handler doesn't fire (e.g. the browser
+     dropping the click event on an <img> from a slight mouse-drag
+     during the click). Modifier-clicks/middle-click are let through
+     un-hijacked so opening in a new tab still works. */
+  document.getElementById('logoHome').addEventListener('click', function(e){
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
     var pc = document.querySelector('.page-content');
     pc.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
     pc.style.transform = 'scale(1.06)';
