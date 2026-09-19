@@ -55,14 +55,12 @@
   /* scroll-behavior stays auto (not smooth) — the click-to-advance JS
      drives scrollTop itself with its own easing curve, and
      scroll-behavior:smooth would make the browser ALSO try to smoothly
-     animate those per-frame assignments on top of it. Settling after a
-     real scroll gesture is native scroll-snap-type:mandatory below, on
-     purpose — matches the reference's own confirmed CSS exactly, and a
-     custom JS settle-on-debounce here fought real trackpad input (any
-     brief pause mid-gesture and it would jump in and start fighting
-     your fingers). Native scroll-snap already knows how to tell a real
-     gesture-end from a brief pause; a 120ms JS timeout doesn't. */
-  .hero-swiper .swiper-wrapper{ scroll-behavior:auto; scroll-snap-type:y mandatory; }
+     animate those per-frame assignments on top of it. freeMode (set in
+     JS below) is what actually turns off snap-to-completion — it adds
+     Swiper's own swiper-free-mode class, which its stylesheet uses to
+     set scroll-snap-type:none at higher specificity than anything
+     declared here, so there's no point duplicating it in this file. */
+  .hero-swiper .swiper-wrapper{ scroll-behavior:auto; }
   /* Graceful degradation: if Swiper's JS never runs for any reason
      (blocked script, network failure), Swiper never adds the
      "swiper-initialized" class it normally adds on init. In that
@@ -368,6 +366,15 @@
      your scrolling. Sensitivity well below 1 spreads that same input
      across many more notches so the climb reads as continuous instead
      of a jump-then-snap. */
+  /* freeMode:true — Travis wants zero auto-completion: wherever a
+     scroll gesture stops, it just stays there, piece by piece, full
+     manual control. Without it, scroll-snap-type:mandatory (matching
+     the reference's own confirmed CSS) auto-finishes the transition
+     the moment you let go past the midpoint — reads as "too fast" no
+     matter how gently the active scrolling itself is tuned, since the
+     snap-to-completion isn't something scroll speed controls at all.
+     This is an explicit, deliberate difference from the reference's
+     mechanism, not a mismatch to fix. */
   var heroSwiper = new Swiper('.hero-swiper', {
     direction: 'vertical',
     slidesPerView: 1,
@@ -375,10 +382,11 @@
     resistanceRatio: 0,
     parallax: true,
     cssMode: true,
+    freeMode: true,
     mousewheel: {
       enabled: true,
       forceToAxis: true,
-      sensitivity: 0.14
+      sensitivity: 0.06
     }
   });
 
