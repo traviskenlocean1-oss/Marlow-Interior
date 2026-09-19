@@ -52,6 +52,11 @@
     background:var(--bg-fallback);
   }
   .hero-swiper{ width:100%; height:100%; }
+  /* Once you stop scrolling mid-transition, scroll-snap-type:mandatory
+     forces a jump to the nearest slide; without this it's an instant
+     jump, which is its own small "cut". This eases that final settle
+     instead of snapping it there in one frame. */
+  .hero-swiper .swiper-wrapper{ scroll-behavior:smooth; }
   /* Graceful degradation: if Swiper's JS never runs for any reason
      (blocked script, network failure), Swiper never adds the
      "swiper-initialized" class it normally adds on init. In that
@@ -325,7 +330,19 @@
      hands slide positioning to the browser's native scroll-snap, so
      Swiper's job here is just tracking index and driving the parallax
      attributes; it never fights real scroll input with a canned
-     animation the way JS-transform mode did. */
+     animation the way JS-transform mode did.
+
+     In cssMode, Swiper's mousewheel module still intercepts every wheel
+     event itself (calls preventDefault, then scrolls the wrapper
+     programmatically) rather than handing it to the browser untouched —
+     default sensitivity:1 multiplies a single mouse-wheel notch
+     (~100-120px of native deltaY) almost 1:1, which covers most of a
+     slide's height in one or two notches. What's left then gets
+     completed instantly by scroll-snap-type:mandatory, so the motion
+     reads as a quick, two-phase snap rather than something that follows
+     your scrolling. Sensitivity well below 1 spreads that same input
+     across many more notches so the climb reads as continuous instead
+     of a jump-then-snap. */
   var heroSwiper = new Swiper('.hero-swiper', {
     direction: 'vertical',
     slidesPerView: 1,
@@ -334,7 +351,9 @@
     parallax: true,
     cssMode: true,
     mousewheel: {
-      forceToAxis: true
+      enabled: true,
+      forceToAxis: true,
+      sensitivity: 0.28
     }
   });
 
