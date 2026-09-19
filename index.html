@@ -24,23 +24,16 @@
     overflow-x:hidden;
   }
 
-  /* ── Real Swiper.js slide-travel + parallax, continuously bound to
-     scroll (not touch/wheel snap). A tall wrapper (scroll runway)
-     holds a position:sticky stage containing the actual Swiper
-     instance; on every scroll tick we call swiper.setProgress() with
-     our own 0-1 value, so Swiper computes the real slide transform
-     AND the per-layer parallax offsets (data-swiper-parallax, same
-     values as dsgninterior.se) continuously — no snapping, because
-     nothing ever jumps to a discrete slide index, it just tracks
-     scroll position 1:1 the whole way through. ── */
-  .stage-wrap{
-    position:relative;
-    height:220vh;
-    height:220dvh;
-  }
+  /* ── Real Swiper.js, native mousewheel + parallax modules — the
+     actual mechanism confirmed on dsgninterior.se (direction:vertical,
+     effect:'slide', speed:500, mousewheel.enabled:true, parallax:true,
+     data-swiper-parallax on both media and title at different rates).
+     Swiper owns input handling entirely here; no custom scroll
+     listener driving it. Self-contained single-viewport carousel — no
+     scroll-runway wrapper needed, since mousewheel triggers Swiper's
+     own internal slide transitions rather than real page scroll. ── */
   .stage{
-    position:sticky;
-    top:0;
+    position:relative;
     width:100%;
     height:100vh;
     height:100dvh;
@@ -120,19 +113,28 @@
   }
 
   /* ── Headline ── */
+  /* The slide itself centers its title vertically via flex; the title
+     wrapper is sized to its OWN content (not stretched to fill the
+     982px slide) so Swiper's parallax percentage — calculated against
+     the parallax element's own size — stays a modest, safe shift
+     instead of one large enough to cancel a whole slide's offset. That
+     stretched-to-fill-the-slide sizing was the real cause of the
+     "next slide visible at rest" bug: a 100% shift of an 982px-tall
+     element is 982px, exactly canceling the adjacent slide's own
+     off-screen position. Sized to content, 100% of ~115px is ~115px —
+     nowhere near enough to do that. */
+  .swiper-slide{
+    display:flex;
+    align-items:center;
+  }
   .hero-title-wrap{
-    position:absolute;
-    inset:0;
+    position:relative;
     z-index:2;
+    width:100%;
   }
   .hero-content{
     position:relative;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
     padding:0 clamp(20px, 5vw, 64px);
-    padding-top:18px; /* clearance from top edge so tight line-height never clips ascenders */
   }
   .hero-title-line{
     /* no overflow:hidden here — nothing animates through a mask on this
@@ -217,14 +219,14 @@
   }
 
   /* ── Project title — centered, parallax-driven same as the hero
-     title (data-swiper-parallax on the wrapper + inner span). ── */
+     title (data-swiper-parallax on the wrapper + inner span). Sized
+     to content for the same reason as .hero-title-wrap above. ── */
   .project-title-wrap{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    position:relative;
     z-index:2;
+    width:100%;
+    display:flex;
+    justify-content:center;
   }
   .project-title{
     font-family:'Poppins', sans-serif;
@@ -273,114 +275,54 @@
   </div>
 </button>
 
-<div class="stage-wrap" id="stageWrap">
-  <section class="stage" id="stage">
-    <div class="hero-swiper swiper">
-      <div class="swiper-wrapper">
+<section class="stage" id="stage">
+  <div class="hero-swiper swiper">
+    <div class="swiper-wrapper">
 
-        <div class="swiper-slide">
-          <div class="slide-media" id="heroMedia">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="assets/marlow-hero.mp4" type="video/mp4">
-            </video>
-          </div>
-          <div class="hero-title-wrap" id="heroTitleWrap">
-            <div class="hero-content">
-              <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
-              <div class="hero-title-line"><div class="hero-title">considered living</div></div>
-            </div>
+      <div class="swiper-slide">
+        <div class="slide-media" data-swiper-parallax="60%">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="assets/marlow-hero.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="hero-title-wrap" data-swiper-parallax="100%">
+          <div class="hero-content" data-swiper-parallax="-60">
+            <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
+            <div class="hero-title-line"><div class="hero-title">considered living</div></div>
           </div>
         </div>
-
-        <div class="swiper-slide">
-          <div class="slide-media" id="projectMedia">
-            <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
-          </div>
-          <div class="project-title-wrap" id="projectTitleWrap">
-            <h2 class="project-title">Bayshore Residence</h2>
-          </div>
-        </div>
-
       </div>
+
+      <div class="swiper-slide">
+        <div class="slide-media" data-swiper-parallax="60%">
+          <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+        </div>
+        <div class="project-title-wrap" data-swiper-parallax="100%">
+          <h2 class="project-title" data-swiper-parallax="-60">Bayshore Residence</h2>
+        </div>
+      </div>
+
     </div>
-  </section>
-</div>
+  </div>
+</section>
 
 <script src="assets/vendor/swiper-bundle.min.js"></script>
 <script>
-  /* Real Swiper.js slide-travel, driven continuously from scroll
-     instead of touch/wheel snap (verified: linear wrapper transform
-     from 0 to -100% across progress 0 to 1, real motion, not a
-     snap). Swiper's own PARALLAX MODULE was removed after finding a
-     real bug it caused: parallax offsets are computed from each
-     slide's own progress (-1/0/+1 relative to itself), and for the
-     "next" slide sitting at rest (own progress exactly +1), a 100%
-     parallax value exactly cancels that slide's off-screen position —
-     pulling its content back into view even at overall progress 0,
-     before any scrolling happens. Confirmed directly: the slide's own
-     offsetTop was correctly 982 (below the fold) while its title's
-     actual painted position was 483 (visible) — the parallax
-     transform was doing that. That module is built around Swiper's
-     normal snap-per-tick usage, not continuous progress-driving, so
-     it doesn't hold up here.
-
-     Replaced with a hand-rolled crossfade computed from the SAME
-     single progress value already driving the slide-travel — opacity
-     is directly proportional to overall progress, so it's guaranteed
-     exactly 0/1 at rest (no per-slide-progress edge case possible)
-     and ramps smoothly as the real slide-travel happens, so both
-     slides are genuinely partially visible mid-scroll instead of a
-     hard cut between them. */
-  var stageWrap = document.getElementById('stageWrap');
+  /* Real Swiper.js, native mousewheel-driven slide transitions — the
+     confirmed mechanism from dsgninterior.se. Swiper owns all input
+     handling; no custom scroll listener, no manual setProgress. */
   var heroSwiper = new Swiper('.hero-swiper', {
     direction: 'vertical',
-    allowTouchMove: false,
-    simulateTouch: false,
-    speed: 0
+    effect: 'slide',
+    speed: 500,
+    parallax: true,
+    mousewheel: {
+      enabled: true
+    }
   });
 
-  var heroMedia = document.getElementById('heroMedia');
-  var heroTitleWrap = document.getElementById('heroTitleWrap');
-  var projectMedia = document.getElementById('projectMedia');
-  var projectTitleWrap = document.getElementById('projectTitleWrap');
-
-  function stageProgress(){
-    var rect = stageWrap.getBoundingClientRect();
-    var scrollable = rect.height - window.innerHeight;
-    if (scrollable <= 0) return 0;
-    var raw = -rect.top / scrollable;
-    return Math.max(0, Math.min(1, raw));
-  }
-
-  function updateStage(){
-    var p = stageProgress();
-    heroSwiper.setProgress(p, 0);
-    heroMedia.style.opacity = 1 - p;
-    heroTitleWrap.style.opacity = 1 - p;
-    projectMedia.style.opacity = p;
-    projectTitleWrap.style.opacity = p;
-  }
-
-  window.addEventListener('scroll', updateStage, { passive: true });
-  updateStage();
-
-  /* Click direction: a click on the stage only ever advances forward
-     (hero -> project), never reverses. Real native smooth scroll —
-     the scroll listener above keeps driving setProgress continuously
-     throughout the animated scroll, so the click transition is just
-     as continuous as a manual scroll, not a teleport. */
-  function scrollToProgress(p){
-    var rect = stageWrap.getBoundingClientRect();
-    var scrollable = rect.height - window.innerHeight;
-    var targetY = window.scrollY + rect.top + (scrollable * p);
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
-  }
-
-  document.getElementById('stage').addEventListener('click', function(){
-    if (stageProgress() <= 0.5) scrollToProgress(1);
-  });
   document.getElementById('scrollBtn').addEventListener('click', function(){
-    scrollToProgress(1);
+    heroSwiper.slideNext();
   });
 </script>
 
