@@ -275,11 +275,16 @@
     display:flex;
     justify-content:center;
   }
+  /* Same font-size/line-height/letter-spacing as .hero-title —
+     previously smaller (clamp(36px,6vw,96px) vs the hero's
+     clamp(46px,8.45vw,150px)), which read as inconsistent given both
+     wraps center the same way in an identically-sized slide. */
   .project-title{
     font-family:'Poppins', sans-serif;
     font-weight:500;
-    font-size:clamp(36px, 6vw, 96px);
-    letter-spacing:-0.03em;
+    font-size:clamp(46px, 8.45vw, 150px);
+    line-height:1;
+    letter-spacing:-0.047em;
     color:var(--ivory);
     text-align:center;
     white-space:nowrap;
@@ -460,15 +465,30 @@
   var heroSlideEl = heroSwiper.slides[0];
   var bayshoreSlideEl = heroSwiper.slides[1];
   var maxScroll = wrapperEl.scrollHeight - wrapperEl.clientHeight;
+  var lastRenderedScroll = null;
   function renderReveal(){
     var s = wrapperEl.scrollTop;
-    heroSlideEl.style.transform = 'translateY(' + s + 'px)';
-    bayshoreSlideEl.style.transform = 'translateY(' + (s - wrapperEl.clientHeight) + 'px)';
-    var progress = maxScroll > 0 ? Math.min(Math.max(s / maxScroll, 0), 1) : 0;
-    bayshoreSlideEl.style.clipPath = 'inset(' + ((1 - progress) * 100) + '% 0 0 0)';
+    /* Skip the DOM writes entirely when nothing changed — this loop
+       runs every frame forever, and touching style/transform on two
+       elements 60x/sec even at rest is wasted work for zero visual
+       benefit. */
+    if (s !== lastRenderedScroll){
+      lastRenderedScroll = s;
+      heroSlideEl.style.transform = 'translateY(' + s + 'px)';
+      bayshoreSlideEl.style.transform = 'translateY(' + (s - wrapperEl.clientHeight) + 'px)';
+      var progress = maxScroll > 0 ? Math.min(Math.max(s / maxScroll, 0), 1) : 0;
+      bayshoreSlideEl.style.clipPath = 'inset(' + ((1 - progress) * 100) + '% 0 0 0)';
+    }
+    requestAnimationFrame(renderReveal);
   }
-  wrapperEl.addEventListener('scroll', renderReveal);
-  renderReveal();
+  /* Driven by rAF every frame, not the 'scroll' event: on real fast
+     trackpad scrolling the browser can repaint faster than scroll
+     events actually fire (they're throttled/coalesced under load), so
+     for a frame or two the compensating transform was stale — visible
+     as the whole composition briefly jumping/bouncing and the raw
+     .stage background flashing through in the gap. rAF ties this to
+     the same clock the browser paints on, so it can't fall behind. */
+  requestAnimationFrame(renderReveal);
 
   /* Click-to-advance on the hero itself. Deliberately not on <a>/
      <button> and no cursor:pointer anywhere — Travis wants this to
