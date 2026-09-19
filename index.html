@@ -55,7 +55,10 @@
   .hero-swiper:not(.swiper-initialized) .swiper-slide:not(:first-child){
     display:none;
   }
-  .slide-media{ position:absolute; inset:0; }
+  /* top/bottom extend 80px past the slide so the ±70px translateY the
+     progress-driven parallax applies (see the Swiper init script) never
+     exposes a gap at the edge — the classic oversized-background trick. */
+  .slide-media{ position:absolute; top:-80px; left:0; right:0; bottom:-80px; will-change:transform; }
   .slide-media video,
   .slide-media img{
     position:absolute;
@@ -302,13 +305,47 @@
 <script>
   /* Real Swiper.js, native mousewheel-driven slide transitions — the
      confirmed mechanism from dsgninterior.se. Swiper owns all input
-     handling; no custom scroll listener, no manual setProgress. */
+     handling; no custom scroll listener, no manual setProgress.
+
+     Media/title move at different rates during the transition (Swiper's
+     own parallax module twice caused the hidden-slide-visible-at-rest
+     bug, because it sizes its shift as a % of the parallax element's
+     OWN size — safe when that happens to be small, silently wrong
+     whenever it isn't). This does the same layered-motion job with a
+     fixed pixel offset driven directly off each slide's own `progress`
+     (-1 previous, 0 active, +1 next), which can never depend on element
+     size, so it can't reproduce that bug class. Without this, media and
+     title move as one rigid block and the transition reads as plain
+     browser scroll instead of a designed slide. */
   var heroSwiper = new Swiper('.hero-swiper', {
     direction: 'vertical',
     effect: 'slide',
     speed: 500,
+    watchSlidesProgress: true,
     mousewheel: {
       enabled: true
+    },
+    on: {
+      progress: function(swiper){
+        swiper.slides.forEach(function(slideEl){
+          var p = slideEl.progress;
+          var media = slideEl.querySelector('.slide-media');
+          var title = slideEl.querySelector('.hero-title-wrap, .project-title-wrap');
+          if (media) media.style.transform = 'translateY(' + (p * -70) + 'px)';
+          if (title) title.style.transform = 'translateY(' + (p * 130) + 'px)';
+        });
+      },
+      /* Swiper calls this right as it starts animating its own wrapper
+         over `duration` ms. Our progress handler above sets media/title
+         straight to their final value with no transition of its own, so
+         without this it snaps instead of easing — matching Swiper's own
+         duration here keeps the two motions visually in sync instead of
+         one sliding and the other teleporting. */
+      setTransition: function(swiper, duration){
+        document.querySelectorAll('.slide-media, .hero-title-wrap, .project-title-wrap').forEach(function(el){
+          el.style.transition = duration ? 'transform ' + duration + 'ms ease' : '';
+        });
+      }
     }
   });
 
