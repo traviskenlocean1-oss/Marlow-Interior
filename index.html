@@ -131,8 +131,13 @@
     align-items:center;
     overflow:hidden;
   }
+  /* Each later slide stacks above the one before it, so it can reveal
+     over it correctly — generalizes to however many project slides
+     there are, not just two. */
   .swiper-slide:nth-child(1){ z-index:1; }
   .swiper-slide:nth-child(2){ z-index:2; }
+  .swiper-slide:nth-child(3){ z-index:3; }
+  .swiper-slide:nth-child(4){ z-index:4; }
   /* Centered to match the reference's .banner-title look (previously
      only the project title was centered, hero was left-stacked, which
      read as inconsistent). NOT copying their exact position:absolute;
@@ -342,10 +347,28 @@
     </div>
   </div>
 
+  <div class="swiper-slide">
+    <div class="slide-media">
+      <img src="assets/gallery/project2-banner.jpg" alt="Coral Gables Residence">
+    </div>
+    <div class="project-title-wrap">
+      <h2 class="project-title">Coral Gables Residence</h2>
+    </div>
+  </div>
+
+  <div class="swiper-slide">
+    <div class="slide-media">
+      <img src="assets/gallery/project3-banner.jpg" alt="Sunset Harbour Residence">
+    </div>
+    <div class="project-title-wrap">
+      <h2 class="project-title">Sunset Harbour Residence</h2>
+    </div>
+  </div>
+
 </section>
 
 <script>
-  /* No Swiper. Both .swiper-slide elements are plain
+  /* No Swiper. Every .swiper-slide element is plain
      position:absolute;inset:0 with zero transform ever applied to
      their position — see the CSS comment above .stage for the full
      reasoning. Two JS numbers drive the whole transition: targetProgress
@@ -366,8 +389,12 @@
      sources of truth. */
   var stageEl = document.getElementById('stage');
   var slides = document.querySelectorAll('.swiper-slide');
-  var bayshoreSlideEl = slides[1];
-  var MAX_SCROLL = 1032;
+  /* One "segment" of scroll (SLIDE_UNIT) per reveal — hero to Bayshore,
+     Bayshore to Coral Gables, Coral Gables to Sunset Harbour. Generalizes
+     to however many project slides exist; adding a 4th later is just
+     another .swiper-slide in the markup, nothing here needs to change. */
+  var SLIDE_UNIT = 1032;
+  var MAX_SCROLL = (slides.length - 1) * SLIDE_UNIT;
   /* How many scrolls it takes — tune directly (higher = fewer scrolls
      needed). Independent of the smoothing factor below. */
   var WHEEL_SENSITIVITY = 0.65;
@@ -404,7 +431,7 @@
      to chase during this animation (its own delta is always zero),
      leaving this curve exactly as tuned and unaffected by it. */
   function smoothScrollToIndex(index, duration){
-    var target = clamp(index, 0, 1) * MAX_SCROLL;
+    var target = clamp(index, 0, slides.length - 1) * SLIDE_UNIT;
     var start = displayProgress;
     var delta = target - start;
     if (Math.abs(delta) < 1) return;
@@ -421,7 +448,7 @@
   }
 
   function currentIndex(){
-    return Math.round(displayProgress / MAX_SCROLL);
+    return Math.round(displayProgress / SLIDE_UNIT);
   }
 
   document.getElementById('scrollBtn').addEventListener('click', function(){
@@ -439,19 +466,27 @@
     smoothScrollToIndex(currentIndex() + 1, 1400);
   });
 
-  /* Reveal effect: Bayshore's photo and title sit in their final,
-     already-composed position permanently (plain CSS, no transform,
-     see above) and a clip-path is the only thing that changes as
-     displayProgress moves — growing from fully hidden to fully shown,
-     revealing what's already there rather than sliding it into frame. */
+  /* Reveal effect: every project slide's photo and title sit in their
+     final, already-composed position permanently (plain CSS, no
+     transform, see above) and each one's own clip-path is the only
+     thing that changes as displayProgress crosses its own segment —
+     growing from fully hidden to fully shown, revealing what's already
+     there rather than sliding it into frame. Slide i (1-indexed) owns
+     the segment [(i-1)*SLIDE_UNIT, i*SLIDE_UNIT]; before its segment
+     starts it's clamped fully hidden, after its segment ends it's
+     clamped fully shown and stays that way while a later slide reveals
+     over it in turn. */
   var lastRendered = null;
   function renderReveal(){
     displayProgress += (targetProgress - displayProgress) * SMOOTHING;
     if (Math.abs(targetProgress - displayProgress) < 0.05) displayProgress = targetProgress;
     if (displayProgress !== lastRendered){
       lastRendered = displayProgress;
-      var progress = displayProgress / MAX_SCROLL;
-      bayshoreSlideEl.style.clipPath = 'inset(' + ((1 - progress) * 100) + '% 0 0 0)';
+      for (var i = 1; i < slides.length; i++){
+        var segStart = (i - 1) * SLIDE_UNIT;
+        var segProgress = clamp((displayProgress - segStart) / SLIDE_UNIT, 0, 1);
+        slides[i].style.clipPath = 'inset(' + ((1 - segProgress) * 100) + '% 0 0 0)';
+      }
     }
     requestAnimationFrame(renderReveal);
   }
