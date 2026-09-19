@@ -152,14 +152,31 @@
     align-items:center;
     overflow:hidden;
   }
+  /* Centered to match the reference's .banner-title look (previously
+     only the project title was centered, hero was left-stacked, which
+     read as inconsistent). NOT copying their exact position:absolute;
+     inset:0 sizing though: tried that first and it immediately brought
+     back the full bleed bug — confirmed the inline transform Swiper's
+     parallax module applies is translate3d(0,-100%,0), and at 100% of
+     an element sized to the FULL slide, that's a full slide-height
+     shift, exactly canceling the slide's own off-screen offset again.
+     Fourth time this exact bug class has shown up from a parallax-
+     tagged element matching the slide's own size — not worth a fifth.
+     Kept content-sized (this wrapper only as tall as its own text) and
+     centered via flex + text-align instead, which gets the identical
+     visual result with no element ever reaching slide-height. */
   .hero-title-wrap{
     position:relative;
     z-index:2;
     width:100%;
+    display:flex;
+    justify-content:center;
+    text-align:center;
   }
   .hero-content{
     position:relative;
     padding:0 clamp(20px, 5vw, 64px);
+    text-align:center;
   }
   .hero-title-line{
     /* no overflow:hidden here — nothing animates through a mask on this
@@ -243,7 +260,9 @@
     .scroll-indicator{ right:20px; bottom:20px; }
   }
 
-  /* ── Project title — centered ── */
+  /* ── Project title — same content-sized-and-centered treatment as
+     .hero-title-wrap, and same reasoning: not the reference's own
+     position:absolute;inset:0 sizing, for the same bleed-bug reason. ── */
   .project-title-wrap{
     position:relative;
     z-index:2;
