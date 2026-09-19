@@ -332,13 +332,13 @@
     <div class="swiper-wrapper">
 
       <div class="swiper-slide">
-        <div class="slide-media" data-swiper-parallax="60%">
+        <div class="slide-media">
           <video autoplay muted loop playsinline preload="auto">
             <source src="assets/marlow-hero.mp4" type="video/mp4">
           </video>
         </div>
-        <div class="hero-title-wrap" data-swiper-parallax="100%">
-          <div class="hero-content" data-swiper-parallax="-60">
+        <div class="hero-title-wrap">
+          <div class="hero-content">
             <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
             <div class="hero-title-line"><div class="hero-title">considered living</div></div>
           </div>
@@ -360,12 +360,24 @@
 
 <script src="assets/vendor/swiper-bundle.min.js"></script>
 <script>
-  /* cssMode + resistanceRatio:0 + parallax:true + mousewheel.forceToAxis
-     — pulled directly from dsgninterior.se's own live app bundle. This
-     hands slide positioning to the browser's native scroll-snap, so
-     Swiper's job here is just tracking index and driving the parallax
-     attributes; it never fights real scroll input with a canned
-     animation the way JS-transform mode did.
+  /* cssMode + resistanceRatio:0 + mousewheel.forceToAxis — pulled
+     directly from dsgninterior.se's own live app bundle. This hands
+     slide positioning to the browser's native scroll-snap, so Swiper's
+     job here is just tracking index; it never fights real scroll input
+     with a canned animation the way JS-transform mode did.
+
+     parallax:true (matching their config) was removed again after it
+     came back to bite a fourth time: with the hero/Bayshore held static
+     by the custom reveal system below, Swiper's parallax module was
+     STILL shifting hero's video/title internally off of hero's own real
+     scroll progress — small at first, but by deep scroll it was large
+     enough to push the video out of its own frame and expose the raw
+     .stage background color underneath (the "brown bar" Travis kept
+     screenshotting), plus a smaller version of the same shift on the
+     title text read as "bouncing". The custom reveal system fully
+     replaces what parallax was for here, so there's nothing left for it
+     to usefully do — removed the module and every data-swiper-parallax
+     attribute in the markup, not just tuned it again.
 
      In cssMode, Swiper's mousewheel module still intercepts every wheel
      event itself (calls preventDefault, then scrolls the wrapper
@@ -392,7 +404,6 @@
     slidesPerView: 1,
     speed: 1100,
     resistanceRatio: 0,
-    parallax: true,
     cssMode: true,
     freeMode: true,
     mousewheel: {
