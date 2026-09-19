@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bayshore Residence | Marlow Interiors</title>
+<meta name="description" content="Bayshore Residence — a quiet, considered kitchen and dining renovation by Marlow Interiors in Miami, FL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#f6f5f4;
+    --ink:#171310;
+    --bg-fallback:#3a2a22;
+    --pad:clamp(20px, 4vw, 48px);
+    --gap:clamp(14px, 1.6vw, 24px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:auto;}
+  body{
+    font-family:'Hanken Grotesk', sans-serif;
+    background:var(--ivory);
+    color:var(--ink);
+    overflow-x:hidden;
+    /* Page-transition standard for this workspace: arrives via a big
+       scale+fade, matching how it leaves index.html. */
+    animation:page-in 0.6s ease both;
+  }
+  @keyframes page-in{
+    from{ opacity:0; transform:scale(0.97); }
+    to{ opacity:1; transform:scale(1); }
+  }
+
+  a{ color:inherit; }
+
+  /* ── Header — fixed, transparent over the banner ── */
+  .site-header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:28px var(--pad);
+  }
+  .site-header img{ height:56px; width:auto; display:block; cursor:pointer; }
+  .site-header nav{
+    display:flex;
+    align-items:center;
+    gap:clamp(20px, 2.6vw, 40px);
+  }
+  .site-header nav a{
+    color:var(--ivory);
+    text-decoration:none;
+    font-size:clamp(15px, 1.4vw, 20px);
+    font-weight:400;
+    letter-spacing:-0.02em;
+    opacity:0.88;
+    transition:opacity 0.2s ease;
+  }
+  .site-header nav a:hover{ opacity:1; }
+  @media (max-width:640px){
+    .site-header nav{ display:none; }
+  }
+
+  /* ── Banner ── */
+  .banner{
+    position:relative;
+    height:100vh;
+    height:100dvh;
+    min-height:560px;
+    overflow:hidden;
+    background:var(--bg-fallback);
+  }
+  .banner img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .banner::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(20,14,10,0.35) 0%, rgba(20,14,10,0.05) 28%, rgba(20,14,10,0.10) 60%, rgba(15,10,7,0.55) 100%);
+    pointer-events:none;
+  }
+  .banner-title{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    display:grid;
+    align-content:center;
+    justify-items:center;
+    padding:var(--pad);
+    text-align:center;
+    /* Comes up slowly on load — not instant. */
+    animation:title-in 1.1s 0.15s cubic-bezier(.16,1,.3,1) both;
+  }
+  @keyframes title-in{
+    from{ opacity:0; transform:translateY(28px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .banner-title h1{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(46px, 8.45vw, 150px);
+    line-height:1;
+    letter-spacing:-0.047em;
+    color:var(--ivory);
+    white-space:nowrap;
+  }
+  @media (max-width:640px){
+    .banner-title h1{ white-space:normal; }
+  }
+
+  /* ── Specs + description ── */
+  .work-texts{
+    display:grid;
+    grid-template-columns:1fr 2fr;
+    gap:var(--gap);
+    padding:var(--pad);
+    background:var(--ivory);
+    animation:content-in 0.8s 0.35s cubic-bezier(.16,1,.3,1) both;
+  }
+  @keyframes content-in{
+    from{ opacity:0; transform:translateY(16px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @media (max-width:800px){
+    .work-texts{ grid-template-columns:1fr; }
+  }
+  .work-specs{
+    padding-top:7px;
+  }
+  .work-specs dt{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    opacity:0.55;
+    margin-top:1em;
+  }
+  .work-specs dt:first-child{ margin-top:0; }
+  .work-specs dd{
+    font-size:clamp(16px, 1.4vw, 19px);
+    padding-bottom:0.5em;
+    border-bottom:1px solid rgba(23,19,16,0.15);
+  }
+  .work-text{ max-width:56em; }
+  .presentation{
+    font-size:clamp(18px, 1.6vw, 24px);
+    line-height:1.4;
+    letter-spacing:-0.01em;
+  }
+  .readmore-toggle{
+    display:inline-block;
+    margin-top:1em;
+    font-size:15px;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    cursor:pointer;
+    background:none;
+    border:none;
+    color:inherit;
+    font-family:inherit;
+    padding:0;
+  }
+  .readmore{
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    transition:max-height 0.6s cubic-bezier(.16,1,.3,1), opacity 0.5s ease, margin-top 0.6s ease;
+  }
+  .readmore.open{
+    max-height:900px;
+    opacity:1;
+    margin-top:1.5em;
+  }
+  .readmore p{
+    font-size:16px;
+    line-height:1.6;
+    opacity:0.85;
+  }
+  .readmore p + p{ margin-top:1em; }
+
+  /* ── Gallery — 6-column grid, blocks span 2/4/6, matching the
+     reference's own real gallery system exactly: landscape blocks use
+     a 3:2 aspect ratio, portrait blocks use 3:4, object-fit:cover
+     handles whatever the source photo's native ratio actually is. ── */
+  .work-gallery{
+    display:grid;
+    gap:var(--gap);
+    padding:var(--gap) var(--pad);
+    background:var(--ivory);
+  }
+  .gallery-row{
+    display:grid;
+    grid-template-columns:repeat(6, 1fr);
+    gap:var(--gap);
+  }
+  .block{ grid-column:span var(--span); overflow:hidden; }
+  .block img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .block-landscape{ aspect-ratio:3 / 2; }
+  .block-portrait{ aspect-ratio:3 / 4; }
+  @media (max-width:800px){
+    .gallery-row{ grid-template-columns:repeat(2, 1fr); }
+    .block{ grid-column:span 2 !important; }
+  }
+
+  /* ── Discover more works ── */
+  .work-related{
+    margin:0 var(--pad);
+    padding:var(--pad) 0;
+    border-top:1px solid rgba(23,19,16,0.15);
+  }
+  .work-related h2{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(28px, 3.2vw, 44px);
+    letter-spacing:-0.02em;
+    margin-bottom:0.6em;
+  }
+  .works-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:var(--gap);
+  }
+  @media (max-width:700px){
+    .works-grid{ grid-template-columns:1fr; }
+  }
+  .work-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+  }
+  .work-cover{
+    position:relative;
+    aspect-ratio:3 / 4;
+    overflow:hidden;
+    background:var(--bg-fallback);
+  }
+  .work-cover img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter:grayscale(1);
+    transform:scale(1.02);
+    transition:filter 0.5s ease, transform 0.6s ease;
+  }
+  .work-link:hover .work-cover img{
+    filter:grayscale(0);
+    transform:scale(1.06);
+  }
+  .work-title{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(18px, 1.6vw, 24px);
+    padding:0.6em 0;
+  }
+
+  /* ── Footer — matches the reference's footer-grid pattern, adapted
+     to Marlow's own brand mark instead of an SVG logo. ── */
+  .site-footer{
+    font-size:14px;
+    color:var(--ivory);
+    background:var(--ink);
+    padding:var(--pad);
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns:auto auto 1fr auto auto;
+    grid-template-rows:1fr auto;
+    grid-template-areas:
+      "logo logo . . ."
+      "contacts address rs legal credits";
+    gap:1em calc(var(--gap) * 2);
+    min-height:clamp(220px, 28vw, 320px);
+  }
+  @media (max-width:900px){
+    .footer-grid{
+      grid-template-columns:1fr;
+      grid-template-rows:auto;
+      grid-template-areas:"logo" "contacts" "address" "rs" "legal" "credits";
+    }
+  }
+  .footer-grid > *{ display:grid; gap:0.35em; align-content:end; }
+  .footer-grid a{ color:inherit; text-decoration:none; opacity:0.85; }
+  .footer-grid a:hover{ opacity:1; }
+  .footer-logo{
+    grid-area:logo;
+    align-items:start;
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(40px, 7vw, 96px);
+    letter-spacing:-0.03em;
+    line-height:0.95;
+  }
+  .footer-logo span{
+    display:block;
+    font-family:'Hanken Grotesk', sans-serif;
+    font-weight:400;
+    font-size:clamp(14px, 1.2vw, 18px);
+    letter-spacing:0.02em;
+    opacity:0.7;
+    margin-top:0.2em;
+  }
+  .contacts{ grid-area:contacts; }
+  .address{ grid-area:address; }
+  .rs{ grid-area:rs; }
+  .legal{ grid-area:legal; }
+  .credits{ grid-area:credits; opacity:0.6; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" id="logoHome">
+  <nav>
+    <a href="index.html">Projects</a>
+    <a href="index.html">Archive</a>
+    <a href="index.html">Studio</a>
+    <a href="index.html">Contact</a>
+  </nav>
+</header>
+
+<section class="banner">
+  <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+  <div class="banner-title">
+    <h1>Bayshore Residence</h1>
+  </div>
+</section>
+
+<div class="work-texts">
+  <dl class="work-specs">
+    <dt>Location</dt><dd>Miami, FL</dd>
+    <dt>Area</dt><dd>3,400 sqft</dd>
+    <dt>Year</dt><dd>2025</dd>
+  </dl>
+  <div class="work-text">
+    <p class="presentation">Bayshore Residence is a kitchen and dining renovation shaped around a single idea: let the light and the water do most of the talking. Warm oak, honed stone, and a quiet material palette give the space room to breathe, while every surface was chosen to age well under daily use.</p>
+    <button class="readmore-toggle" id="readMoreBtn" aria-expanded="false">Read more</button>
+    <div class="readmore" id="readMoreContent">
+      <p>The brief was simple in words and demanding in practice: a family kitchen that could host twelve people on a Sunday and still feel calm on a Tuesday morning. The existing floor plan was opened toward the water, replacing a run of upper cabinetry with clerestory glazing that pulls bay light across the island through the entire afternoon.</p>
+      <p>Cabinetry is rift-cut white oak, left unstained so it will silver gently over the coming years rather than fight the process. The island is a single block of honed dolomite, chosen over polished marble specifically for how it wears — every mark becomes part of the surface instead of a flaw in it.</p>
+      <p>Dining sits adjacent rather than enclosed, separated from the kitchen only by a change in ceiling height. The result is a home that works as hard as any Miami kitchen needs to, without ever looking like it's trying.</p>
+    </div>
+  </div>
+</div>
+
+<div class="work-gallery">
+  <div class="gallery-row">
+    <div class="block block-landscape" style="--span:4">
+      <img src="assets/gallery/bayshore/row1-a-dining.jpg" alt="Bayshore Residence dining table">
+    </div>
+    <div class="block block-portrait" style="--span:2">
+      <img src="assets/gallery/bayshore/row1-b-terrazzo.jpg" alt="Bayshore Residence countertop detail">
+    </div>
+  </div>
+  <div class="gallery-row">
+    <div class="block block-portrait" style="--span:2">
+      <img src="assets/gallery/bayshore/row2-a-kitchen.jpg" alt="Bayshore Residence open kitchen">
+    </div>
+    <div class="block block-portrait" style="--span:2">
+      <img src="assets/gallery/bayshore/row2-b-faucet.jpg" alt="Bayshore Residence fixture detail">
+    </div>
+    <div class="block block-portrait" style="--span:2">
+      <img src="assets/gallery/bayshore/row2-c-marble.jpg" alt="Bayshore Residence counter styling">
+    </div>
+  </div>
+  <div class="gallery-row">
+    <div class="block block-landscape" style="--span:6">
+      <img src="assets/gallery/bayshore/row3-hero-kitchen.jpg" alt="Bayshore Residence kitchen, full width">
+    </div>
+  </div>
+</div>
+
+<nav class="work-related">
+  <h2>Discover more works</h2>
+  <ul class="works-grid" style="list-style:none;">
+    <li>
+      <a href="index.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/project2-banner.jpg" alt="Coral Gables Residence">
+        </div>
+        <h3 class="work-title">Coral Gables Residence</h3>
+      </a>
+    </li>
+    <li>
+      <a href="index.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/project3-banner.jpg" alt="Sunset Harbour Residence">
+        </div>
+        <h3 class="work-title">Sunset Harbour Residence</h3>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-logo">Marlow<span>Interior Design Studio</span></div>
+    <div class="contacts">
+      <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>
+      <a href="tel:+13055550148">+1 (305) 555-0148</a>
+    </div>
+    <div class="address">
+      <span>140 NE 39th St</span>
+      <span>Miami, FL 33137</span>
+    </div>
+    <div class="rs">
+      <a href="#" target="_blank" rel="noopener">Instagram</a>
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="legal">
+      <a href="#">Legal Notice</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <div class="credits">
+      <p>&copy; 2026, Marlow Interiors</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var btn = document.getElementById('readMoreBtn');
+  var content = document.getElementById('readMoreContent');
+  btn.addEventListener('click', function(){
+    var open = content.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.textContent = open ? 'Read less' : 'Read more';
+  });
+
+  /* Logo -> home, same page-transition standard as the click-through
+     that brought us here: scale+fade out, then navigate. */
+  document.getElementById('logoHome').addEventListener('click', function(){
+    document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    document.body.style.transform = 'scale(1.06)';
+    document.body.style.opacity = '0';
+    setTimeout(function(){ window.location.href = 'index.html'; }, 500);
+  });
+</script>
+
+</body>
+</html>

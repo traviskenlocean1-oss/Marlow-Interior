@@ -455,15 +455,40 @@
     smoothScrollToIndex(currentIndex() + 1, 1400);
   });
 
-  /* Click-to-advance on the hero itself. Deliberately not on <a>/
-     <button> and no cursor:pointer anywhere — stays looking like plain,
-     non-interactive hero copy, just with a click shortcut layered
-     underneath. .hero-nav/.hero-contact/scrollBtn are separate
-     fixed-position siblings of .stage, not descendants of it, so their
-     own clicks (nav links, mailto/tel, the scroll button) never reach
-     this listener regardless of visual overlap. */
+  /* Page-to-page transition standard for this workspace: a big,
+     dramatic scale+fade, not a plain cut. Scales/fades the whole page
+     out, then navigates once that's visually finished. */
+  function navigateWithTransition(url){
+    document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    document.body.style.transformOrigin = 'center center';
+    document.body.style.transform = 'scale(1.06)';
+    document.body.style.opacity = '0';
+    setTimeout(function(){ window.location.href = url; }, 500);
+  }
+
+  /* Click-to-advance on the hero itself, unchanged — clicking hero
+     still advances one step to Bayshore Residence. Deliberately not on
+     <a>/<button> and no cursor:pointer anywhere on the hero — stays
+     looking like plain, non-interactive hero copy, just with a click
+     shortcut layered underneath. .hero-nav/.hero-contact/scrollBtn are
+     separate fixed-position siblings of .stage, not descendants of it,
+     so their own clicks (nav links, mailto/tel, the scroll button)
+     never reach this listener regardless of visual overlap.
+
+     Once Bayshore Residence is the active slide, clicking it no longer
+     advances further into the reveal sequence (Travis: "don't add
+     stuff I didn't ask for" — that was never asked for) — it opens
+     Bayshore's own dedicated project page instead, matching the
+     reference: clicking into a project takes you to that project's
+     page, it doesn't keep scrolling the homepage. Coral Gables/Sunset
+     Harbour still just advance for now, until their own pages exist. */
   stageEl.addEventListener('click', function(){
-    smoothScrollToIndex(currentIndex() + 1, 1400);
+    var idx = currentIndex();
+    if (idx === 1){
+      navigateWithTransition('bayshore-residence.html');
+      return;
+    }
+    smoothScrollToIndex(idx + 1, 1400);
   });
 
   /* Reveal effect: every project slide's photo and title sit in their
@@ -487,6 +512,11 @@
         var segProgress = clamp((displayProgress - segStart) / SLIDE_UNIT, 0, 1);
         slides[i].style.clipPath = 'inset(' + ((1 - segProgress) * 100) + '% 0 0 0)';
       }
+      /* Pointer cursor only once Bayshore Residence is fully in view —
+         that's the one slide that's actually clickable right now (opens
+         its own page), so it's the one that should look clickable.
+         Everything else keeps the plain cursor. */
+      stageEl.style.cursor = (currentIndex() === 1) ? 'pointer' : 'auto';
     }
     requestAnimationFrame(renderReveal);
   }
@@ -496,18 +526,20 @@
      hidden, cut back in. A plain opacity fade on a fixed full-screen
      layer, nothing to do with the scroll/reveal mechanism above — reset
      is instant and happens while the screen is fully black, so there's
-     nothing to see happen regardless of how it's done underneath. */
+     nothing to see happen regardless of how it's done underneath.
+     Slowed down (180ms/90ms -> 500ms/450ms) — Travis said the original
+     felt too quick/abrupt for what's meant to read as a smooth cut. */
   document.getElementById('logoHome').addEventListener('click', function(){
     var overlay = document.getElementById('cutTransition');
-    overlay.style.transition = 'opacity 0.18s ease';
+    overlay.style.transition = 'opacity 0.5s ease';
     overlay.style.opacity = '1';
     setTimeout(function(){
       targetProgress = 0;
       displayProgress = 0;
       setTimeout(function(){
         overlay.style.opacity = '0';
-      }, 90);
-    }, 180);
+      }, 150);
+    }, 500);
   });
 </script>
 
