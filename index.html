@@ -23,16 +23,18 @@
     overflow-x:hidden;
   }
 
-  /* ── Sticky-hero-with-overlap, same pattern as Altura Collection:
-     a wrapper taller than the viewport holds a position:sticky hero,
-     so the very next section in normal document flow naturally rises
-     up and covers it as you keep scrolling — no carousel, no JS. ── */
-  .hero-wrap{
+  /* ── Pinned crossfade stage: text and background truly never travel.
+     A tall wrapper (scroll runway) holds a position:sticky stage; two
+     background layers and two text layers sit stacked at the exact
+     same fixed position and crossfade via opacity only, driven by
+     scroll progress through the wrapper. Nothing here ever slides or
+     translates up the page — only opacity changes. ── */
+  .stage-wrap{
     position:relative;
-    height:200vh;
-    height:200dvh;
+    height:220vh;
+    height:220dvh;
   }
-  .hero{
+  .stage{
     position:sticky;
     top:0;
     width:100%;
@@ -42,17 +44,27 @@
     overflow:hidden;
     background:var(--bg-fallback);
   }
-  .hero video{
+  .stage-media{ position:absolute; inset:0; }
+  .stage-media-layer{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 0.05s linear; /* smooths the discrete scroll-tick updates */
+  }
+  .stage-media-layer.is-visible{ opacity:1; }
+  .stage-media-layer video,
+  .stage-media-layer img{
     position:absolute;
     inset:0;
     width:100%;
     height:100%;
     object-fit:cover;
   }
-  .hero::after{
+  .stage::after{
     content:"";
     position:absolute;
     inset:0;
+    z-index:1;
     background:linear-gradient(
       180deg,
       rgba(20,14,10,0.35) 0%,
@@ -62,6 +74,14 @@
     );
     pointer-events:none;
   }
+  .stage-text{ position:absolute; inset:0; z-index:2; }
+  .stage-text-layer{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 0.05s linear;
+  }
+  .stage-text-layer.is-visible{ opacity:1; }
 
   /* ── Nav — fixed globally, same as dsgninterior.se's header: it sits
      above the swiper and never moves while slides change beneath it ── */
@@ -103,7 +123,6 @@
   /* ── Headline ── */
   .hero-content{
     position:relative;
-    z-index:3;
     height:100%;
     display:flex;
     flex-direction:column;
@@ -193,33 +212,12 @@
     .scroll-indicator{ right:20px; bottom:20px; }
   }
 
-  /* ── Project banner — a normal in-flow section, full-bleed photo +
-     title, wrapped in a real link. Being next in the DOM after
-     .hero-wrap is what makes it rise up and cover the sticky hero. ── */
-  .project-slide{
-    position:relative;
-    display:block;
-    width:100%;
-    height:100vh;
-    height:100dvh;
-    background:var(--bg-fallback);
-    text-decoration:none;
-  }
-  .project-slide img{
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    object-fit:cover;
-  }
-  .project-slide::after{
-    content:"";
-    position:absolute; inset:0;
-    background:linear-gradient(180deg, rgba(20,14,10,0.25) 0%, rgba(20,14,10,0.15) 40%, rgba(15,10,7,0.55) 100%);
-  }
-  .project-slide-title{
+  /* ── Project title text layer — centered, same treatment as the
+     hero headline so the crossfade between them feels intentional. ── */
+  .project-title{
     position:absolute;
     left:50%; top:50%;
     transform:translate(-50%,-50%);
-    z-index:2;
     font-family:'Poppins', sans-serif;
     font-weight:500;
     font-size:clamp(36px, 6vw, 96px);
@@ -227,9 +225,10 @@
     color:var(--ivory);
     text-align:center;
     white-space:nowrap;
+    padding:0 24px;
   }
   @media (max-width:640px){
-    .project-slide-title{ white-space:normal; padding:0 24px; }
+    .project-title{ white-space:normal; }
   }
 </style>
 </head>
@@ -256,31 +255,89 @@
   </div>
 </div>
 
-<a class="scroll-indicator" href="#work" style="text-decoration:none;">
+<button class="scroll-indicator" id="scrollBtn" style="background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:none;">
   <span>Scroll to explore</span>
   <div class="ring">
     <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M1 4L6 9L11 4" stroke="#f6f5f4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
-</a>
+</button>
 
-<div class="hero-wrap">
-  <section class="hero">
-    <video autoplay muted loop playsinline preload="auto">
-      <source src="assets/marlow-hero.mp4" type="video/mp4">
-    </video>
-    <div class="hero-content">
-      <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
-      <div class="hero-title-line"><div class="hero-title">considered living</div></div>
+<div class="stage-wrap" id="stageWrap">
+  <section class="stage" id="stage">
+    <div class="stage-media">
+      <div class="stage-media-layer is-visible" id="heroMedia">
+        <video autoplay muted loop playsinline preload="auto">
+          <source src="assets/marlow-hero.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="stage-media-layer" id="projectMedia">
+        <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+      </div>
+    </div>
+    <div class="stage-text">
+      <div class="stage-text-layer is-visible" id="heroText">
+        <div class="hero-content">
+          <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
+          <div class="hero-title-line"><div class="hero-title">considered living</div></div>
+        </div>
+      </div>
+      <div class="stage-text-layer" id="projectText">
+        <h2 class="project-title">Bayshore Residence</h2>
+      </div>
     </div>
   </section>
 </div>
 
-<a href="#" class="project-slide" id="work">
-  <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
-  <h2 class="project-slide-title">Bayshore Residence</h2>
-</a>
+<script>
+  /* Scroll-linked crossfade — nothing here ever translates. Progress
+     0 to 1 across the stage-wrap's scroll runway toggles which media
+     layer and which text layer carries the .is-visible class (pure
+     opacity), with holds at both ends and the crossfade itself in the
+     middle third. */
+  var stageWrap = document.getElementById('stageWrap');
+  var heroMedia = document.getElementById('heroMedia');
+  var projectMedia = document.getElementById('projectMedia');
+  var heroText = document.getElementById('heroText');
+  var projectText = document.getElementById('projectText');
+
+  function stageProgress(){
+    var rect = stageWrap.getBoundingClientRect();
+    var scrollable = rect.height - window.innerHeight;
+    if (scrollable <= 0) return 0;
+    var raw = -rect.top / scrollable;
+    return Math.max(0, Math.min(1, raw));
+  }
+
+  function updateStage(){
+    var showProject = stageProgress() > 0.5;
+    heroMedia.classList.toggle('is-visible', !showProject);
+    heroText.classList.toggle('is-visible', !showProject);
+    projectMedia.classList.toggle('is-visible', showProject);
+    projectText.classList.toggle('is-visible', showProject);
+  }
+
+  window.addEventListener('scroll', updateStage, { passive: true });
+  updateStage();
+
+  /* Click direction: a click on the stage only ever advances forward
+     (hero -> project), never reverses. Real native smooth scroll, no
+     custom easing layer — that's what actually broke last time. */
+  function scrollToProgress(p){
+    var rect = stageWrap.getBoundingClientRect();
+    var scrollable = rect.height - window.innerHeight;
+    var targetY = window.scrollY + rect.top + (scrollable * p);
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+  }
+
+  document.getElementById('stage').addEventListener('click', function(){
+    if (stageProgress() <= 0.5) scrollToProgress(1);
+  });
+  document.getElementById('scrollBtn').addEventListener('click', function(){
+    scrollToProgress(1);
+  });
+</script>
 
 </body>
 </html>
