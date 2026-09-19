@@ -101,8 +101,9 @@
     padding-top:18px; /* clearance from top edge so tight line-height never clips ascenders */
   }
   .hero-title-line{
-    overflow:hidden;
-    padding-bottom:0.1em; /* clearance for descenders (g/y) so tight leading never clips them */
+    /* no overflow:hidden here — nothing animates through a mask on this
+       element, and clipping a font's descenders (g/y/p) is never worth
+       the risk just to keep a box tidy */
   }
   .hero-title{
     font-family:'Poppins', sans-serif;
