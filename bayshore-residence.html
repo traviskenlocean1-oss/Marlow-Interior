@@ -15,6 +15,7 @@
     --bg-fallback:#3a2a22;
     --pad:clamp(20px, 4vw, 48px);
     --gap:clamp(14px, 1.6vw, 24px);
+    --footer-h:clamp(320px, 32vw, 420px);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:auto;}
@@ -23,9 +24,8 @@
     background:var(--ivory);
     color:var(--ink);
     overflow-x:hidden;
-    /* Page-transition standard for this workspace: arrives via a big
-       scale+fade, matching how it leaves index.html. */
-    animation:page-in 0.6s ease both;
+    /* No transform/animation on body itself, deliberately — see the
+       comment on .page-content below for why. */
   }
   @keyframes page-in{
     from{ opacity:0; transform:scale(0.97); }
@@ -271,9 +271,38 @@
     padding:0.6em 0;
   }
 
-  /* ── Footer — matches the reference's footer-grid pattern, adapted
-     to Marlow's own brand mark instead of an SVG logo. ── */
+  /* ── "Coming up" reveal footer — this is the reference's own real
+     technique (their .footer is position:fixed;bottom:0), not a scroll
+     animation: the footer sits fixed at the bottom of the viewport the
+     entire time, and .page-content (everything above it, given its own
+     background + higher z-index so it visually covers the fixed footer
+     underneath) reserves exactly --footer-h of empty scroll room at its
+     end via margin-bottom. Scrolling through that reserved gap is what
+     uncovers the footer — it was never covered by anything, it's simply
+     been sitting still under the page the whole time, so it naturally
+     looks like it rises into view with zero JS. ── */
+  .page-content{
+    position:relative;
+    z-index:2;
+    background:var(--ivory);
+    margin-bottom:var(--footer-h);
+    /* Page-transition standard for this workspace (arrives via a big
+       scale+fade, matching how it leaves index.html) lives here, not on
+       body: .site-header sits OUTSIDE .page-content specifically so
+       this element's transform can never become the containing block
+       for .site-header's position:fixed (it would otherwise stop being
+       fixed to the viewport and start being fixed to this element's own
+       box instead — confirmed directly on .site-footer when this
+       animation briefly lived on body, with the exact same mechanism).
+       backwards (not both/forwards) so the transform doesn't linger
+       after the animation completes either. */
+    animation:page-in 0.6s ease backwards;
+  }
   .site-footer{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    z-index:1;
+    height:var(--footer-h);
     font-size:14px;
     color:var(--ivory);
     background:var(--ink);
@@ -335,6 +364,8 @@
     <a href="index.html">Contact</a>
   </nav>
 </header>
+
+<div class="page-content">
 
 <section class="banner">
   <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
@@ -410,6 +441,8 @@
     </li>
   </ul>
 </nav>
+
+</div>
 
 <footer class="site-footer">
   <div class="footer-grid">
