@@ -475,17 +475,21 @@
      so their own clicks (nav links, mailto/tel, the scroll button)
      never reach this listener regardless of visual overlap.
 
-     Once Bayshore Residence is the active slide, clicking it no longer
+     Once a project slide is the active one, clicking it no longer
      advances further into the reveal sequence (Travis: "don't add
      stuff I didn't ask for" — that was never asked for) — it opens
-     Bayshore's own dedicated project page instead, matching the
-     reference: clicking into a project takes you to that project's
-     page, it doesn't keep scrolling the homepage. Coral Gables/Sunset
-     Harbour still just advance for now, until their own pages exist. */
+     that project's own dedicated page instead, matching the reference:
+     clicking into a project takes you to that project's page, it
+     doesn't keep scrolling the homepage. */
+  var PROJECT_PAGES = {
+    1: 'bayshore-residence.html',
+    2: 'coral-gables-residence.html',
+    3: 'sunset-harbour-residence.html'
+  };
   stageEl.addEventListener('click', function(){
     var idx = currentIndex();
-    if (idx === 1){
-      navigateWithTransition('bayshore-residence.html');
+    if (PROJECT_PAGES[idx]){
+      navigateWithTransition(PROJECT_PAGES[idx]);
       return;
     }
     smoothScrollToIndex(idx + 1, 1400);
@@ -512,11 +516,10 @@
         var segProgress = clamp((displayProgress - segStart) / SLIDE_UNIT, 0, 1);
         slides[i].style.clipPath = 'inset(' + ((1 - segProgress) * 100) + '% 0 0 0)';
       }
-      /* Pointer cursor only once Bayshore Residence is fully in view —
-         that's the one slide that's actually clickable right now (opens
-         its own page), so it's the one that should look clickable.
-         Everything else keeps the plain cursor. */
-      stageEl.style.cursor = (currentIndex() === 1) ? 'pointer' : 'auto';
+      /* Pointer cursor only on the project slides that actually open a
+         page when clicked — the hero stays a plain cursor since its
+         click just advances the reveal instead. */
+      stageEl.style.cursor = PROJECT_PAGES[currentIndex()] ? 'pointer' : 'auto';
     }
     requestAnimationFrame(renderReveal);
   }

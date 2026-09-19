@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bayshore Residence | Marlow Interiors</title>
-<meta name="description" content="Bayshore Residence — a quiet, considered kitchen and dining renovation by Marlow Interiors in Miami, FL.">
+<title>Coral Gables Residence | Marlow Interiors</title>
+<meta name="description" content="Coral Gables Residence — a quiet, considered primary bath and spa renovation by Marlow Interiors in Coral Gables, FL.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
@@ -167,13 +167,6 @@
     font-family:inherit;
     padding:0;
   }
-  /* grid-template-rows 0fr->1fr, not max-height/margin — animating a
-     grid track is the standard way to transition to an unknown content
-     height without the layout-thrash a height/margin/padding animation
-     causes (both trigger reflow every frame). This is also literally
-     what the reference site's own .work-text uses for this exact
-     expand/collapse. Requires min-height:0 on the inner wrapper so a
-     grid child can actually shrink below its content size. */
   .readmore{
     display:grid;
     grid-template-rows:0fr;
@@ -197,9 +190,7 @@
   .readmore p + p{ margin-top:1em; }
 
   /* ── Gallery — 6-column grid, blocks span 2/4/6, matching the
-     reference's own real gallery system exactly: landscape blocks use
-     a 3:2 aspect ratio, portrait blocks use 3:4, object-fit:cover
-     handles whatever the source photo's native ratio actually is. ── */
+     reference's own real gallery system exactly. ── */
   .work-gallery{
     display:grid;
     gap:var(--gap);
@@ -271,31 +262,12 @@
     padding:0.6em 0;
   }
 
-  /* ── "Coming up" reveal footer — this is the reference's own real
-     technique (their .footer is position:fixed;bottom:0), not a scroll
-     animation: the footer sits fixed at the bottom of the viewport the
-     entire time, and .page-content (everything above it, given its own
-     background + higher z-index so it visually covers the fixed footer
-     underneath) reserves exactly --footer-h of empty scroll room at its
-     end via margin-bottom. Scrolling through that reserved gap is what
-     uncovers the footer — it was never covered by anything, it's simply
-     been sitting still under the page the whole time, so it naturally
-     looks like it rises into view with zero JS. ── */
+  /* ── "Coming up" reveal footer ── */
   .page-content{
     position:relative;
     z-index:2;
     background:var(--ivory);
     margin-bottom:var(--footer-h);
-    /* Page-transition standard for this workspace (arrives via a big
-       scale+fade, matching how it leaves index.html) lives here, not on
-       body: .site-header sits OUTSIDE .page-content specifically so
-       this element's transform can never become the containing block
-       for .site-header's position:fixed (it would otherwise stop being
-       fixed to the viewport and start being fixed to this element's own
-       box instead — confirmed directly on .site-footer when this
-       animation briefly lived on body, with the exact same mechanism).
-       backwards (not both/forwards) so the transform doesn't linger
-       after the animation completes either. */
     animation:page-in 0.6s ease backwards;
   }
   .site-footer{
@@ -368,26 +340,26 @@
 <div class="page-content">
 
 <section class="banner">
-  <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+  <img src="assets/gallery/project2-banner.jpg" alt="Coral Gables Residence">
   <div class="banner-title">
-    <h1>Bayshore Residence</h1>
+    <h1>Coral Gables Residence</h1>
   </div>
 </section>
 
 <div class="work-texts">
   <dl class="work-specs">
-    <dt>Location</dt><dd>Miami, FL</dd>
-    <dt>Area</dt><dd>3,400 sqft</dd>
-    <dt>Year</dt><dd>2025</dd>
+    <dt>Location</dt><dd>Coral Gables, FL</dd>
+    <dt>Area</dt><dd>2,850 sqft</dd>
+    <dt>Year</dt><dd>2024</dd>
   </dl>
   <div class="work-text">
-    <p class="presentation">Bayshore Residence is a kitchen and dining renovation shaped around a single idea: let the light and the water do most of the talking. Warm oak, honed stone, and a quiet material palette give the space room to breathe, while every surface was chosen to age well under daily use.</p>
+    <p class="presentation">Coral Gables Residence is a primary bath and spa renovation built around stone, water, and very little else. Carved dolomite, reclaimed teak, and a planted courtyard just past the glass turn a daily routine into something closer to a ritual.</p>
     <button class="readmore-toggle" id="readMoreBtn" aria-expanded="false">Read more</button>
     <div class="readmore" id="readMoreContent">
       <div class="readmore-inner">
-        <p>The brief was simple in words and demanding in practice: a family kitchen that could host twelve people on a Sunday and still feel calm on a Tuesday morning. The existing floor plan was opened toward the water, replacing a run of upper cabinetry with clerestory glazing that pulls bay light across the island through the entire afternoon.</p>
-        <p>Cabinetry is rift-cut white oak, left unstained so it will silver gently over the coming years rather than fight the process. The island is a single block of honed dolomite, chosen over polished marble specifically for how it wears — every mark becomes part of the surface instead of a flaw in it.</p>
-        <p>Dining sits adjacent rather than enclosed, separated from the kitchen only by a change in ceiling height. The result is a home that works as hard as any Miami kitchen needs to, without ever looking like it's trying.</p>
+        <p>The existing bath was landlocked — no daylight, no connection to the garden six feet away. The renovation opened the long wall entirely to a private courtyard, replacing it with pivoting glass that disappears fully into the frame when opened.</p>
+        <p>The tub is a single carved block of dolomite, set directly into a bed of river stone rather than a finished floor — a deliberate blur between inside and outside that continues into the shower, tiled in the same warm terracotta as the courtyard wall beyond it.</p>
+        <p>Everything else stays quiet: teak millwork, honed stone floors, and fixtures in aged brass that were chosen specifically to darken and soften with use rather than stay showroom-new.</p>
       </div>
     </div>
   </div>
@@ -396,34 +368,18 @@
 <div class="work-gallery">
   <div class="gallery-row">
     <div class="block block-landscape" style="--span:4">
-      <img src="assets/gallery/bayshore/row1-a-dining.jpg" alt="Bayshore Residence dining table">
+      <img src="assets/gallery/coral-gables/row2-b-marble-chandelier.jpg" alt="Coral Gables Residence marble bath">
     </div>
     <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/bayshore/row1-b-terrazzo.jpg" alt="Bayshore Residence countertop detail">
+      <img src="assets/gallery/coral-gables/row1-b-stone-tub.jpg" alt="Coral Gables Residence stone tub detail">
     </div>
   </div>
   <div class="gallery-row">
-    <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/bayshore/row2-a-kitchen.jpg" alt="Bayshore Residence open kitchen">
+    <div class="block block-portrait" style="--span:3">
+      <img src="assets/gallery/coral-gables/row1-a-marble-view.jpg" alt="Coral Gables Residence bath with courtyard view">
     </div>
-    <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/bayshore/row2-b-faucet.jpg" alt="Bayshore Residence fixture detail">
-    </div>
-    <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/bayshore/row2-c-marble.jpg" alt="Bayshore Residence counter styling">
-    </div>
-  </div>
-  <div class="gallery-row">
-    <div class="block block-landscape" style="--span:6">
-      <img src="assets/gallery/bayshore/row3-hero-kitchen.jpg" alt="Bayshore Residence kitchen, full width">
-    </div>
-  </div>
-  <div class="gallery-row">
-    <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/bayshore/row4-b-marble.jpg" alt="Bayshore Residence kitchen island detail">
-    </div>
-    <div class="block block-landscape" style="--span:4">
-      <img src="assets/gallery/bayshore/row4-a-island.jpg" alt="Bayshore Residence kitchen island, brass pendants">
+    <div class="block block-portrait" style="--span:3">
+      <img src="assets/gallery/coral-gables/row2-a-terracotta.jpg" alt="Coral Gables Residence terracotta wall detail">
     </div>
   </div>
 </div>
@@ -432,11 +388,11 @@
   <h2>Discover more works</h2>
   <ul class="works-grid" style="list-style:none;">
     <li>
-      <a href="coral-gables-residence.html" class="work-link">
+      <a href="bayshore-residence.html" class="work-link">
         <div class="work-cover">
-          <img src="assets/gallery/project2-banner.jpg" alt="Coral Gables Residence">
+          <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
         </div>
-        <h3 class="work-title">Coral Gables Residence</h3>
+        <h3 class="work-title">Bayshore Residence</h3>
       </a>
     </li>
     <li>
@@ -486,11 +442,6 @@
     btn.textContent = open ? 'Read less' : 'Read more';
   });
 
-  /* Logo -> home, same page-transition standard as the click-through
-     that brought us here: scale+fade out, then navigate. Targets
-     .page-content, not body — same containing-block reasoning as the
-     CSS comment above it (this fires right before navigating away, so
-     it's brief, but there's no reason to reopen that risk at all). */
   document.getElementById('logoHome').addEventListener('click', function(){
     var pc = document.querySelector('.page-content');
     pc.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
