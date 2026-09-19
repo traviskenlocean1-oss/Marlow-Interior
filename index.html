@@ -60,7 +60,13 @@
      Swiper's own swiper-free-mode class, which its stylesheet uses to
      set scroll-snap-type:none at higher specificity than anything
      declared here, so there's no point duplicating it in this file. */
-  .hero-swiper .swiper-wrapper{ scroll-behavior:auto; }
+  /* overscroll-behavior:contain stops the browser's own rubber-band
+     bounce at the very top/bottom of this scroll container — without
+     it, scrollTop can briefly go slightly negative or past maxScroll
+     right at the edges before springing back, which is the real source
+     of the brown-background flash right at the ends of the scroll
+     (belt-and-suspenders with the clamp in the JS render loop below). */
+  .hero-swiper .swiper-wrapper{ scroll-behavior:auto; overscroll-behavior:contain; }
   /* Graceful degradation: if Swiper's JS never runs for any reason
      (blocked script, network failure), Swiper never adds the
      "swiper-initialized" class it normally adds on init. In that
@@ -478,7 +484,18 @@
   var maxScroll = wrapperEl.scrollHeight - wrapperEl.clientHeight;
   var lastRenderedScroll = null;
   function renderReveal(){
-    var s = wrapperEl.scrollTop;
+    /* Clamped to [0, maxScroll] — real trackpad/OS overscroll
+       (rubber-banding) can briefly report a scrollTop slightly below 0
+       or above maxScroll right at either end before it springs back.
+       Unclamped, that briefly fed an out-of-range value into the
+       transforms below, shifting hero/Bayshore just enough to expose a
+       sliver of the raw .stage background at exactly the top or bottom
+       edge — the brown flash Travis kept seeing specifically "when
+       scrolling up a little" or "back down", i.e. right at the ends,
+       never in the middle. Clamping means an overscrolled value renders
+       identically to the true boundary, so there's nothing left to leak
+       through. */
+    var s = Math.min(Math.max(wrapperEl.scrollTop, 0), maxScroll);
     /* Skip the DOM writes entirely when nothing changed — this loop
        runs every frame forever, and touching style/transform on two
        elements 60x/sec even at rest is wasted work for zero visual
@@ -487,7 +504,7 @@
       lastRenderedScroll = s;
       heroSlideEl.style.transform = 'translateY(' + s + 'px)';
       bayshoreSlideEl.style.transform = 'translateY(' + (s - wrapperEl.clientHeight) + 'px)';
-      var progress = maxScroll > 0 ? Math.min(Math.max(s / maxScroll, 0), 1) : 0;
+      var progress = maxScroll > 0 ? s / maxScroll : 0;
       bayshoreSlideEl.style.clipPath = 'inset(' + ((1 - progress) * 100) + '% 0 0 0)';
     }
     requestAnimationFrame(renderReveal);
