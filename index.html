@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/vendor/swiper-bundle.min.css">
 <style>
   :root{
     --ivory:#f6f5f4;
@@ -24,24 +23,30 @@
     overflow-x:hidden;
   }
 
-  /* ── Real Swiper.js in cssMode — the actual mechanism confirmed by
-     pulling dsgninterior.se's own live CSS/JS bundles directly:
-     .swiper-wrapper carries scroll-snap-type:y mandatory, each
-     .swiper-slide carries scroll-snap-align:start, and their init call
-     passes cssMode:true (plus resistanceRatio:0, parallax:true). That
-     means the hero is a REAL native-scroll region — the browser's own
-     scroll physics move it continuously as you scroll, snapping to the
-     nearest slide when you stop — not a JS-transform carousel that
-     waits for a wheel tick then plays one canned animation regardless
-     of how much you actually scrolled. That distinction is exactly
-     what read as "just scrolling" / "not already moving" before: a
-     JS-transform Swiper can play a very smooth animation, but it will
-     never feel like real scroll, because it isn't driven by real
-     scroll. cssMode is real scroll, so it can't feel like anything
-     else. It also removes the entire bug class that hit this build
-     twice: with slides genuinely stacked in normal flow instead of
-     absolutely-positioned-then-transformed-off-screen, there's no
-     off-screen offset for a parallax shift to ever cancel out. ── */
+  /* ── No Swiper, no real scroll at all — a small custom wheel handler
+     (see the script below) owns the transition entirely. Landed here
+     after three rounds of chasing a subtle "bounce": the previous
+     architecture kept both slides in real document flow and canceled
+     each one's natural scroll-linked movement with an equal-and-
+     opposite JS transform every frame, which only stays correct if the
+     browser's real scroll position and that cancelling transform never
+     drift apart — and under real trackpad input they kept finding new
+     ways to (timing, rounding, overscroll, Swiper's own freeMode
+     momentum). Removing the natural scroll position from both slides
+     entirely (position:fixed) fixed that architecturally, but broke
+     real wheel scrolling outright: Swiper's cssMode mousewheel handler
+     computes its own scroll boundaries from each slide's real layout
+     position, and slides outside document flow have none, so it had
+     nothing to measure against. Those two requirements — Swiper owning
+     wheel input, and slides with zero natural position — are
+     structurally incompatible as long as Swiper owns the wheel
+     mechanism. Solution: stop using Swiper for that at all. Both slides
+     are plain position:absolute;inset:0 inside .stage, and a scroll
+     PROGRESS value (0 to 1032, matching the old scrollTop range for
+     continuity) lives in one JS variable, driven directly by a wheel
+     listener with the same tuned sensitivity as before. Nothing else
+     ever reads or writes a real scroll position, so there is no second
+     number left for anything to drift against. */
   .stage{
     position:relative;
     width:100%;
@@ -51,37 +56,10 @@
     overflow:hidden;
     background:var(--bg-fallback);
   }
-  .hero-swiper{ width:100%; height:100%; }
-  /* scroll-behavior stays auto (not smooth) — the click-to-advance JS
-     drives scrollTop itself with its own easing curve, and
-     scroll-behavior:smooth would make the browser ALSO try to smoothly
-     animate those per-frame assignments on top of it. freeMode (set in
-     JS below) is what actually turns off snap-to-completion — it adds
-     Swiper's own swiper-free-mode class, which its stylesheet uses to
-     set scroll-snap-type:none at higher specificity than anything
-     declared here, so there's no point duplicating it in this file. */
-  /* overscroll-behavior:contain stops the browser's own rubber-band
-     bounce at the very top/bottom of this scroll container — without
-     it, scrollTop can briefly go slightly negative or past maxScroll
-     right at the edges before springing back, which is the real source
-     of the brown-background flash right at the ends of the scroll
-     (belt-and-suspenders with the clamp in the JS render loop below). */
-  .hero-swiper .swiper-wrapper{ scroll-behavior:auto; overscroll-behavior:contain; }
-  /* Graceful degradation: if Swiper's JS never runs for any reason
-     (blocked script, network failure), Swiper never adds the
-     "swiper-initialized" class it normally adds on init. In that
-     case, hide every slide but the first so the page degrades to a
-     clean static hero instead of every slide dumping into normal
-     document flow and stacking/cutting off text. */
-  .hero-swiper:not(.swiper-initialized) .swiper-slide:not(:first-child){
-    display:none;
-  }
-  /* Oversized on top/bottom (65% of the slide's own height each way)
-     so the 60% data-swiper-parallax shift on this element — see the
-     markup below — never exposes a gap at the slide's edge while it's
-     scrolled past. Matches the reference's own oversized background
-     media for the same reason. */
-  .slide-media{ position:absolute; top:-65%; left:0; right:0; bottom:-65%; }
+  /* No overscan needed — .slide-media never has any transform applied
+     to it (the old parallax shift this used to compensate for was
+     removed entirely), so it can just be inset:0 and covered plainly. */
+  .slide-media{ position:absolute; inset:0; }
   .slide-media video,
   .slide-media img{
     position:absolute;
@@ -143,24 +121,16 @@
   }
 
   /* ── Headline ── */
-  /* overflow:hidden is load-bearing, not tidiness: .slide-media is
-     oversized on top/bottom (see below) so its parallax shift never
-     exposes a gap. Slides are genuine stacked document flow now (real
-     scroll), so without this, an adjacent slide's oversized background
-     physically pokes into view regardless of scroll position — this is
-     the third distinct way this same bug class has shown up. Confirmed
-     the reference does the same: its own .banner rule carries
-     overflow:hidden for exactly this reason. */
+  /* Plain position:absolute;inset:0 within .stage — no scroll flow, no
+     transform, nothing ever moves these. Each one's position is 100%
+     static CSS, permanently. */
   .swiper-slide{
+    position:absolute;
+    inset:0;
     display:flex;
     align-items:center;
     overflow:hidden;
   }
-  /* Explicit stacking order for the cover effect (see the scroll
-     listener in the script): the hero gets a transform applied to hold
-     it visually in place, and transform creates its own stacking
-     context, so DOM order alone can't be trusted to keep Bayshore
-     painting on top of it. */
   .swiper-slide:nth-child(1){ z-index:1; }
   .swiper-slide:nth-child(2){ z-index:2; }
   /* Centered to match the reference's .banner-title look (previously
@@ -334,216 +304,122 @@
 </button>
 
 <section class="stage" id="stage">
-  <div class="hero-swiper swiper">
-    <div class="swiper-wrapper">
 
-      <div class="swiper-slide">
-        <div class="slide-media">
-          <video autoplay muted loop playsinline preload="auto">
-            <source src="assets/marlow-hero.mp4" type="video/mp4">
-          </video>
-        </div>
-        <div class="hero-title-wrap">
-          <div class="hero-content">
-            <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
-            <div class="hero-title-line"><div class="hero-title">considered living</div></div>
-          </div>
-        </div>
+  <div class="swiper-slide">
+    <div class="slide-media">
+      <video autoplay muted loop playsinline preload="auto">
+        <source src="assets/marlow-hero.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-title-wrap">
+      <div class="hero-content">
+        <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
+        <div class="hero-title-line"><div class="hero-title">considered living</div></div>
       </div>
-
-      <div class="swiper-slide">
-        <div class="slide-media">
-          <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
-        </div>
-        <div class="project-title-wrap">
-          <h2 class="project-title">Bayshore Residence</h2>
-        </div>
-      </div>
-
     </div>
   </div>
+
+  <div class="swiper-slide">
+    <div class="slide-media">
+      <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+    </div>
+    <div class="project-title-wrap">
+      <h2 class="project-title">Bayshore Residence</h2>
+    </div>
+  </div>
+
 </section>
 
-<script src="assets/vendor/swiper-bundle.min.js"></script>
 <script>
-  /* cssMode + resistanceRatio:0 + mousewheel.forceToAxis — pulled
-     directly from dsgninterior.se's own live app bundle. This hands
-     slide positioning to the browser's native scroll-snap, so Swiper's
-     job here is just tracking index; it never fights real scroll input
-     with a canned animation the way JS-transform mode did.
+  /* No Swiper. Both .swiper-slide elements are plain
+     position:absolute;inset:0 with zero transform ever applied to
+     their position — see the CSS comment above .stage for the full
+     reasoning. One JS number (scrollProgress, 0 to MAX_SCROLL) is the
+     single source of truth for the whole transition; a wheel listener
+     is the only thing that changes it, and the render loop is the only
+     thing that reads it. Nothing else in this file ever touches
+     position, so there is nothing left for two independently-tracked
+     numbers to drift apart from. */
+  var stageEl = document.getElementById('stage');
+  var slides = document.querySelectorAll('.swiper-slide');
+  var bayshoreSlideEl = slides[1];
+  var MAX_SCROLL = 1032;
+  /* Same tuned value carried over from the old Swiper mousewheel
+     sensitivity — still the right amount of movement per wheel notch,
+     the mechanism producing it is what changed. */
+  var WHEEL_SENSITIVITY = 0.045;
+  var scrollProgress = 0;
 
-     parallax:true (matching their config) was removed again after it
-     came back to bite a fourth time: with the hero/Bayshore held static
-     by the custom reveal system below, Swiper's parallax module was
-     STILL shifting hero's video/title internally off of hero's own real
-     scroll progress — small at first, but by deep scroll it was large
-     enough to push the video out of its own frame and expose the raw
-     .stage background color underneath (the "brown bar" Travis kept
-     screenshotting), plus a smaller version of the same shift on the
-     title text read as "bouncing". The custom reveal system fully
-     replaces what parallax was for here, so there's nothing left for it
-     to usefully do — removed the module and every data-swiper-parallax
-     attribute in the markup, not just tuned it again.
+  function clamp(v, lo, hi){
+    return Math.min(Math.max(v, lo), hi);
+  }
 
-     In cssMode, Swiper's mousewheel module still intercepts every wheel
-     event itself (calls preventDefault, then scrolls the wrapper
-     programmatically) rather than handing it to the browser untouched —
-     default sensitivity:1 multiplies a single mouse-wheel notch
-     (~100-120px of native deltaY) almost 1:1, which covers most of a
-     slide's height in one or two notches. What's left then gets
-     completed instantly by scroll-snap-type:mandatory, so the motion
-     reads as a quick, two-phase snap rather than something that follows
-     your scrolling. Sensitivity well below 1 spreads that same input
-     across many more notches so the climb reads as continuous instead
-     of a jump-then-snap. */
-  /* freeMode:true — Travis wants zero auto-completion: wherever a
-     scroll gesture stops, it just stays there, piece by piece, full
-     manual control. Without it, scroll-snap-type:mandatory (matching
-     the reference's own confirmed CSS) auto-finishes the transition
-     the moment you let go past the midpoint — reads as "too fast" no
-     matter how gently the active scrolling itself is tuned, since the
-     snap-to-completion isn't something scroll speed controls at all.
-     This is an explicit, deliberate difference from the reference's
-     mechanism, not a mismatch to fix. */
-  var heroSwiper = new Swiper('.hero-swiper', {
-    direction: 'vertical',
-    slidesPerView: 1,
-    speed: 1100,
-    resistanceRatio: 0,
-    cssMode: true,
-    /* freeMode:true (a bare boolean) turns on ALL of Swiper's default
-       freeMode physics, which includes momentum:true and
-       momentumBounce:true — inertia that keeps the scroll drifting
-       after input stops, and a deliberate spring-back overshoot at
-       either edge. That's Swiper itself adding motion on top of real
-       scroll input, driven directly via JS (not the browser's own
-       overscroll, which the scroll-position clamp and
-       overscroll-behavior:contain already covered) — a likely real
-       source of the residual "bounce" that persisted after those.
-       Explicitly disabling momentum keeps the "stays exactly where you
-       release it, zero auto-snap" behavior Travis wants, with none of
-       the extra drift/bounce that came bundled with it by default. */
-    freeMode: {
-      enabled: true,
-      momentum: false
-    },
-    mousewheel: {
-      enabled: true,
-      forceToAxis: true,
-      sensitivity: 0.045
-    }
-  });
-
-  /* Custom eased scrollTo, used ONLY for discrete click actions
-     (scrollBtn, click-to-advance below) — not for anything tied to an
-     ongoing scroll gesture. A debounced version of this used to also
-     drive the settle-after-scrolling, but on real trackpad input any
-     brief pause mid-gesture made it jump in and fight the next bit of
-     input, feeling like the page was twitching against your fingers.
-     Settling after a real scroll gesture is native
-     scroll-snap-type:mandatory now (see CSS) — matches the reference's
-     own confirmed mechanism exactly, and native scroll-snap already
-     knows how to tell "gesture genuinely ended" from "brief pause" in a
-     way a JS debounce timer can't approximate. Discrete clicks have no
-     such risk (nothing else is scrolling at that moment), so they keep
-     the fully custom, tunable-duration animation. */
-  var wrapperEl = heroSwiper.wrapperEl;
+  /* preventDefault + this file owning scrollProgress directly is the
+     entire mechanism — piece by piece, stays exactly where you release
+     it, zero auto-snap, exactly as before. No momentum, no bounce-back
+     at the edges: nothing here ever adds motion beyond what the wheel
+     itself just did. */
+  stageEl.addEventListener('wheel', function(e){
+    e.preventDefault();
+    scrollProgress = clamp(scrollProgress + e.deltaY * WHEEL_SENSITIVITY, 0, MAX_SCROLL);
+  }, { passive: false });
 
   function easeInOutCubic(t){
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
+  /* Discrete click actions only (scrollBtn, click-to-advance) — not
+     tied to an ongoing wheel gesture, so animating scrollProgress
+     directly here has no competing input to fight. */
   function smoothScrollToIndex(index, duration){
-    var target = Math.max(0, Math.min(index, heroSwiper.slides.length - 1)) * wrapperEl.clientHeight;
-    var startTop = wrapperEl.scrollTop;
-    var delta = target - startTop;
+    var target = clamp(index, 0, 1) * MAX_SCROLL;
+    var start = scrollProgress;
+    var delta = target - start;
     if (Math.abs(delta) < 1) return;
     var startTime = null;
     function step(now){
       if (startTime === null) startTime = now;
-      var progress = Math.min((now - startTime) / duration, 1);
-      wrapperEl.scrollTop = startTop + delta * easeInOutCubic(progress);
-      if (progress < 1) requestAnimationFrame(step);
+      var t = Math.min((now - startTime) / duration, 1);
+      scrollProgress = start + delta * easeInOutCubic(t);
+      if (t < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
   }
 
   function currentIndex(){
-    return Math.round(wrapperEl.scrollTop / wrapperEl.clientHeight);
+    return Math.round(scrollProgress / MAX_SCROLL);
   }
 
   document.getElementById('scrollBtn').addEventListener('click', function(){
     smoothScrollToIndex(currentIndex() + 1, 1400);
   });
 
-  /* Reveal effect, not a cover effect: Travis clarified further — even
-     with the hero held static, Bayshore Residence itself still visibly
-     translated into place, which read as "the image is coming up/in".
-     What he actually wants is closer to a curtain lifting: Bayshore's
-     photo and title should sit in their final, already-composed
-     position the entire time and simply become visible as you scroll,
-     never sliding to get there.
+  /* Click-to-advance on the hero itself. Deliberately not on <a>/
+     <button> and no cursor:pointer anywhere — stays looking like plain,
+     non-interactive hero copy, just with a click shortcut layered
+     underneath. .hero-nav/.hero-contact/scrollBtn are separate
+     fixed-position siblings of .stage, not descendants of it, so their
+     own clicks (nav links, mailto/tel, the scroll button) never reach
+     this listener regardless of visual overlap. */
+  stageEl.addEventListener('click', function(){
+    smoothScrollToIndex(currentIndex() + 1, 1400);
+  });
 
-     The scroll mechanism itself is still completely untouched (real
-     scroll still drives everything the same way) — this only adds two
-     things per scroll event: the same equal-and-opposite counter-
-     transform as before, now applied to BOTH slides so NEITHER one's
-     content ever visibly moves, and a clip-path on Bayshore that grows
-     from fully hidden to fully shown as scroll progresses, revealing
-     its already-static composition rather than sliding it into frame.
-     data-swiper-parallax was removed from Bayshore's media/title in the
-     markup for the same reason — any independent internal motion there
-     would contradict "already there, just revealed". */
-  var heroSlideEl = heroSwiper.slides[0];
-  var bayshoreSlideEl = heroSwiper.slides[1];
-  var maxScroll = wrapperEl.scrollHeight - wrapperEl.clientHeight;
-  var lastRenderedScroll = null;
+  /* Reveal effect: Bayshore's photo and title sit in their final,
+     already-composed position permanently (plain CSS, no transform,
+     see above) and a clip-path is the only thing that changes as
+     scrollProgress moves — growing from fully hidden to fully shown,
+     revealing what's already there rather than sliding it into frame. */
+  var lastRendered = null;
   function renderReveal(){
-    /* Clamped to [0, maxScroll] — real trackpad/OS overscroll
-       (rubber-banding) can briefly report a scrollTop slightly below 0
-       or above maxScroll right at either end before it springs back.
-       Unclamped, that briefly fed an out-of-range value into the
-       transforms below, shifting hero/Bayshore just enough to expose a
-       sliver of the raw .stage background at exactly the top or bottom
-       edge — the brown flash Travis kept seeing specifically "when
-       scrolling up a little" or "back down", i.e. right at the ends,
-       never in the middle. Clamping means an overscrolled value renders
-       identically to the true boundary, so there's nothing left to leak
-       through. */
-    var s = Math.min(Math.max(wrapperEl.scrollTop, 0), maxScroll);
-    /* Skip the DOM writes entirely when nothing changed — this loop
-       runs every frame forever, and touching style/transform on two
-       elements 60x/sec even at rest is wasted work for zero visual
-       benefit. */
-    if (s !== lastRenderedScroll){
-      lastRenderedScroll = s;
-      heroSlideEl.style.transform = 'translateY(' + s + 'px)';
-      bayshoreSlideEl.style.transform = 'translateY(' + (s - wrapperEl.clientHeight) + 'px)';
-      var progress = maxScroll > 0 ? s / maxScroll : 0;
+    if (scrollProgress !== lastRendered){
+      lastRendered = scrollProgress;
+      var progress = scrollProgress / MAX_SCROLL;
       bayshoreSlideEl.style.clipPath = 'inset(' + ((1 - progress) * 100) + '% 0 0 0)';
     }
     requestAnimationFrame(renderReveal);
   }
-  /* Driven by rAF every frame, not the 'scroll' event: on real fast
-     trackpad scrolling the browser can repaint faster than scroll
-     events actually fire (they're throttled/coalesced under load), so
-     for a frame or two the compensating transform was stale — visible
-     as the whole composition briefly jumping/bouncing and the raw
-     .stage background flashing through in the gap. rAF ties this to
-     the same clock the browser paints on, so it can't fall behind. */
   requestAnimationFrame(renderReveal);
-
-  /* Click-to-advance on the hero itself. Deliberately not on <a>/
-     <button> and no cursor:pointer anywhere — Travis wants this to
-     stay looking like plain, non-interactive hero copy, just with a
-     click shortcut layered underneath, not something that visibly
-     invites clicking. .hero-nav/.hero-contact/scrollBtn are separate
-     fixed-position siblings of .stage, not descendants of it, so their
-     own clicks (nav links, mailto/tel, the scroll button) never reach
-     this listener regardless of visual overlap. */
-  document.getElementById('stage').addEventListener('click', function(){
-    smoothScrollToIndex(currentIndex() + 1, 1400);
-  });
 </script>
 
 </body>
