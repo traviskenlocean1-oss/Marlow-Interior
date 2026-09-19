@@ -279,13 +279,13 @@
       <div class="swiper-wrapper">
 
         <div class="swiper-slide">
-          <div class="slide-media" data-swiper-parallax="60%">
+          <div class="slide-media" id="heroMedia">
             <video autoplay muted loop playsinline preload="auto">
               <source src="assets/marlow-hero.mp4" type="video/mp4">
             </video>
           </div>
-          <div class="hero-title-wrap" data-swiper-parallax="100%">
-            <div class="hero-content" data-swiper-parallax="-60">
+          <div class="hero-title-wrap" id="heroTitleWrap">
+            <div class="hero-content">
               <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
               <div class="hero-title-line"><div class="hero-title">considered living</div></div>
             </div>
@@ -293,11 +293,11 @@
         </div>
 
         <div class="swiper-slide">
-          <div class="slide-media" data-swiper-parallax="60%">
+          <div class="slide-media" id="projectMedia">
             <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
           </div>
-          <div class="project-title-wrap" data-swiper-parallax="100%">
-            <h2 class="project-title" data-swiper-parallax="-60">Bayshore Residence</h2>
+          <div class="project-title-wrap" id="projectTitleWrap">
+            <h2 class="project-title">Bayshore Residence</h2>
           </div>
         </div>
 
@@ -308,23 +308,41 @@
 
 <script src="assets/vendor/swiper-bundle.min.js"></script>
 <script>
-  /* Real Swiper.js, same parallax values as dsgninterior.se
-     (data-swiper-parallax="60%" on the media, "100%"/-60 on the
-     title), but instead of letting Swiper handle touch/wheel input
-     itself (which snaps per-tick), we disable its own input handling
-     entirely and drive swiper.setProgress() continuously from our own
-     scroll position — this keeps the real slide-travel + parallax
-     math (Swiper's own engine) but ties it 1:1 to scroll instead of
-     snapping, so every intermediate scroll position shows the real
-     intermediate transform/parallax state. */
+  /* Real Swiper.js slide-travel, driven continuously from scroll
+     instead of touch/wheel snap (verified: linear wrapper transform
+     from 0 to -100% across progress 0 to 1, real motion, not a
+     snap). Swiper's own PARALLAX MODULE was removed after finding a
+     real bug it caused: parallax offsets are computed from each
+     slide's own progress (-1/0/+1 relative to itself), and for the
+     "next" slide sitting at rest (own progress exactly +1), a 100%
+     parallax value exactly cancels that slide's off-screen position —
+     pulling its content back into view even at overall progress 0,
+     before any scrolling happens. Confirmed directly: the slide's own
+     offsetTop was correctly 982 (below the fold) while its title's
+     actual painted position was 483 (visible) — the parallax
+     transform was doing that. That module is built around Swiper's
+     normal snap-per-tick usage, not continuous progress-driving, so
+     it doesn't hold up here.
+
+     Replaced with a hand-rolled crossfade computed from the SAME
+     single progress value already driving the slide-travel — opacity
+     is directly proportional to overall progress, so it's guaranteed
+     exactly 0/1 at rest (no per-slide-progress edge case possible)
+     and ramps smoothly as the real slide-travel happens, so both
+     slides are genuinely partially visible mid-scroll instead of a
+     hard cut between them. */
   var stageWrap = document.getElementById('stageWrap');
   var heroSwiper = new Swiper('.hero-swiper', {
     direction: 'vertical',
-    parallax: true,
     allowTouchMove: false,
     simulateTouch: false,
     speed: 0
   });
+
+  var heroMedia = document.getElementById('heroMedia');
+  var heroTitleWrap = document.getElementById('heroTitleWrap');
+  var projectMedia = document.getElementById('projectMedia');
+  var projectTitleWrap = document.getElementById('projectTitleWrap');
 
   function stageProgress(){
     var rect = stageWrap.getBoundingClientRect();
@@ -335,7 +353,12 @@
   }
 
   function updateStage(){
-    heroSwiper.setProgress(stageProgress(), 0);
+    var p = stageProgress();
+    heroSwiper.setProgress(p, 0);
+    heroMedia.style.opacity = 1 - p;
+    heroTitleWrap.style.opacity = 1 - p;
+    projectMedia.style.opacity = p;
+    projectTitleWrap.style.opacity = p;
   }
 
   window.addEventListener('scroll', updateStage, { passive: true });
