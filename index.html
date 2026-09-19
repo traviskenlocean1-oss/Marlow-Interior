@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.css">
 <style>
   :root{
     --ivory:#f6f5f4;
@@ -24,18 +23,21 @@
     overflow-x:hidden;
   }
 
-  /* Swiper needs explicit height on the container + every slide for
-     vertical mode — html/body height:100% (already set above) plus
-     these makes the whole viewport one full-height slide at a time. */
-  .home-swiper, .home-swiper .swiper-slide{
+  /* ── Sticky-hero-with-overlap, same pattern as Altura Collection:
+     a wrapper taller than the viewport holds a position:sticky hero,
+     so the very next section in normal document flow naturally rises
+     up and covers it as you keep scrolling — no carousel, no JS. ── */
+  .hero-wrap{
+    position:relative;
+    height:200vh;
+    height:200dvh;
+  }
+  .hero{
+    position:sticky;
+    top:0;
+    width:100%;
     height:100vh;
     height:100dvh;
-  }
-
-  .hero{
-    position:relative;
-    width:100%;
-    height:100%;
     min-height:560px;
     overflow:hidden;
     background:var(--bg-fallback);
@@ -191,13 +193,16 @@
     .scroll-indicator{ right:20px; bottom:20px; }
   }
 
-  /* ── Project banner slide — same treatment as the hero, a full-bleed
-     photo + title, wrapped in a real link like the reference's own
-     banner-1/banner-2/etc slides ── */
+  /* ── Project banner — a normal in-flow section, full-bleed photo +
+     title, wrapped in a real link. Being next in the DOM after
+     .hero-wrap is what makes it rise up and cover the sticky hero. ── */
   .project-slide{
     position:relative;
     display:block;
-    width:100%; height:100%;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    background:var(--bg-fallback);
     text-decoration:none;
   }
   .project-slide img{
@@ -251,50 +256,31 @@
   </div>
 </div>
 
-<button class="scroll-indicator" id="scrollBtn" style="background:none;border:none;cursor:pointer;font-family:inherit;">
+<a class="scroll-indicator" href="#work" style="text-decoration:none;">
   <span>Scroll to explore</span>
   <div class="ring">
     <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M1 4L6 9L11 4" stroke="#f6f5f4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
-</button>
+</a>
 
-<div class="swiper home-swiper">
-  <div class="swiper-wrapper">
-
-    <div class="swiper-slide">
-      <section class="hero">
-        <video autoplay muted loop playsinline preload="auto">
-          <source src="assets/marlow-hero.mp4" type="video/mp4">
-        </video>
-        <div class="hero-content">
-          <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
-          <div class="hero-title-line"><div class="hero-title">considered living</div></div>
-        </div>
-      </section>
+<div class="hero-wrap">
+  <section class="hero">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="assets/marlow-hero.mp4" type="video/mp4">
+    </video>
+    <div class="hero-content">
+      <div class="hero-title-line"><div class="hero-title">quiet interiors</div></div>
+      <div class="hero-title-line"><div class="hero-title">considered living</div></div>
     </div>
-
-    <div class="swiper-slide">
-      <a href="#" class="project-slide">
-        <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
-        <h2 class="project-slide-title">Bayshore Residence</h2>
-      </a>
-    </div>
-
-  </div>
+  </section>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.js"></script>
-<script>
-  const homeSwiper = new Swiper('.home-swiper', {
-    direction: 'vertical',
-    speed: 700,
-    mousewheel: true,
-    keyboard: true,
-  });
-  document.getElementById('scrollBtn').addEventListener('click', () => homeSwiper.slideNext());
-</script>
+<a href="#" class="project-slide" id="work">
+  <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+  <h2 class="project-slide-title">Bayshore Residence</h2>
+</a>
 
 </body>
 </html>
