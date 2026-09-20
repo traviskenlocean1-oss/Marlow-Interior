@@ -450,14 +450,15 @@
      reference structure/mechanism exactly while keeping Marlow's own
      typography, not swapping in a third font family. ── */
   .typo-titles-section{
-    background:color-mix(in srgb, var(--burgundy) 35%, white);
+    /* Exact value measured directly off the reference's own rendered
+       page (getComputedStyle on .section-typo-titles, not eyeballed) —
+       color-mix(burgundy 35%, white) was a reasonable-looking guess at
+       their derivation but produced a visibly pink/mauve tint next to
+       their actual neutral warm gray, since it mixed in Marlow's own
+       (much redder) burgundy instead of theirs. */
+    background:#dbdbd8;
     color:var(--ink);
-    /* Extra bottom padding isn't just visual breathing room here — this
-       is the last thing on the page, so the caption's own scroll-
-       reveal trigger needs real scroll room below it to fire in. Too
-       little and the document runs out of scroll before the trigger's
-       "top 80%" point is ever reachable, permanently stuck hidden. */
-    padding:clamp(64px, 9vw, 120px) clamp(20px, 4vw, 48px) clamp(140px, 16vw, 220px);
+    padding:clamp(64px, 9vw, 120px) clamp(20px, 4vw, 48px) clamp(56px, 7vw, 96px);
     overflow:clip;
   }
   .typo-titles-stack{
@@ -503,7 +504,7 @@
   }
   .typo-caption{
     max-width:26em;
-    font-size:clamp(15px, 1.1vw, 18px);
+    font-size:clamp(18px, 1.6vw, 26px);
     line-height:1.5;
     font-weight:500;
     text-transform:uppercase;
@@ -968,15 +969,19 @@
     document.querySelectorAll('.typo-line').forEach(function(lineEl){
       var words = splitWords(lineEl);
       gsap.set(words, { yPercent: 115, rotate: 8 });
+      /* The caption is the very last element on the page — there's
+         only as much bottom padding below it as looks right visually,
+         not extra room reserved for the trigger math. "top bottom"
+         fires the instant it starts entering the viewport at all, so
+         it stays reachable regardless of how little padding follows
+         it. The three headline lines above it have real page content
+         after them (the caption itself), so they keep the later
+         "top 92%" trigger that reads better mid-page. */
+      var isLast = lineEl.classList.contains('typo-caption');
       gsap.timeline({
         scrollTrigger: {
           trigger: lineEl,
-          /* Looser than the panels' "top 80%" — this section is the
-             last thing on the page, so the caption line in particular
-             has no scroll room below it to spare; firing a bit earlier
-             keeps it reliably reachable instead of needing the exact
-             amount of bottom padding to line up perfectly. */
-          start: 'top 92%',
+          start: isLast ? 'top bottom' : 'top 92%',
           end: 'bottom 40%',
           toggleActions: 'play none play reverse'
         }
