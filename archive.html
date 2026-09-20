@@ -82,17 +82,38 @@
 
   .archives-intro{
     padding:calc(var(--pad) * 2.6) var(--pad) 0;
-    max-width:44em;
+    max-width:64em;
   }
-  .archives-intro p{
-    font-size:clamp(16px, 1.3vw, 19px);
-    line-height:1.5;
-    opacity:0.75;
+  /* Headline-scale, matching the reference's own dsgn archive intro —
+     this is the page's actual headline, not body copy, so it gets the
+     same Poppins treatment as every other h1/h2 on the site rather
+     than small muted paragraph text. */
+  .archives-intro .archives-headline{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(28px, 3.6vw, 58px);
+    line-height:1.15;
+    letter-spacing:-0.01em;
   }
   .archives-intro .archives-contact{
     font-size:14px;
-    margin-top:0.75em;
+    margin-top:1em;
     opacity:0.55;
+    max-width:44em;
+  }
+
+  /* Word-by-word entrance reveal, same technique as the Ironclad build:
+     each word sits in an overflow:hidden outer span so a transform on
+     the inner span can clip-reveal it, split at runtime via
+     splitWords() rather than hardcoded markup. */
+  .reveal-word{
+    display:inline-block;
+    overflow:hidden;
+    vertical-align:top;
+  }
+  .reveal-word__inner{
+    display:inline-block;
+    transform-origin:left bottom;
   }
 
   /* ── Archive grid — each item is a small click/dot-driven carousel
@@ -101,7 +122,7 @@
      matching the reference dsgn archive's real structure. ── */
   .archives-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns:repeat(auto-fill, minmax(380px, 1fr));
     gap:calc(var(--gap) * 1.6) var(--gap);
     padding:var(--pad);
     list-style:none;
@@ -254,6 +275,7 @@
     pointer-events:none;
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 <body>
 
@@ -277,7 +299,7 @@
   <h1 class="sr">Marlow Archive</h1>
 
   <div class="archives-intro">
-    <p>Marlow Archive is a curated selection of interior design pieces and furniture, including project leftovers, unused vintage finds, and other timeless objects ready for a new home.</p>
+    <p class="archives-headline">Marlow Archive is a curated selection of interior design pieces and furniture, including project leftovers, unused vintage finds, and other timeless objects ready for a new home.</p>
     <p class="archives-contact">For enquiries, please contact us at <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>. All prices are listed in USD. Prices are per item.</p>
   </div>
 
@@ -483,9 +505,43 @@
 <script>
   requestAnimationFrame(function(){
     var wipe = document.getElementById('pageWipe');
-    wipe.style.transition = 'transform 0.6s cubic-bezier(.76,0,.24,1)';
+    wipe.style.transition = 'transform 1.5s cubic-bezier(.16,1,.3,1)';
     wipe.style.transform = 'translateX(100%)';
   });
+
+  /* Word-by-word scroll-in for the headline, same technique as the
+     Ironclad build: split the text into per-word spans, park each one
+     off-screen (translateY + slight rotate) via GSAP so it can
+     interpolate cleanly, then reveal the whole line in a staggered
+     tween the moment it scrolls into view. One-shot via
+     IntersectionObserver — it never re-fires after that. */
+  function splitWords(el){
+    var words = el.textContent.trim().split(/\s+/);
+    el.innerHTML = words.map(function(w){
+      return '<span class="reveal-word"><span class="reveal-word__inner">' + w + '</span></span>';
+    }).join(' ');
+    return el.querySelectorAll('.reveal-word__inner');
+  }
+  var archivesHeadline = document.querySelector('.archives-headline');
+  if (archivesHeadline && window.gsap && 'IntersectionObserver' in window){
+    var headlineWords = splitWords(archivesHeadline);
+    gsap.set(headlineWords, { yPercent: 115, rotate: 8 });
+    var headlineIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          gsap.to(headlineWords, {
+            yPercent: 0,
+            rotate: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+            stagger: 0.025
+          });
+          headlineIO.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    headlineIO.observe(archivesHeadline);
+  }
 
   document.getElementById('logoHome').addEventListener('click', function(e){
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;

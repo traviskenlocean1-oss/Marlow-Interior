@@ -149,6 +149,19 @@
     border-bottom:1px solid rgba(23,19,16,0.15);
   }
   .work-text{ max-width:56em; }
+  /* Word-by-word entrance reveal, same technique as the Ironclad
+     build: each word sits in an overflow:hidden outer span so a
+     transform on the inner span can clip-reveal it, split at runtime
+     via splitWords() rather than hardcoded markup. */
+  .reveal-word{
+    display:inline-block;
+    overflow:hidden;
+    vertical-align:top;
+  }
+  .reveal-word__inner{
+    display:inline-block;
+    transform-origin:left bottom;
+  }
   .presentation{
     font-size:clamp(18px, 1.6vw, 24px);
     line-height:1.4;
@@ -339,6 +352,7 @@
     pointer-events:none;
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 <body>
 
@@ -487,6 +501,38 @@
      dropping the click event on an <img> from a slight mouse-drag
      during the click). Modifier-clicks/middle-click are let through
      un-hijacked so opening in a new tab still works. */
+  /* Word-by-word scroll-in for the intro paragraph, same technique as
+     the Ironclad build: split into per-word spans, park each one off
+     -screen via GSAP, then reveal in a staggered tween the moment it
+     scrolls into view. One-shot via IntersectionObserver. */
+  function splitWords(el){
+    var words = el.textContent.trim().split(/s+/);
+    el.innerHTML = words.map(function(w){
+      return '<span class="reveal-word"><span class="reveal-word__inner">' + w + '</span></span>';
+    }).join(' ');
+    return el.querySelectorAll('.reveal-word__inner');
+  }
+  var presentationEl = document.querySelector('.presentation');
+  if (presentationEl && window.gsap && 'IntersectionObserver' in window){
+    var presentationWords = splitWords(presentationEl);
+    gsap.set(presentationWords, { yPercent: 115, rotate: 8 });
+    var presentationIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          gsap.to(presentationWords, {
+            yPercent: 0,
+            rotate: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+            stagger: 0.02
+          });
+          presentationIO.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    presentationIO.observe(presentationEl);
+  }
+
   document.getElementById('logoHome').addEventListener('click', function(e){
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
