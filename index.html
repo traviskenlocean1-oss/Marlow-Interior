@@ -533,11 +533,23 @@
     width:100%;
     padding-top:34vw;
     min-height:360px;
-    overflow:hidden;
   }
+  /* Real inset on both sides, measured directly off the reference's
+     rendered page (getBoundingClientRect at 1440px: ~50px left,
+     ~66px right of a 1440-wide viewport, i.e. roughly 3.5-4.5%) — our
+     first pass used inset:0 on this and .solution-bar, which runs the
+     photo edge-to-edge with nothing to grow into: position:absolute
+     children measure inset from the parent's PADDING-BOX edge, not
+     inside it, so padding on .solution-item wouldn't actually have
+     inset these — they need their own explicit left/right values
+     instead. The scroll-zoom only enlarges the image *inside* this
+     fixed frame, so this is what keeps it from ever reaching the true
+     viewport edges regardless of scale. */
   .solution-media{
     position:absolute;
-    inset:0;
+    top:0; bottom:0;
+    left:clamp(20px, 4vw, 80px);
+    right:clamp(20px, 4vw, 80px);
     overflow:hidden;
   }
   .solution-media img{
@@ -550,7 +562,9 @@
   }
   .solution-bar{
     position:absolute;
-    left:0; right:0; bottom:0;
+    left:clamp(20px, 4vw, 80px);
+    right:clamp(20px, 4vw, 80px);
+    bottom:0;
     z-index:2;
     display:flex;
     align-items:center;
@@ -1086,19 +1100,25 @@
     });
 
     /* Same scroll-scrubbed zoom technique for the solutions-section
-       photo, tuned to a more dramatic range (1.05 -> 1.45) per
-       Travis's explicit ask that it "noticeably" expand — starts
-       barely cropped in, ends visibly zoomed by the time the item
-       scrolls fully past. */
+       photo. scrub:1.2 (a lag in seconds) rather than scrub:true (an
+       instant 1:1 tie) — Travis found the plain 1:1 version too
+       sensitive/jumpy; the lag makes the image settle smoothly toward
+       wherever the scroll position currently is instead of snapping
+       exactly to it every frame, the same "trailing" smoothing
+       principle as the homepage's own wheel-reveal easing. Range eased
+       back from 1.45 to 1.28 — the photo is now inset with real gutter
+       on both sides (see .solution-media), so it no longer needs a
+       dramatic scale to read as "growing"; it only has to get close to
+       those edges, not slam into them. */
     document.querySelectorAll('.solution-media img').forEach(function(img){
       gsap.to(img, {
-        scale: 1.45,
+        scale: 1.28,
         ease: 'none',
         scrollTrigger: {
           trigger: img.closest('.solution-item'),
           start: 'top bottom',
           end: 'bottom top',
-          scrub: true
+          scrub: 1.2
         }
       });
     });
