@@ -525,14 +525,26 @@
      mouse hover, compared side by side, gave the true before/after).
      Only building one item for now per Travis's explicit request to
      confirm this one before the other two get built the same way. ── */
+  /* Same background color as .typo-titles-section above it, not
+     --ivory — the reference uses the literal same background-color
+     variable for both of these sections (confirmed in their CSS:
+     .section-solutions and .section-typo-titles both read
+     var(--section-colors--light-base)), so on their page there's no
+     seam between them at all. Ours had --ivory here, a visibly
+     different near-white next to the warm gray above it, which read
+     as a stray leftover default rather than an intentional color. */
   .solutions-section{
-    background:var(--ivory);
+    background:#dbdbd8;
   }
   .solution-item{
     position:relative;
     width:100%;
     padding-top:34vw;
     min-height:360px;
+    margin-bottom:clamp(32px, 5vw, 80px);
+  }
+  .solution-item:last-child{
+    margin-bottom:0;
   }
   /* Starting inset on both sides — matches Travis's explicit "the way
      it looks right now, that's the size it needs to be from the
@@ -560,6 +572,11 @@
     object-fit:cover;
     display:block;
   }
+  /* Thin top rule, always visible regardless of hover — found in the
+     reference's own CSS (.solution-showcase-link has a permanent
+     border-top), not something hover toggles. Sits right where the
+     photo meets the info bar, so it reads as a fixed divider marking
+     that this bottom strip is interactive even before anyone hovers. */
   .solution-bar{
     position:absolute;
     left:clamp(20px, 4vw, 80px);
@@ -571,6 +588,7 @@
     justify-content:space-between;
     gap:clamp(16px, 2vw, 32px);
     padding:clamp(18px, 2.4vw, 32px) clamp(20px, 4vw, 48px);
+    border-top:1px solid rgba(246,245,244,0.5);
     text-decoration:none;
     color:var(--ivory);
     overflow:hidden;
@@ -622,7 +640,7 @@
     position:relative;
     z-index:1;
     font-family:'Poppins', sans-serif;
-    font-weight:700;
+    font-weight:500;
     font-size:clamp(28px, 4vw, 56px);
     line-height:1;
     text-transform:uppercase;
@@ -825,6 +843,46 @@
       </div>
       <div class="solution-about">
         <p>Considered interiors for the way people actually live</p>
+      </div>
+      <span class="solution-plus">+</span>
+    </a>
+  </div>
+  <div class="solution-item">
+    <div class="solution-media">
+      <img src="assets/gallery/solutions/renovation.jpg" alt="Marlow Interiors — Renovation">
+    </div>
+    <a href="projects.html" class="solution-bar">
+      <div class="solution-overlay"></div>
+      <div class="solution-label">
+        <span class="solution-dot"></span>
+        <span>Tailored to the space</span>
+      </div>
+      <div class="solution-title">
+        <div class="solution-title-box"></div>
+        <h2>Renovation</h2>
+      </div>
+      <div class="solution-about">
+        <p>Full renovations that respect what's already working</p>
+      </div>
+      <span class="solution-plus">+</span>
+    </a>
+  </div>
+  <div class="solution-item">
+    <div class="solution-media">
+      <img src="assets/gallery/solutions/styling.jpg" alt="Marlow Interiors — Styling">
+    </div>
+    <a href="projects.html" class="solution-bar">
+      <div class="solution-overlay"></div>
+      <div class="solution-label">
+        <span class="solution-dot"></span>
+        <span>Down to the last detail</span>
+      </div>
+      <div class="solution-title">
+        <div class="solution-title-box"></div>
+        <h2>Styling</h2>
+      </div>
+      <div class="solution-about">
+        <p>Furniture, art, and finishing touches, chosen with intention</p>
       </div>
       <span class="solution-plus">+</span>
     </a>
