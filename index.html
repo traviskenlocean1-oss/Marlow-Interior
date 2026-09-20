@@ -515,6 +515,141 @@
     .typo-title-row--1st{ flex-direction:column; align-items:flex-start; gap:16px; }
     .typo-title-image{ width:100%; height:auto; aspect-ratio:4/3; }
   }
+
+  /* ── Solutions showcase — full-bleed photo with a bottom info bar,
+     copied from the Halston reference's real hover mechanism (their
+     own resting-state opacity/transform values read misleadingly via
+     getComputedStyle — a covering element makes the bar look hidden
+     at rest despite reporting opacity:1 — so this reproduces the
+     confirmed VISUAL result: a fresh, un-hovered load and a real
+     mouse hover, compared side by side, gave the true before/after).
+     Only building one item for now per Travis's explicit request to
+     confirm this one before the other two get built the same way. ── */
+  .solutions-section{
+    background:var(--ivory);
+  }
+  .solution-item{
+    position:relative;
+    width:100%;
+    padding-top:34vw;
+    min-height:360px;
+    overflow:hidden;
+  }
+  .solution-media{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+  }
+  .solution-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transform:scale(1.05);
+    will-change:transform;
+  }
+  .solution-bar{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:clamp(16px, 2vw, 32px);
+    padding:clamp(18px, 2.4vw, 32px) clamp(20px, 4vw, 48px);
+    text-decoration:none;
+    color:var(--ivory);
+    overflow:hidden;
+  }
+  .solution-overlay{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:var(--burgundy);
+    opacity:0;
+    transition:opacity 0.4s ease;
+  }
+  .solution-label{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:none;
+    font-size:12px;
+    font-weight:500;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    border:1px solid rgba(246,245,244,0.5);
+    padding:9px 16px;
+    border-radius:999px;
+    transition:transform 0.4s ease;
+  }
+  .solution-dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background:currentColor;
+    flex:none;
+  }
+  .solution-title{
+    position:relative;
+    z-index:2;
+    overflow:hidden;
+  }
+  .solution-title-box{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:rgba(246,245,244,0.16);
+    transform:translateX(-100%);
+    transition:transform 0.5s cubic-bezier(.65,0,.35,1);
+  }
+  .solution-title h2{
+    position:relative;
+    z-index:1;
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+    font-size:clamp(28px, 4vw, 56px);
+    line-height:1;
+    text-transform:uppercase;
+    padding:0.15em 0.35em;
+    margin:0;
+    white-space:nowrap;
+  }
+  .solution-about{
+    position:relative;
+    z-index:2;
+    flex:none;
+    max-width:20em;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity 0.4s ease, transform 0.4s ease;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    text-align:right;
+  }
+  .solution-plus{
+    position:absolute;
+    right:clamp(20px, 4vw, 48px);
+    top:50%;
+    transform:translateY(-50%);
+    z-index:2;
+    font-size:22px;
+    line-height:1;
+    transition:opacity 0.3s ease;
+  }
+  .solution-bar:hover .solution-overlay{ opacity:1; }
+  .solution-bar:hover .solution-label{ transform:translateX(16px); }
+  .solution-bar:hover .solution-title-box{ transform:translateX(0); }
+  .solution-bar:hover .solution-about{ opacity:0.9; transform:translateY(0); }
+  .solution-bar:hover .solution-plus{ opacity:0; }
+  @media (max-width:700px){
+    .solution-item{ padding-top:70vw; }
+    .solution-bar{ flex-wrap:wrap; row-gap:12px; }
+    .solution-about{ display:none; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -656,6 +791,29 @@
       <h2 class="typo-heading typo-line">Lasting solutions</h2>
       <p class="typo-caption typo-line">What the work is built on. Three principles that run through every project we take on.</p>
     </div>
+  </div>
+</section>
+
+<section class="solutions-section">
+  <div class="solution-item">
+    <div class="solution-media">
+      <img src="assets/gallery/solutions/interiors.jpg" alt="Marlow Interiors — Interiors">
+    </div>
+    <a href="projects.html" class="solution-bar">
+      <div class="solution-overlay"></div>
+      <div class="solution-label">
+        <span class="solution-dot"></span>
+        <span>Concept to completion</span>
+      </div>
+      <div class="solution-title">
+        <div class="solution-title-box"></div>
+        <h2>Interiors</h2>
+      </div>
+      <div class="solution-about">
+        <p>Considered interiors for the way people actually live</p>
+      </div>
+      <span class="solution-plus">+</span>
+    </a>
   </div>
 </section>
 
@@ -920,6 +1078,24 @@
         ease: 'none',
         scrollTrigger: {
           trigger: img.closest('.studio-panel'),
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+    });
+
+    /* Same scroll-scrubbed zoom technique for the solutions-section
+       photo, tuned to a more dramatic range (1.05 -> 1.45) per
+       Travis's explicit ask that it "noticeably" expand — starts
+       barely cropped in, ends visibly zoomed by the time the item
+       scrolls fully past. */
+    document.querySelectorAll('.solution-media img').forEach(function(img){
+      gsap.to(img, {
+        scale: 1.45,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: img.closest('.solution-item'),
           start: 'top bottom',
           end: 'bottom top',
           scrub: true
