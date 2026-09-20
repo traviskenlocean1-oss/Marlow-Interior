@@ -291,6 +291,16 @@
 <body>
 
 <div class="cut-transition" id="cutTransition"></div>
+<script>
+  /* Arrival half of the film-cut: start opaque (set synchronously here,
+     before the rest of the page paints, so there's no flash of the
+     page underneath) so navigating here from a project page's logo
+     click — which fades this same overlay to black before leaving —
+     continues the cut instead of jumping straight to a bare page. The
+     fade-out back to 0 happens later, once the reveal mechanism below
+     has actually initialized. */
+  document.getElementById('cutTransition').style.opacity = '1';
+</script>
 
 <div class="hero-nav">
   <a href="index.html" id="logoHome" style="display:block;">
@@ -526,6 +536,21 @@
     requestAnimationFrame(renderReveal);
   }
   requestAnimationFrame(renderReveal);
+
+  /* Fade the arrival overlay back out now that the reveal mechanism
+     above has actually initialized (slide 0 positioned, cursor state
+     set) — completes the cut started either by this page's own
+     synchronous inline script above, or by a project page's logo
+     click fading the same overlay to black just before navigating
+     here. requestAnimationFrame instead of running synchronously so
+     the opacity:1 starting state has actually painted first — setting
+     the transition and the target opacity in the same tick can get
+     coalesced by the browser and skip the fade. */
+  requestAnimationFrame(function(){
+    var overlay = document.getElementById('cutTransition');
+    overlay.style.transition = 'opacity 0.5s ease';
+    overlay.style.opacity = '0';
+  });
 
   /* Logo → home: cut to black, jump back to the hero underneath while
      hidden, cut back in. A plain opacity fade on a fixed full-screen

@@ -323,9 +323,26 @@
   .rs{ grid-area:rs; }
   .legal{ grid-area:legal; }
   .credits{ grid-area:credits; opacity:0.6; }
+
+  /* Full-screen film-cut overlay, same technique as index.html's own
+     logo reset. Fading only .page-content left the fixed header/footer
+     static during the exit, which read as a glitch instead of a clean
+     cut — this covers literally everything (z-index above header's 50
+     and footer's 1) so the whole viewport cuts to black regardless of
+     scroll position, then index.html fades in from black on arrival. */
+  .cut-transition{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+  }
 </style>
 </head>
 <body>
+
+<div class="cut-transition" id="cutTransition"></div>
 
 <header class="site-header">
   <a href="index.html" id="logoHome" style="display:block;">
@@ -460,7 +477,12 @@
     btn.textContent = open ? 'Read less' : 'Read more';
   });
 
-  /* logoHome is a real <a href="index.html"> — a plain click still
+  /* Logo -> home: full-screen cut to black, then navigate — same
+     overlay technique as index.html's own logo reset (covers the
+     whole viewport, including the fixed header/footer, instead of
+     only fading .page-content which read as a glitch).
+
+     logoHome is a real <a href="index.html"> — a plain click still
      navigates even if this handler doesn't fire (e.g. the browser
      dropping the click event on an <img> from a slight mouse-drag
      during the click). Modifier-clicks/middle-click are let through
@@ -468,10 +490,9 @@
   document.getElementById('logoHome').addEventListener('click', function(e){
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
-    var pc = document.querySelector('.page-content');
-    pc.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-    pc.style.transform = 'scale(1.06)';
-    pc.style.opacity = '0';
+    var overlay = document.getElementById('cutTransition');
+    overlay.style.transition = 'opacity 0.5s ease';
+    overlay.style.opacity = '1';
     setTimeout(function(){ window.location.href = 'index.html'; }, 500);
   });
 </script>
