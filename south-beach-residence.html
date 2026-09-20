@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Coral Gables Residence | Marlow Interiors</title>
-<meta name="description" content="Coral Gables Residence — a quiet, considered primary bath and spa renovation by Marlow Interiors in Coral Gables, FL.">
+<title>South Beach Residence | Marlow Interiors</title>
+<meta name="description" content="South Beach Residence — a home bar and lounge renovation by Marlow Interiors in Miami Beach, FL.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
@@ -24,17 +24,12 @@
     background:var(--ivory);
     color:var(--ink);
     overflow-x:hidden;
-    /* No transform/animation on body itself, deliberately — see the
-       comment on .page-content below for why. */
   }
   @keyframes page-in{
     from{ opacity:0; transform:scale(0.97); }
     to{ opacity:1; transform:scale(1); }
   }
-
   a{ color:inherit; }
-
-  /* ── Header — fixed, transparent over the banner ── */
   .site-header{
     position:fixed;
     top:0; left:0; right:0;
@@ -63,8 +58,6 @@
   @media (max-width:640px){
     .site-header nav{ display:none; }
   }
-
-  /* ── Banner ── */
   .banner{
     position:relative;
     height:100vh;
@@ -96,7 +89,6 @@
     justify-items:center;
     padding:var(--pad);
     text-align:center;
-    /* Comes up slowly on load — not instant. */
     animation:title-in 1.1s 0.15s cubic-bezier(.16,1,.3,1) both;
   }
   @keyframes title-in{
@@ -106,7 +98,7 @@
   .banner-title h1{
     font-family:'Poppins', sans-serif;
     font-weight:500;
-    font-size:clamp(46px, 8.45vw, 150px);
+    font-size:clamp(40px, 7.2vw, 130px);
     line-height:1;
     letter-spacing:-0.047em;
     color:var(--ivory);
@@ -115,8 +107,6 @@
   @media (max-width:640px){
     .banner-title h1{ white-space:normal; }
   }
-
-  /* ── Specs + description ── */
   .work-texts{
     display:grid;
     grid-template-columns:1fr 2fr;
@@ -132,9 +122,7 @@
   @media (max-width:800px){
     .work-texts{ grid-template-columns:1fr; }
   }
-  .work-specs{
-    padding-top:7px;
-  }
+  .work-specs{ padding-top:7px; }
   .work-specs dt{
     font-size:13px;
     text-transform:uppercase;
@@ -154,43 +142,6 @@
     line-height:1.4;
     letter-spacing:-0.01em;
   }
-  .readmore-toggle{
-    display:inline-block;
-    margin-top:1em;
-    font-size:15px;
-    text-decoration:underline;
-    text-underline-offset:3px;
-    cursor:pointer;
-    background:none;
-    border:none;
-    color:inherit;
-    font-family:inherit;
-    padding:0;
-  }
-  .readmore{
-    display:grid;
-    grid-template-rows:0fr;
-    opacity:0;
-    transition:grid-template-rows 0.6s cubic-bezier(.16,1,.3,1), opacity 0.5s ease;
-  }
-  .readmore.open{
-    grid-template-rows:1fr;
-    opacity:1;
-  }
-  .readmore-inner{
-    overflow:hidden;
-    min-height:0;
-    padding-top:1.5em;
-  }
-  .readmore p{
-    font-size:16px;
-    line-height:1.6;
-    opacity:0.85;
-  }
-  .readmore p + p{ margin-top:1em; }
-
-  /* ── Gallery — 6-column grid, blocks span 2/4/6, matching the
-     reference's own real gallery system exactly. ── */
   .work-gallery{
     display:grid;
     gap:var(--gap);
@@ -210,8 +161,6 @@
     .gallery-row{ grid-template-columns:repeat(2, 1fr); }
     .block{ grid-column:span 2 !important; }
   }
-
-  /* ── Discover more works ── */
   .work-related{
     margin:0 var(--pad);
     padding:var(--pad) 0;
@@ -232,11 +181,7 @@
   @media (max-width:700px){
     .works-grid{ grid-template-columns:1fr; }
   }
-  .work-link{
-    display:block;
-    text-decoration:none;
-    color:inherit;
-  }
+  .work-link{ display:block; text-decoration:none; color:inherit; }
   .work-cover{
     position:relative;
     aspect-ratio:3 / 4;
@@ -244,25 +189,17 @@
     background:var(--bg-fallback);
   }
   .work-cover img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    filter:grayscale(1);
-    transform:scale(1.02);
+    width:100%; height:100%; object-fit:cover;
+    filter:grayscale(1); transform:scale(1.02);
     transition:filter 0.5s ease, transform 0.6s ease;
   }
-  .work-link:hover .work-cover img{
-    filter:grayscale(0);
-    transform:scale(1.06);
-  }
+  .work-link:hover .work-cover img{ filter:grayscale(0); transform:scale(1.06); }
   .work-title{
     font-family:'Poppins', sans-serif;
     font-weight:500;
     font-size:clamp(18px, 1.6vw, 24px);
     padding:0.6em 0;
   }
-
-  /* ── "Coming up" reveal footer ── */
   .page-content{
     position:relative;
     z-index:2;
@@ -323,13 +260,6 @@
   .rs{ grid-area:rs; }
   .legal{ grid-area:legal; }
   .credits{ grid-area:credits; opacity:0.6; }
-
-  /* Full-screen film-cut overlay, same technique as index.html's own
-     logo reset. Fading only .page-content left the fixed header/footer
-     static during the exit, which read as a glitch instead of a clean
-     cut — this covers literally everything (z-index above header's 50
-     and footer's 1) so the whole viewport cuts to black regardless of
-     scroll position, then index.html fades in from black on arrival. */
   .cut-transition{
     position:fixed;
     inset:0;
@@ -359,62 +289,30 @@
 <div class="page-content">
 
 <section class="banner">
-  <img src="assets/gallery/project2-banner.jpg" alt="Coral Gables Residence">
+  <img src="assets/gallery/south-beach/banner.jpg" alt="South Beach Residence">
   <div class="banner-title">
-    <h1>Coral Gables Residence</h1>
+    <h1>South Beach Residence</h1>
   </div>
 </section>
 
 <div class="work-texts">
   <dl class="work-specs">
-    <dt>Location</dt><dd>Coral Gables, FL</dd>
-    <dt>Area</dt><dd>2,850 sqft</dd>
+    <dt>Location</dt><dd>Miami Beach, FL</dd>
+    <dt>Area</dt><dd>1,400 sqft</dd>
     <dt>Year</dt><dd>2024</dd>
   </dl>
   <div class="work-text">
-    <p class="presentation">Coral Gables Residence is a primary bath and spa renovation built around stone, water, and very little else. Carved dolomite, reclaimed teak, and a planted courtyard just past the glass turn a daily routine into something closer to a ritual.</p>
-    <button class="readmore-toggle" id="readMoreBtn" aria-expanded="false">Read more</button>
-    <div class="readmore" id="readMoreContent">
-      <div class="readmore-inner">
-        <p>The existing bath was landlocked — no daylight, no connection to the garden six feet away. The renovation opened the long wall entirely to a private courtyard, replacing it with pivoting glass that disappears fully into the frame when opened.</p>
-        <p>The tub is a single carved block of dolomite, set directly into a bed of river stone rather than a finished floor — a deliberate blur between inside and outside that continues into the shower, tiled in the same warm terracotta as the courtyard wall beyond it.</p>
-        <p>Everything else stays quiet: teak millwork, honed stone floors, and fixtures in aged brass that were chosen specifically to darken and soften with use rather than stay showroom-new.</p>
-      </div>
-    </div>
+    <p class="presentation">A home bar built for the way this client actually entertains — low light, warm brass, and a counter long enough for six people to lean on at once.</p>
   </div>
 </div>
 
 <div class="work-gallery">
   <div class="gallery-row">
     <div class="block block-landscape" style="--span:4">
-      <img src="assets/gallery/coral-gables/row2-b-marble-chandelier.jpg" alt="Coral Gables Residence marble bath">
+      <img src="assets/gallery/south-beach/row1-a-bar-detail.jpg" alt="South Beach Residence bar counter detail">
     </div>
     <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/coral-gables/row1-b-stone-tub.jpg" alt="Coral Gables Residence stone tub detail">
-    </div>
-  </div>
-  <div class="gallery-row">
-    <div class="block block-portrait" style="--span:3">
-      <img src="assets/gallery/coral-gables/row1-a-marble-view.jpg" alt="Coral Gables Residence bath with courtyard view">
-    </div>
-    <div class="block block-portrait" style="--span:3">
-      <img src="assets/gallery/coral-gables/row2-a-terracotta.jpg" alt="Coral Gables Residence terracotta wall detail">
-    </div>
-  </div>
-  <div class="gallery-row">
-    <div class="block block-landscape" style="--span:6">
-      <img src="assets/gallery/coral-gables/row3-hero-sauna-shower.jpg" alt="Coral Gables Residence sauna and marble shower, full width">
-    </div>
-  </div>
-  <div class="gallery-row">
-    <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/coral-gables/row4-a-glass-shower-gold.jpg" alt="Coral Gables Residence glass shower with brass fixtures">
-    </div>
-    <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/coral-gables/row4-b-glass-shower-chrome.jpg" alt="Coral Gables Residence glass shower detail">
-    </div>
-    <div class="block block-portrait" style="--span:2">
-      <img src="assets/gallery/coral-gables/row4-c-freestanding-tub.jpg" alt="Coral Gables Residence freestanding tub by the window">
+      <img src="assets/gallery/south-beach/row1-b-lounge-corner.jpg" alt="South Beach Residence lounge corner">
     </div>
   </div>
 </div>
@@ -423,19 +321,19 @@
   <h2>Discover more works</h2>
   <ul class="works-grid" style="list-style:none;">
     <li>
-      <a href="bayshore-residence.html" class="work-link">
+      <a href="aventura-residence.html" class="work-link">
         <div class="work-cover">
-          <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+          <img src="assets/gallery/aventura/banner.jpg" alt="Aventura Residence">
         </div>
-        <h3 class="work-title">Bayshore Residence</h3>
+        <h3 class="work-title">Aventura Residence</h3>
       </a>
     </li>
     <li>
-      <a href="sunset-harbour-residence.html" class="work-link">
+      <a href="palm-island-residence.html" class="work-link">
         <div class="work-cover">
-          <img src="assets/gallery/project3-banner.jpg" alt="Sunset Harbour Residence">
+          <img src="assets/gallery/palm-island/banner.jpg" alt="Palm Island Residence">
         </div>
-        <h3 class="work-title">Sunset Harbour Residence</h3>
+        <h3 class="work-title">Palm Island Residence</h3>
       </a>
     </li>
   </ul>
@@ -469,24 +367,6 @@
 </footer>
 
 <script>
-  var btn = document.getElementById('readMoreBtn');
-  var content = document.getElementById('readMoreContent');
-  btn.addEventListener('click', function(){
-    var open = content.classList.toggle('open');
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    btn.textContent = open ? 'Read less' : 'Read more';
-  });
-
-  /* Logo -> home: full-screen cut to black, then navigate — same
-     overlay technique as index.html's own logo reset (covers the
-     whole viewport, including the fixed header/footer, instead of
-     only fading .page-content which read as a glitch).
-
-     logoHome is a real <a href="index.html"> — a plain click still
-     navigates even if this handler doesn't fire (e.g. the browser
-     dropping the click event on an <img> from a slight mouse-drag
-     during the click). Modifier-clicks/middle-click are let through
-     un-hijacked so opening in a new tab still works. */
   document.getElementById('logoHome').addEventListener('click', function(e){
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();

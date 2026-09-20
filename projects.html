@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects | Marlow Interiors</title>
+<meta name="description" content="Selected interior design projects by Marlow Interiors — residential work across Miami and South Florida.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#f6f5f4;
+    --ink:#171310;
+    --bg-fallback:#3a2a22;
+    --pad:clamp(20px, 4vw, 48px);
+    --gap:clamp(14px, 1.6vw, 24px);
+    --footer-h:clamp(320px, 32vw, 420px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:auto;}
+  body{
+    font-family:'Hanken Grotesk', sans-serif;
+    background:var(--ivory);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  @keyframes page-in{
+    from{ opacity:0; transform:scale(0.97); }
+    to{ opacity:1; transform:scale(1); }
+  }
+  a{ color:inherit; }
+
+  /* ── Header — this page has no dark banner behind it, so unlike the
+     project pages it's a solid light bar with the ink logo/text, not a
+     transparent overlay with the white logo. ── */
+  .site-header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:24px var(--pad);
+    background:var(--ivory);
+    border-bottom:1px solid rgba(23,19,16,0.08);
+  }
+  .site-header img{ height:44px; width:auto; display:block; cursor:pointer; }
+  .site-header nav{
+    display:flex;
+    align-items:center;
+    gap:clamp(20px, 2.6vw, 40px);
+  }
+  .site-header nav a{
+    color:var(--ink);
+    text-decoration:none;
+    font-size:clamp(15px, 1.4vw, 20px);
+    font-weight:400;
+    letter-spacing:-0.02em;
+    opacity:0.65;
+    transition:opacity 0.2s ease;
+  }
+  .site-header nav a:hover, .site-header nav a.active{ opacity:1; }
+  @media (max-width:640px){
+    .site-header nav{ display:none; }
+  }
+
+  .page-content{
+    position:relative;
+    z-index:2;
+    background:var(--ivory);
+    margin-bottom:var(--footer-h);
+    animation:page-in 0.6s ease backwards;
+  }
+
+  /* Visually hidden but present for screen readers/SEO — the reference
+     site's own Projects page has no visible heading either, it goes
+     straight into the grid under the header. */
+  .sr{
+    position:absolute;
+    width:1px; height:1px;
+    padding:0; margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  /* ── Projects grid — grayscale by default, colorizes on hover. Same
+     technique as the "Discover more works" cover treatment on each
+     project page, just at index-page scale (more columns, more
+     items). Simple CSS filter crossfade rather than the reference's
+     two-stacked-picture-layers approach — same visual result, one
+     fewer image request per card. ── */
+  .projects-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+    gap:var(--gap);
+    padding:calc(var(--pad) * 2.6) var(--pad) var(--pad);
+    list-style:none;
+  }
+  .work-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+  }
+  .work-cover{
+    position:relative;
+    aspect-ratio:3 / 4;
+    overflow:hidden;
+    background:var(--bg-fallback);
+  }
+  .work-cover img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter:grayscale(1);
+    transform:scale(1.02);
+    transition:filter 0.5s ease, transform 0.6s ease;
+  }
+  .work-link:hover .work-cover img{
+    filter:grayscale(0);
+    transform:scale(1.06);
+  }
+  .work-title{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(18px, 1.6vw, 24px);
+    padding:0.6em 0;
+  }
+
+  .site-footer{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    z-index:1;
+    height:var(--footer-h);
+    font-size:14px;
+    color:var(--ivory);
+    background:var(--ink);
+    padding:var(--pad);
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns:auto auto 1fr auto auto;
+    grid-template-rows:1fr auto;
+    grid-template-areas:
+      "logo logo . . ."
+      "contacts address rs legal credits";
+    gap:1em calc(var(--gap) * 2);
+    min-height:clamp(220px, 28vw, 320px);
+  }
+  @media (max-width:900px){
+    .footer-grid{
+      grid-template-columns:1fr;
+      grid-template-rows:auto;
+      grid-template-areas:"logo" "contacts" "address" "rs" "legal" "credits";
+    }
+  }
+  .footer-grid > *{ display:grid; gap:0.35em; align-content:end; }
+  .footer-grid a{ color:inherit; text-decoration:none; opacity:0.85; }
+  .footer-grid a:hover{ opacity:1; }
+  .footer-logo{
+    grid-area:logo;
+    align-items:start;
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(40px, 7vw, 96px);
+    letter-spacing:-0.03em;
+    line-height:0.95;
+  }
+  .footer-logo span{
+    display:block;
+    font-family:'Hanken Grotesk', sans-serif;
+    font-weight:400;
+    font-size:clamp(14px, 1.2vw, 18px);
+    letter-spacing:0.02em;
+    opacity:0.7;
+    margin-top:0.2em;
+  }
+  .contacts{ grid-area:contacts; }
+  .address{ grid-area:address; }
+  .rs{ grid-area:rs; }
+  .legal{ grid-area:legal; }
+  .credits{ grid-area:credits; opacity:0.6; }
+
+  .cut-transition{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+  }
+
+  /* ── Entry wipe: a white bar sweeps across on load, then recedes to
+     reveal the (already-rendered, grayscale) grid underneath — the
+     "fast swipe" Travis described from the reference site's own route
+     transition. Distinct from the black cut-transition used by the
+     logo, which is the fixed "returning home" motion; this is the
+     section-page arrival motion. Starts fully covering the screen
+     (set synchronously below, before paint) and wipes off to the
+     right with a fast, decisive ease. ── */
+  .page-wipe{
+    position:fixed;
+    inset:0;
+    z-index:99;
+    background:var(--ivory);
+    transform:translateX(0);
+    pointer-events:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="cut-transition" id="cutTransition"></div>
+<div class="page-wipe" id="pageWipe"></div>
+
+<header class="site-header">
+  <a href="index.html" id="logoHome" style="display:block;">
+    <img src="assets/marlow-logo.png" alt="Marlow Interiors" draggable="false" style="cursor:pointer;display:block;-webkit-user-drag:none;">
+  </a>
+  <nav>
+    <a href="projects.html" class="active">Projects</a>
+    <a href="archive.html">Archive</a>
+    <a href="studio.html">Studio</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<div class="page-content">
+
+  <h1 class="sr">Projects</h1>
+
+  <ul class="projects-grid">
+    <li>
+      <a href="bayshore-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+        </div>
+        <h2 class="work-title">Bayshore Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="coral-gables-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/project2-banner.jpg" alt="Coral Gables Residence">
+        </div>
+        <h2 class="work-title">Coral Gables Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="sunset-harbour-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/project3-banner.jpg" alt="Sunset Harbour Residence">
+        </div>
+        <h2 class="work-title">Sunset Harbour Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="brickell-loft-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/brickell-loft/banner.jpg" alt="Brickell Loft Residence">
+        </div>
+        <h2 class="work-title">Brickell Loft Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="pinecrest-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/pinecrest/banner.jpg" alt="Pinecrest Residence">
+        </div>
+        <h2 class="work-title">Pinecrest Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="key-biscayne-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/key-biscayne/banner.jpg" alt="Key Biscayne Residence">
+        </div>
+        <h2 class="work-title">Key Biscayne Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="south-beach-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/south-beach/banner.jpg" alt="South Beach Residence">
+        </div>
+        <h2 class="work-title">South Beach Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="coconut-grove-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/coconut-grove/banner.jpg" alt="Coconut Grove Residence">
+        </div>
+        <h2 class="work-title">Coconut Grove Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="aventura-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/aventura/banner.jpg" alt="Aventura Residence">
+        </div>
+        <h2 class="work-title">Aventura Residence</h2>
+      </a>
+    </li>
+    <li>
+      <a href="palm-island-residence.html" class="work-link">
+        <div class="work-cover">
+          <img src="assets/gallery/palm-island/banner.jpg" alt="Palm Island Residence">
+        </div>
+        <h2 class="work-title">Palm Island Residence</h2>
+      </a>
+    </li>
+  </ul>
+
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-logo">Marlow<span>Interior Design Studio</span></div>
+    <div class="contacts">
+      <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>
+      <a href="tel:+13055550148">+1 (305) 555-0148</a>
+    </div>
+    <div class="address">
+      <span>140 NE 39th St</span>
+      <span>Miami, FL 33137</span>
+    </div>
+    <div class="rs">
+      <a href="#" target="_blank" rel="noopener">Instagram</a>
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="legal">
+      <a href="#">Legal Notice</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <div class="credits">
+      <p>&copy; 2026, Marlow Interiors</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* Entry wipe: set at opacity/position covering (already is, via CSS
+     default), then slide off on the next frame so the covering state
+     actually paints first before the transition starts. */
+  requestAnimationFrame(function(){
+    var wipe = document.getElementById('pageWipe');
+    wipe.style.transition = 'transform 0.6s cubic-bezier(.76,0,.24,1)';
+    wipe.style.transform = 'translateX(100%)';
+  });
+
+  /* Logo -> home: full-screen cut to black, then navigate — same
+     overlay technique used on every other page. */
+  document.getElementById('logoHome').addEventListener('click', function(e){
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    var overlay = document.getElementById('cutTransition');
+    overlay.style.transition = 'opacity 0.5s ease';
+    overlay.style.opacity = '1';
+    setTimeout(function(){ window.location.href = 'index.html'; }, 500);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive | Marlow Interiors</title>
+<meta name="description" content="Marlow Archive — a curated selection of vintage and reclaimed furniture, project surplus, and timeless pieces ready for a new home.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#f6f5f4;
+    --ink:#171310;
+    --bg-fallback:#3a2a22;
+    --pad:clamp(20px, 4vw, 48px);
+    --gap:clamp(14px, 1.6vw, 24px);
+    --footer-h:clamp(320px, 32vw, 420px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:auto;}
+  body{
+    font-family:'Hanken Grotesk', sans-serif;
+    background:var(--ivory);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  @keyframes page-in{
+    from{ opacity:0; transform:scale(0.97); }
+    to{ opacity:1; transform:scale(1); }
+  }
+  a{ color:inherit; }
+
+  .site-header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:24px var(--pad);
+    background:var(--ivory);
+    border-bottom:1px solid rgba(23,19,16,0.08);
+  }
+  .site-header img{ height:44px; width:auto; display:block; cursor:pointer; }
+  .site-header nav{
+    display:flex;
+    align-items:center;
+    gap:clamp(20px, 2.6vw, 40px);
+  }
+  .site-header nav a{
+    color:var(--ink);
+    text-decoration:none;
+    font-size:clamp(15px, 1.4vw, 20px);
+    font-weight:400;
+    letter-spacing:-0.02em;
+    opacity:0.65;
+    transition:opacity 0.2s ease;
+  }
+  .site-header nav a:hover, .site-header nav a.active{ opacity:1; }
+  @media (max-width:640px){
+    .site-header nav{ display:none; }
+  }
+
+  .page-content{
+    position:relative;
+    z-index:2;
+    background:var(--ivory);
+    margin-bottom:var(--footer-h);
+    animation:page-in 0.6s ease backwards;
+  }
+
+  .sr{
+    position:absolute;
+    width:1px; height:1px;
+    padding:0; margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  .archives-intro{
+    padding:calc(var(--pad) * 2.6) var(--pad) 0;
+    max-width:44em;
+  }
+  .archives-intro p{
+    font-size:clamp(16px, 1.3vw, 19px);
+    line-height:1.5;
+    opacity:0.75;
+  }
+  .archives-intro .archives-contact{
+    font-size:14px;
+    margin-top:0.75em;
+    opacity:0.55;
+  }
+
+  /* ── Archive grid — each item is a small click/dot-driven carousel
+     (no drag, no library: this site deliberately doesn't use Swiper —
+     see index.html's own reveal mechanism for why) plus a specs list,
+     matching the reference dsgn archive's real structure. ── */
+  .archives-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:calc(var(--gap) * 1.6) var(--gap);
+    padding:var(--pad);
+    list-style:none;
+  }
+  .archive-media{
+    position:relative;
+    aspect-ratio:3 / 4;
+    overflow:hidden;
+    background:var(--bg-fallback);
+    cursor:pointer;
+  }
+  .archive-slides{
+    display:flex;
+    width:100%;
+    height:100%;
+    transition:transform 0.5s cubic-bezier(.65,0,.35,1);
+  }
+  .archive-slide{
+    flex:0 0 100%;
+    width:100%;
+    height:100%;
+  }
+  .archive-slide img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    filter:grayscale(1);
+    transform:scale(1.02);
+    transition:filter 0.4s ease, transform 0.5s ease;
+  }
+  .archive-media:hover .archive-slide img{
+    filter:grayscale(0);
+    transform:scale(1.05);
+  }
+  .archive-pagination{
+    position:absolute;
+    bottom:14px; left:0; right:0;
+    display:flex;
+    justify-content:center;
+    gap:7px;
+    z-index:2;
+  }
+  .archive-dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.5);
+    border:none;
+    padding:0;
+    cursor:pointer;
+    transition:background 0.2s ease, transform 0.2s ease;
+  }
+  .archive-dot.active{ background:#fff; transform:scale(1.35); }
+
+  .archive-text{ padding-top:0.85em; }
+  .archive-title{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(17px, 1.4vw, 20px);
+    margin-bottom:0.55em;
+  }
+  .archive-specs{
+    display:grid;
+    grid-template-columns:max-content auto;
+    font-size:14px;
+  }
+  .archive-specs dt{
+    opacity:0.55;
+    padding:0.3em 0;
+    border-top:1px solid rgba(23,19,16,0.12);
+  }
+  .archive-specs dd{
+    padding:0.3em 0;
+    padding-left:calc(var(--gap) * 1.2);
+    text-align:right;
+    border-top:1px solid rgba(23,19,16,0.12);
+  }
+  .archive-specs dt:last-of-type, .archive-specs dd:last-of-type{
+    border-bottom:1px solid rgba(23,19,16,0.12);
+  }
+
+  .site-footer{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    z-index:1;
+    height:var(--footer-h);
+    font-size:14px;
+    color:var(--ivory);
+    background:var(--ink);
+    padding:var(--pad);
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns:auto auto 1fr auto auto;
+    grid-template-rows:1fr auto;
+    grid-template-areas:
+      "logo logo . . ."
+      "contacts address rs legal credits";
+    gap:1em calc(var(--gap) * 2);
+    min-height:clamp(220px, 28vw, 320px);
+  }
+  @media (max-width:900px){
+    .footer-grid{
+      grid-template-columns:1fr;
+      grid-template-rows:auto;
+      grid-template-areas:"logo" "contacts" "address" "rs" "legal" "credits";
+    }
+  }
+  .footer-grid > *{ display:grid; gap:0.35em; align-content:end; }
+  .footer-grid a{ color:inherit; text-decoration:none; opacity:0.85; }
+  .footer-grid a:hover{ opacity:1; }
+  .footer-logo{
+    grid-area:logo;
+    align-items:start;
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(40px, 7vw, 96px);
+    letter-spacing:-0.03em;
+    line-height:0.95;
+  }
+  .footer-logo span{
+    display:block;
+    font-family:'Hanken Grotesk', sans-serif;
+    font-weight:400;
+    font-size:clamp(14px, 1.2vw, 18px);
+    letter-spacing:0.02em;
+    opacity:0.7;
+    margin-top:0.2em;
+  }
+  .contacts{ grid-area:contacts; }
+  .address{ grid-area:address; }
+  .rs{ grid-area:rs; }
+  .legal{ grid-area:legal; }
+  .credits{ grid-area:credits; opacity:0.6; }
+
+  .cut-transition{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+  }
+  .page-wipe{
+    position:fixed;
+    inset:0;
+    z-index:99;
+    background:var(--ivory);
+    transform:translateX(0);
+    pointer-events:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="cut-transition" id="cutTransition"></div>
+<div class="page-wipe" id="pageWipe"></div>
+
+<header class="site-header">
+  <a href="index.html" id="logoHome" style="display:block;">
+    <img src="assets/marlow-logo.png" alt="Marlow Interiors" draggable="false" style="cursor:pointer;display:block;-webkit-user-drag:none;">
+  </a>
+  <nav>
+    <a href="projects.html">Projects</a>
+    <a href="archive.html" class="active">Archive</a>
+    <a href="studio.html">Studio</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<div class="page-content">
+
+  <h1 class="sr">Marlow Archive</h1>
+
+  <div class="archives-intro">
+    <p>Marlow Archive is a curated selection of interior design pieces and furniture, including project leftovers, unused vintage finds, and other timeless objects ready for a new home.</p>
+    <p class="archives-contact">For enquiries, please contact us at <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>. All prices are listed in USD. Prices are per item.</p>
+  </div>
+
+  <ul class="archives-grid">
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/01-dining-chair.jpg" alt="Danish-style dining chair"></div>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #001</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Danish-Style Dining Chair</dd>
+          <dt>Quantity</dt><dd>4</dd>
+          <dt>Condition</dt><dd>Restored</dd>
+          <dt>Price</dt><dd>$220 each</dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/02-lounge-chair.jpg" alt="Mid-century lounge chair"></div>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #002</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Mid-Century Lounge Chair</dd>
+          <dt>Quantity</dt><dd>1</dd>
+          <dt>Condition</dt><dd>Good</dd>
+          <dt>Price</dt><dd>$340</dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/03-bench-a.jpg" alt="Reclaimed trestle bench, first of a pair"></div>
+          <div class="archive-slide"><img src="assets/gallery/archive/03-bench-b.jpg" alt="Reclaimed trestle bench, second of a pair"></div>
+        </div>
+        <div class="archive-pagination">
+          <button class="archive-dot active" aria-label="Slide 1"></button>
+          <button class="archive-dot" aria-label="Slide 2"></button>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #003</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Reclaimed Trestle Bench (Pair)</dd>
+          <dt>Quantity</dt><dd>2</dd>
+          <dt>Condition</dt><dd>Patinated</dd>
+          <dt>Price</dt><dd>$180</dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/04-brass-lamp.jpg" alt="Brass table lamp"></div>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #004</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Brass Table Lamp</dd>
+          <dt>Quantity</dt><dd>1</dd>
+          <dt>Condition</dt><dd>Rewired, working</dd>
+          <dt>Price</dt><dd>$95</dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/05-oval-mirror.jpg" alt="Gilt oval mirror"></div>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #005</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Gilt Oval Mirror</dd>
+          <dt>Quantity</dt><dd>1</dd>
+          <dt>Condition</dt><dd>Excellent</dd>
+          <dt>Price</dt><dd>$260</dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/06-kilim-a.jpg" alt="Vintage kilim rug, folded"></div>
+          <div class="archive-slide"><img src="assets/gallery/archive/06-kilim-b.jpg" alt="Vintage kilim rug, on display"></div>
+        </div>
+        <div class="archive-pagination">
+          <button class="archive-dot active" aria-label="Slide 1"></button>
+          <button class="archive-dot" aria-label="Slide 2"></button>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #006</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Vintage Kilim Rug (5&times;7)</dd>
+          <dt>Quantity</dt><dd>1</dd>
+          <dt>Condition</dt><dd>Good</dd>
+          <dt>Price</dt><dd>$410</dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/07-oak-stool.jpg" alt="Turned oak stool"></div>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #007</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Turned Oak Stool</dd>
+          <dt>Quantity</dt><dd>1</dd>
+          <dt>Condition</dt><dd>Good</dd>
+          <dt>Price</dt><dd>$85</dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/08-pendant-a.jpg" alt="Industrial dome pendant light"></div>
+          <div class="archive-slide"><img src="assets/gallery/archive/08-pendant-b.jpg" alt="Industrial cage pendant light"></div>
+        </div>
+        <div class="archive-pagination">
+          <button class="archive-dot active" aria-label="Slide 1"></button>
+          <button class="archive-dot" aria-label="Slide 2"></button>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #008</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Industrial Pendant Light (Set of 2)</dd>
+          <dt>Quantity</dt><dd>2</dd>
+          <dt>Condition</dt><dd>Working</dd>
+          <dt>Price</dt><dd>$150</dd>
+        </dl>
+      </div>
+    </li>
+
+    <li class="archive">
+      <div class="archive-media">
+        <div class="archive-slides">
+          <div class="archive-slide"><img src="assets/gallery/archive/09-sideboard.jpg" alt="Antique wood sideboard"></div>
+        </div>
+      </div>
+      <div class="archive-text">
+        <h2 class="archive-title">Archive #009</h2>
+        <dl class="archive-specs">
+          <dt>Object</dt><dd>Antique Wood Sideboard</dd>
+          <dt>Quantity</dt><dd>1</dd>
+          <dt>Condition</dt><dd>Minor wear</dd>
+          <dt>Price</dt><dd>$520</dd>
+        </dl>
+      </div>
+    </li>
+
+  </ul>
+
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-logo">Marlow<span>Interior Design Studio</span></div>
+    <div class="contacts">
+      <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>
+      <a href="tel:+13055550148">+1 (305) 555-0148</a>
+    </div>
+    <div class="address">
+      <span>140 NE 39th St</span>
+      <span>Miami, FL 33137</span>
+    </div>
+    <div class="rs">
+      <a href="#" target="_blank" rel="noopener">Instagram</a>
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="legal">
+      <a href="#">Legal Notice</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <div class="credits">
+      <p>&copy; 2026, Marlow Interiors</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  requestAnimationFrame(function(){
+    var wipe = document.getElementById('pageWipe');
+    wipe.style.transition = 'transform 0.6s cubic-bezier(.76,0,.24,1)';
+    wipe.style.transform = 'translateX(100%)';
+  });
+
+  document.getElementById('logoHome').addEventListener('click', function(e){
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    var overlay = document.getElementById('cutTransition');
+    overlay.style.transition = 'opacity 0.5s ease';
+    overlay.style.opacity = '1';
+    setTimeout(function(){ window.location.href = 'index.html'; }, 500);
+  });
+
+  /* Per-item carousel: click the media to advance, click a dot to jump
+     directly — "when you click on it, it swipes over to the next", per
+     Travis's description of the reference site's archive behavior.
+     Single-slide items skip this entirely (no dots, nothing to
+     advance to). No drag/swipe-gesture library, consistent with this
+     site's standing "no Swiper" decision (see index.html). */
+  document.querySelectorAll('.archive-media').forEach(function(media){
+    var slides = media.querySelectorAll('.archive-slide');
+    if (slides.length < 2) return;
+    var track = media.querySelector('.archive-slides');
+    var dots = media.querySelectorAll('.archive-dot');
+    var index = 0;
+    function goTo(i){
+      index = (i + slides.length) % slides.length;
+      track.style.transform = 'translateX(-' + (index * 100) + '%)';
+      dots.forEach(function(d, di){ d.classList.toggle('active', di === index); });
+    }
+    media.addEventListener('click', function(e){
+      if (e.target.closest('.archive-dot')) return;
+      goTo(index + 1);
+    });
+    dots.forEach(function(dot, i){
+      dot.addEventListener('click', function(e){
+        e.stopPropagation();
+        goTo(i);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
