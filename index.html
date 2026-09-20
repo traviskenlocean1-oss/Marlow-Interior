@@ -534,17 +534,19 @@
     padding-top:34vw;
     min-height:360px;
   }
-  /* Real inset on both sides, measured directly off the reference's
-     rendered page (getBoundingClientRect at 1440px: ~50px left,
-     ~66px right of a 1440-wide viewport, i.e. roughly 3.5-4.5%) — our
-     first pass used inset:0 on this and .solution-bar, which runs the
-     photo edge-to-edge with nothing to grow into: position:absolute
-     children measure inset from the parent's PADDING-BOX edge, not
-     inside it, so padding on .solution-item wouldn't actually have
-     inset these — they need their own explicit left/right values
-     instead. The scroll-zoom only enlarges the image *inside* this
-     fixed frame, so this is what keeps it from ever reaching the true
-     viewport edges regardless of scale. */
+  /* Starting inset on both sides — matches Travis's explicit "the way
+     it looks right now, that's the size it needs to be from the
+     beginning" — roughly the reference's own resting gutter
+     (getBoundingClientRect at 1440px: ~50-66px, ~3.5-4.5%). This is
+     the FROM state for the scroll-driven grow below: the frame itself
+     widens as you scroll (left/right insets tweened toward a thin
+     sliver via GSAP), not the image scaling inside a fixed frame —
+     object-fit:cover just keeps the photo filling whatever size the
+     frame currently is, no transform on the img at all. Using
+     explicit left/right here rather than padding on .solution-item:
+     position:absolute children measure inset from the parent's
+     padding-box edge, not inside it, so the parent's own padding
+     wouldn't actually move these. */
   .solution-media{
     position:absolute;
     top:0; bottom:0;
@@ -557,8 +559,6 @@
     height:100%;
     object-fit:cover;
     display:block;
-    transform:scale(1.05);
-    will-change:transform;
   }
   .solution-bar{
     position:absolute;
@@ -1099,25 +1099,40 @@
       });
     });
 
-    /* Same scroll-scrubbed zoom technique for the solutions-section
-       photo. scrub:1.2 (a lag in seconds) rather than scrub:true (an
-       instant 1:1 tie) — Travis found the plain 1:1 version too
-       sensitive/jumpy; the lag makes the image settle smoothly toward
-       wherever the scroll position currently is instead of snapping
-       exactly to it every frame, the same "trailing" smoothing
-       principle as the homepage's own wheel-reveal easing. Range eased
-       back from 1.45 to 1.28 — the photo is now inset with real gutter
-       on both sides (see .solution-media), so it no longer needs a
-       dramatic scale to read as "growing"; it only has to get close to
-       those edges, not slam into them. */
-    document.querySelectorAll('.solution-media img').forEach(function(img){
-      gsap.to(img, {
-        scale: 1.28,
+    /* The frame itself grows, not the photo inside it — Travis was
+       explicit this was the actual ask (the previous pass scaled the
+       <img> inside a fixed-size frame, which reads as "the inside of
+       the image" zooming rather than "the actual photo" growing).
+       gsap.to() with no "from" reads whatever left/right the CSS
+       clamp() currently resolves to as the starting point, so this
+       naturally begins at the same size Travis already confirmed was
+       right, then tweens both the photo and the bottom bar's left/
+       right insets down to a thin sliver (10px) by the time the item
+       scrolls fully past — object-fit:cover on the img just keeps it
+       filling whatever size the frame currently is, no transform on
+       the image at all. .solution-bar is animated in lockstep so the
+       info bar's edges always match the photo's. scrub:1.2 (a lag in
+       seconds, not an instant 1:1 tie) for the same smoothing reason
+       as before — Travis found the plain 1:1 version too sensitive. */
+    document.querySelectorAll('.solution-item').forEach(function(item){
+      var media = item.querySelector('.solution-media');
+      var bar = item.querySelector('.solution-bar');
+      gsap.to([media, bar], {
+        left: 10,
+        right: 10,
         ease: 'none',
         scrollTrigger: {
-          trigger: img.closest('.solution-item'),
+          trigger: item,
           start: 'top bottom',
-          end: 'bottom top',
+          /* "bottom top" (full exit) needs item.height + one whole
+             viewport of scroll room after it — this section is the
+             last thing on the page, so there's nothing after it to
+             supply that room, and the trigger's end became physically
+             unreachable (same bug class as the typo-titles caption
+             earlier). "bottom bottom" only needs the item's own
+             height's worth of scroll, which reliably fits regardless
+             of what (if anything) follows it on the page. */
+          end: 'bottom bottom',
           scrub: 1.2
         }
       });
