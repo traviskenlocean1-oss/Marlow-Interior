@@ -13,6 +13,7 @@
     --ivory:#f6f5f4;
     --ink:#171310;
     --bg-fallback:#3a2a22;
+    --burgundy:#47262c;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
@@ -93,6 +94,20 @@
     align-items:center;
     justify-content:space-between;
     padding:28px clamp(20px, 4vw, 48px);
+    background:transparent;
+    transition:background 0.3s ease;
+  }
+  /* Transparent works fine over the stage (short, centered slide
+     titles never actually reach the header), but the studio-intro
+     panels below have real flowing paragraph text that scrolls right
+     underneath during the transition between panels — a transparent
+     header there just overlaps into an unreadable mess of white-on-
+     white text. Toggled on once real scroll passes the stage (see the
+     scroll listener in the script). */
+  .hero-nav.is-solid{
+    background:rgba(20,14,10,0.55);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
   }
   .hero-nav img{
     height:68px;
@@ -286,7 +301,124 @@
     opacity:0;
     pointer-events:none;
   }
+
+  /* .hero-contact / .scroll-indicator are hero-specific chrome — once
+     real scroll carries the page past .stage into the studio-intro
+     section below, "scroll to explore" no longer makes sense and the
+     bottom-left contact block would just float over unrelated content.
+     Faded out via the scroll listener near the bottom of the script,
+     not removed, so they're still there instantly on scrolling back up. */
+  .hero-contact, .scroll-indicator{
+    transition:opacity 0.4s ease;
+  }
+
+  /* ── Studio intro — two full-height panels below the slide-reveal
+     stage. This is real document-flow scroll, not the clip-path reveal
+     mechanism above: once the wheel handler lets go at the last slide
+     (see the scroll-handoff comment in the script), the browser just
+     scrolls the page normally and this content comes into view like on
+     any other page. Burgundy per Travis's reference (a Halston
+     architecture template) — he called out liking their accent color
+     specifically, not just the "words coming in" mechanic. ── */
+  .studio-intro{
+    background:var(--burgundy);
+    color:var(--ivory);
+  }
+  .studio-panel{
+    display:flex;
+    min-height:100vh;
+    align-items:center;
+  }
+  .studio-panel--reverse{ flex-direction:row-reverse; }
+  .studio-panel-media{
+    flex:1 1 50%;
+    height:100vh;
+    overflow:hidden;
+    position:relative;
+    background:var(--bg-fallback);
+  }
+  /* Starts scaled up (zoomed in / cropped tighter) and GSAP scrubs it
+     down to 1 across the panel's full scroll-through — the image's own
+     content expands to fill more of the same frame as you scroll,
+     rather than the frame itself resizing. Set here as the CSS resting
+     state so there's no flash of the un-zoomed image before JS runs. */
+  .studio-panel-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transform:scale(1.35);
+    will-change:transform;
+  }
+  .studio-panel-text{
+    flex:1 1 50%;
+    padding:0 clamp(32px, 6vw, 96px);
+  }
+  .studio-copy{
+    font-size:clamp(20px, 2vw, 30px);
+    line-height:1.45;
+    letter-spacing:-0.01em;
+    max-width:26em;
+  }
+  /* Same word-by-word reveal technique as the Ironclad build and the
+     Archive/project pages, but bidirectional here (toggleActions below
+     handles play-forward on scroll down, reverse on scroll back up) —
+     Travis specifically asked for the words to leave again when
+     scrolling back up past this section, not just a one-shot reveal. */
+  .reveal-word{
+    display:inline-block;
+    overflow:hidden;
+    vertical-align:top;
+  }
+  .reveal-word__inner{
+    display:inline-block;
+    transform-origin:left bottom;
+  }
+  .about-us-btn{
+    margin-top:2.5em;
+    display:inline-flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 28px;
+    border:1px solid rgba(246,245,244,0.4);
+    border-radius:999px;
+    color:var(--ivory);
+    text-decoration:none;
+    font-size:14px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    transition:border-color 0.3s ease, background 0.3s ease;
+  }
+  .about-us-btn:hover{
+    border-color:var(--ivory);
+    background:rgba(246,245,244,0.08);
+  }
+  /* Two icons stacked in the same box, crossfaded + slid on hover —
+     the "hover your key detail" Travis pointed out on the reference's
+     own About Us button (+ at rest, → on hover). */
+  .about-us-btn__icon{
+    position:relative;
+    width:16px; height:16px;
+    display:inline-block;
+  }
+  .about-us-btn__icon span{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+    line-height:1;
+    transition:opacity 0.3s ease, transform 0.3s ease;
+  }
+  .icon-arrow{ opacity:0; transform:translateX(-6px); }
+  .about-us-btn:hover .icon-plus{ opacity:0; transform:translateX(6px); }
+  .about-us-btn:hover .icon-arrow{ opacity:1; transform:translateX(0); }
+  @media (max-width:800px){
+    .studio-panel, .studio-panel--reverse{ flex-direction:column; }
+    .studio-panel-media{ height:60vh; }
+    .studio-panel-text{ padding:48px clamp(20px, 6vw, 48px); }
+  }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
@@ -379,6 +511,35 @@
 
 </section>
 
+<section class="studio-intro">
+
+  <div class="studio-panel">
+    <div class="studio-panel-media">
+      <img src="assets/gallery/studio-intro/panel-1-desk.jpg" alt="Marlow Interiors, studio desk">
+    </div>
+    <div class="studio-panel-text">
+      <p class="studio-copy">Founded in Miami, Marlow is a small, deliberately selective studio. Every project is led start to finish by the same two hands, so the thinking behind the first sketch is still visible in the last detail installed.</p>
+    </div>
+  </div>
+
+  <div class="studio-panel studio-panel--reverse">
+    <div class="studio-panel-media">
+      <img src="assets/gallery/studio-intro/panel-2-model.jpg" alt="Marlow Interiors, reviewing a model">
+    </div>
+    <div class="studio-panel-text">
+      <p class="studio-copy">Every project starts with the site itself — its light, its bones, what's already working. Nothing gets specified until we understand what the space is asking for, not just what the brief says it wants.</p>
+      <a href="studio.html" class="about-us-btn">
+        <span class="about-us-btn__label">About Us</span>
+        <span class="about-us-btn__icon">
+          <span class="icon-plus">+</span>
+          <span class="icon-arrow">&rarr;</span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+</section>
+
 <script>
   /* No Swiper. Every .swiper-slide element is plain
      position:absolute;inset:0 with zero transform ever applied to
@@ -427,11 +588,46 @@
      it, zero auto-snap. No momentum, no bounce-back at the edges:
      nothing here ever adds motion beyond what the wheel itself just
      did (the easing below only smooths the render toward wherever the
-     wheel already put the target, it never moves the target itself). */
+     wheel already put the target, it never moves the target itself).
+
+     Scroll handoff to the studio-intro section below: .stage sits in
+     normal document flow (not position:fixed — see the CSS comment
+     above it), so once we stop calling preventDefault here the browser
+     just scrolls the real page on its own, sliding .stage away and
+     bringing the section below into view exactly like any other page.
+     Two cases let real scroll through instead of hijacking the wheel:
+     (1) window.scrollY > 0 — the page has already scrolled past the
+     slide-reveal phase, so every wheel tick from here belongs to the
+     browser regardless of direction, all the way until scrollY is back
+     to exactly 0; (2) targetProgress is already maxed out (Sunset
+     Harbour fully revealed) and the user is still scrolling down —
+     that's the moment to release into real scroll rather than clamping
+     forever with nothing visibly happening. Scrolling back up is the
+     mirror image: real scroll carries the page back up to scrollY 0 on
+     its own (case 1 covers that), and only once .stage is fully back
+     to filling the viewport does the next wheel-up tick fall through
+     to the hijack below and start un-revealing slides again. */
   stageEl.addEventListener('wheel', function(e){
+    if (window.scrollY > 0) return;
+    if (targetProgress >= MAX_SCROLL && e.deltaY > 0) return;
     e.preventDefault();
     targetProgress = clamp(targetProgress + e.deltaY * WHEEL_SENSITIVITY, 0, MAX_SCROLL);
   }, { passive: false });
+
+  /* .hero-contact/.scroll-indicator are hero-only chrome — fade them
+     out once real scroll carries the page into the studio-intro
+     section, back in once scrolled back to the top. */
+  var heroContactEl = document.querySelector('.hero-contact');
+  var scrollBtnEl = document.getElementById('scrollBtn');
+  var heroNavEl = document.querySelector('.hero-nav');
+  window.addEventListener('scroll', function(){
+    var pastStage = window.scrollY > 10;
+    heroContactEl.style.opacity = pastStage ? '0' : '';
+    heroContactEl.style.pointerEvents = pastStage ? 'none' : '';
+    scrollBtnEl.style.opacity = pastStage ? '0' : '';
+    scrollBtnEl.style.pointerEvents = pastStage ? 'none' : '';
+    heroNavEl.classList.toggle('is-solid', pastStage);
+  }, { passive: true });
 
   function easeInOutCubic(t){
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -584,6 +780,67 @@
       }, 150);
     }, 500);
   });
+
+  /* Studio-intro panels below the stage: real scroll-triggered motion
+     via GSAP ScrollTrigger, since this section lives in normal document
+     flow (unlike the reveal mechanism above, which has nothing to do
+     with real scroll position at all). */
+  if (window.gsap && window.ScrollTrigger){
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* Photo "zoom reveal": starts scaled up per the CSS resting state
+       (1.35) and scrubs down to 1 across the panel's own scroll-through
+       — the image's content expands to fill more of the same frame as
+       you scroll, the frame itself never resizes. scrub:true ties it
+       directly to scroll position in both directions, so scrolling back
+       up re-zooms it exactly back in rather than replaying a timed
+       animation. */
+    document.querySelectorAll('.studio-panel-media img').forEach(function(img){
+      gsap.to(img, {
+        scale: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: img.closest('.studio-panel'),
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+    });
+
+    /* Word-by-word reveal, same split technique as the Ironclad build
+       and the Archive/project pages — but bidirectional here.
+       toggleActions "play none play reverse" means: scrolling down into
+       it plays the reveal forward and it stays revealed as you continue
+       down (onLeave: none); scrolling back up out of the top reverses
+       it, i.e. the words leave, per Travis's explicit ask; scrolling
+       back down into it from below plays it forward again. */
+    function splitWords(el){
+      var words = el.textContent.trim().split(/\s+/);
+      el.innerHTML = words.map(function(w){
+        return '<span class="reveal-word"><span class="reveal-word__inner">' + w + '</span></span>';
+      }).join(' ');
+      return el.querySelectorAll('.reveal-word__inner');
+    }
+    document.querySelectorAll('.studio-copy').forEach(function(copyEl){
+      var words = splitWords(copyEl);
+      gsap.set(words, { yPercent: 115, rotate: 8 });
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: copyEl,
+          start: 'top 80%',
+          end: 'bottom 40%',
+          toggleActions: 'play none play reverse'
+        }
+      }).to(words, {
+        yPercent: 0,
+        rotate: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: 0.02
+      });
+    });
+  }
 </script>
 
 </body>
