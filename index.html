@@ -856,6 +856,171 @@
   @media (max-width:800px){
     .service-row-large-title{ display:none; }
   }
+
+  /* ── Action / CTA strip — reference's real .section-cta-compact: a
+     plain 3-col grid (label+heading / photo / tagline+button), light
+     content-panel background. Photo does a one-shot scale-in on
+     scroll enter (not a continuous scrub like the reveal section
+     above), matching Travis's "the photo expands when you scroll
+     down to that section" — this is a one-time arrival, not tied to
+     scroll position. ── */
+  .cta-section{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    align-items:center;
+    gap:clamp(16px, 2vw, 32px);
+    padding:clamp(56px, 8vw, 96px) clamp(20px, 4vw, 48px);
+    background:#d1d1cd;
+    color:var(--ink);
+  }
+  .cta-block{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:1.1em;
+  }
+  .cta-label{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border:1px solid rgba(23,19,16,0.4);
+    border-radius:3px;
+    padding:5px 10px;
+    font-size:12px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+  }
+  .cta-heading{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(22px, 2vw, 27px);
+    line-height:1.3;
+    max-width:14em;
+  }
+  .cta-photo{
+    aspect-ratio:8/5;
+    overflow:hidden;
+    transform:scale(0.88);
+    opacity:0;
+  }
+  .cta-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .cta-tagline{
+    font-size:clamp(15px, 1.2vw, 17px);
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    max-width:16em;
+  }
+  .cta-button{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid var(--ink);
+    padding:13px 18px;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    text-decoration:none;
+    color:var(--ink);
+    transition:background 0.25s ease, color 0.25s ease;
+  }
+  .cta-button:hover{ background:var(--ink); color:var(--ivory); }
+  @media (max-width:800px){
+    .cta-section{ grid-template-columns:1fr; }
+  }
+
+  /* ── Testimonials — reference's real reviews section: a 3-col title
+     block (corner labels + centered "Testimonials" pill/heading), then
+     3 cards each with a quote mark, a portrait photo, a category pill,
+     the quote, and a name. Fake/placeholder client content per
+     Travis's explicit instruction this round ("just like you see
+     these fake ones obviously"). ── */
+  .testimonials-section{
+    padding:clamp(56px, 8vw, 96px) clamp(20px, 4vw, 48px);
+    background:var(--ivory);
+    color:var(--ink);
+  }
+  .testimonials-title{
+    display:grid;
+    grid-template-columns:1fr 3fr 1fr;
+    align-items:start;
+    border-top:1px solid rgba(23,19,16,0.15);
+    padding-top:20px;
+    margin-bottom:clamp(40px, 6vw, 72px);
+  }
+  .testimonials-corner{
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    opacity:0.55;
+  }
+  .testimonials-corner.is-right{ text-align:right; }
+  .testimonials-center{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:1.1em;
+  }
+  .testimonials-heading{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(22px, 2vw, 27px);
+    line-height:1.3;
+    max-width:16em;
+  }
+  .testimonials-grid{
+    display:flex;
+    gap:clamp(8px, 1vw, 16px);
+    flex-wrap:wrap;
+  }
+  .testimonial-card{
+    flex:1 1 300px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    padding:clamp(24px, 3vw, 43px);
+    background:#e6e5e3;
+  }
+  .testimonial-quote-mark{
+    font-family:'Hanken Grotesk', sans-serif;
+    font-weight:800;
+    font-size:36px;
+    line-height:0.5;
+    color:var(--ink);
+  }
+  .testimonial-photo{
+    width:clamp(130px, 14vw, 192px);
+    aspect-ratio:4/5;
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .testimonial-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .testimonial-label{
+    display:inline-flex;
+    align-self:flex-start;
+    border:1px solid rgba(23,19,16,0.4);
+    border-radius:3px;
+    padding:5px 10px;
+    font-size:12px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+  }
+  .testimonial-quote{
+    font-size:clamp(16px, 1.2vw, 17.4px);
+    font-weight:500;
+    line-height:1.3;
+  }
+  .testimonial-name{
+    font-size:clamp(16px, 1.2vw, 17.4px);
+    opacity:0.9;
+  }
+  @media (max-width:800px){
+    .testimonials-title{ grid-template-columns:1fr; text-align:center; gap:16px; }
+    .testimonials-corner.is-right{ text-align:center; }
+    .testimonials-grid{ flex-direction:column; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -1152,6 +1317,59 @@
       <div class="service-row-count">Avg. 5 days</div>
       <div class="service-row-large-title">Home Staging</div>
     </a>
+  </div>
+</section>
+
+<div class="reveal-spacer"></div>
+
+<section class="cta-section">
+  <div class="cta-block">
+    <span class="cta-label">Action</span>
+    <h2 class="cta-heading">Thoughtful interior design begins here</h2>
+  </div>
+  <div class="cta-photo">
+    <img src="assets/gallery/cta-section/action-photo.jpg" alt="Marlow Interiors">
+  </div>
+  <div class="cta-block">
+    <p class="cta-tagline">Spaces crafted through warmth, materiality, and clarity.</p>
+    <a href="contact.html" class="cta-button">
+      <span>Start your project</span>
+      <span>+</span>
+    </a>
+  </div>
+</section>
+
+<section class="testimonials-section">
+  <div class="testimonials-title">
+    <div class="testimonials-corner">Client</div>
+    <div class="testimonials-center">
+      <span class="cta-label">Testimonials</span>
+      <h2 class="testimonials-heading">These are a few words from the clients who live with the result every day.</h2>
+    </div>
+    <div class="testimonials-corner is-right">Perspectives</div>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <div class="testimonial-quote-mark">&rdquo;</div>
+      <div class="testimonial-photo"><img src="assets/gallery/testimonials/client-1.jpg" alt=""></div>
+      <span class="testimonial-label">Homeowner</span>
+      <p class="testimonial-quote">From the first sketch to the final install, everything felt considered. The process never once felt like a compromise.</p>
+      <p class="testimonial-name">Daniel Ortiz</p>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-quote-mark">&rdquo;</div>
+      <div class="testimonial-photo"><img src="assets/gallery/testimonials/client-2.jpg" alt=""></div>
+      <span class="testimonial-label">Repeat Client</span>
+      <p class="testimonial-quote">We'd worked with two other designers before Marlow. This was the first time the finished space actually looked like what we'd imagined.</p>
+      <p class="testimonial-name">James Calloway</p>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-quote-mark">&rdquo;</div>
+      <div class="testimonial-photo"><img src="assets/gallery/testimonials/client-3.jpg" alt=""></div>
+      <span class="testimonial-label">Private Client</span>
+      <p class="testimonial-quote">The level of care in every material choice was obvious immediately. Nothing in this house feels like an afterthought.</p>
+      <p class="testimonial-name">Renee Castellanos</p>
+    </div>
   </div>
 </section>
 
@@ -1605,6 +1823,46 @@
         .to(smallPhoto, { xPercent: 0, scale: 1, opacity: 1, duration: 0.32, ease: 'power2.out' }, 0.56)
         .to(lineWords[3], { yPercent: 0, rotate: 0, scale: 1, opacity: 1, duration: 0.34, stagger: 0.09, ease: 'power3.out' }, 0.68);
     })();
+
+    /* CTA photo — one-shot scale/fade-in on scroll arrival (not tied
+       to scroll position like the reveal-section above), per Travis:
+       "the photo expands when you scroll down to that section."
+       Bidirectional so scrolling back up re-hides it, matching this
+       page's other arrival reveals. */
+    document.querySelectorAll('.cta-photo').forEach(function(photo){
+      gsap.to(photo, {
+        scale: 1,
+        opacity: 1,
+        duration: 1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: photo,
+          start: 'top 85%',
+          end: 'bottom 40%',
+          toggleActions: 'play none play reverse'
+        }
+      });
+    });
+
+    /* Headings "walk into place" the same way — reusing splitWords. */
+    document.querySelectorAll('.cta-heading, .testimonials-heading').forEach(function(headingEl){
+      var words = splitWords(headingEl);
+      gsap.set(words, { yPercent: 115, rotate: 8 });
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: headingEl,
+          start: 'top 85%',
+          end: 'bottom 40%',
+          toggleActions: 'play none play reverse'
+        }
+      }).to(words, {
+        yPercent: 0,
+        rotate: 0,
+        duration: 1.3,
+        ease: 'power3.out',
+        stagger: 0.045
+      });
+    });
   }
 </script>
 
