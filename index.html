@@ -936,9 +936,13 @@
      the quote, and a name. Fake/placeholder client content per
      Travis's explicit instruction this round ("just like you see
      these fake ones obviously"). ── */
+  /* Matches .cta-section's background exactly, not --ivory — Travis
+     was direct that a plain white gap between panel-toned sections
+     reads as broken, not intentional (same standing rule already
+     applied elsewhere on this site). */
   .testimonials-section{
     padding:clamp(56px, 8vw, 96px) clamp(20px, 4vw, 48px);
-    background:var(--ivory);
+    background:#d1d1cd;
     color:var(--ink);
   }
   .testimonials-title{
@@ -1020,6 +1024,87 @@
     .testimonials-title{ grid-template-columns:1fr; text-align:center; gap:16px; }
     .testimonials-corner.is-right{ text-align:center; }
     .testimonials-grid{ flex-direction:column; }
+  }
+
+  /* ── Closing consultation banner — reference's real .footer-action:
+     a giant background wordmark, sitting still and already fully
+     visible (not word-revealed), behind a small centered photo that
+     grows as you scroll — same frame-growth technique already built
+     for .solution-item earlier (inset shrinks via GSAP scrub, the
+     photo itself never scales/transforms). Once the photo has grown,
+     heading + button fade in on top of it. Two explicit changes from
+     the reference per Travis: real black (not their dark brown), and
+     the giant background word is our own "Marlow" instead of their
+     generic "Consultation" — this is the site's actual closing brand
+     moment, not a generic CTA label. Last section on the page. ── */
+  .closing-cta{
+    position:relative;
+    height:200vh;
+    background:#050505;
+    color:var(--ivory);
+  }
+  .closing-cta-pin{
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .closing-cta-word{
+    position:absolute;
+    z-index:1;
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(60px, 11vw, 190px);
+    letter-spacing:-0.01em;
+    color:rgba(246,245,244,0.9);
+    white-space:nowrap;
+  }
+  .closing-cta-media{
+    position:absolute;
+    z-index:2;
+    top:31vh; bottom:31vh; left:42vw; right:42vw;
+    overflow:hidden;
+  }
+  .closing-cta-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .closing-cta-media::after{
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(23,19,16,0.55), rgba(0,0,0,0) 65%);
+  }
+  .closing-cta-content{
+    position:absolute;
+    z-index:3;
+    top:clamp(24px, 6vh, 72px);
+    left:clamp(20px, 5vw, 80px);
+    max-width:26em;
+  }
+  .closing-cta-heading{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(22px, 2.2vw, 31px);
+    line-height:1.35;
+    margin-bottom:1.2em;
+  }
+  .closing-cta-button{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid rgba(246,245,244,0.6);
+    padding:13px 18px;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    text-decoration:none;
+    color:var(--ivory);
+    transition:background 0.25s ease, color 0.25s ease;
+  }
+  .closing-cta-button:hover{ background:var(--ivory); color:var(--ink); }
+  @media (max-width:800px){
+    .closing-cta-media{ top:36vh; bottom:36vh; left:12vw; right:12vw; }
   }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -1369,6 +1454,22 @@
       <span class="testimonial-label">Private Client</span>
       <p class="testimonial-quote">The level of care in every material choice was obvious immediately. Nothing in this house feels like an afterthought.</p>
       <p class="testimonial-name">Renee Castellanos</p>
+    </div>
+  </div>
+</section>
+
+<section class="closing-cta">
+  <div class="closing-cta-pin">
+    <div class="closing-cta-word">Marlow</div>
+    <div class="closing-cta-media">
+      <img src="assets/gallery/closing-cta/photo.jpg" alt="Marlow Interiors">
+    </div>
+    <div class="closing-cta-content">
+      <h2 class="closing-cta-heading">Have a project in mind? Let's talk about it.</h2>
+      <a href="contact.html" class="closing-cta-button">
+        <span>Schedule a consultation</span>
+        <span>+</span>
+      </a>
     </div>
   </div>
 </section>
@@ -1863,6 +1964,31 @@
         stagger: 0.045
       });
     });
+
+    /* Closing consultation banner — same frame-growth technique as
+       .solution-item earlier on this page: the media's own inset
+       shrinks via scrub (the frame itself grows), the img never gets
+       a transform. Pin range is 200vh (2x viewport, matching the
+       reference's real .footer-action), so the growth has real scroll
+       distance to play out across rather than snapping. */
+    (function(){
+      var closing = document.querySelector('.closing-cta');
+      if (!closing) return;
+      var media = closing.querySelector('.closing-cta-media');
+      var content = closing.querySelector('.closing-cta-content');
+      gsap.set(content, { opacity: 0, y: 16 });
+
+      var tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: closing,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1
+        }
+      });
+      tl.to(media, { top: '6vh', bottom: '6vh', left: '6vw', right: '6vw', ease: 'none' }, 0)
+        .to(content, { opacity: 1, y: 0, ease: 'power2.out' }, 0.55);
+    })();
   }
 </script>
 
