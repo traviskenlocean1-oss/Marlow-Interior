@@ -397,48 +397,93 @@
     .client-cell.is-empty{ display:none; }
   }
 
-  /* ── Testimonial ── */
-  .testimonial-section{
-    display:grid;
-    grid-template-columns:auto 1fr;
-    gap:clamp(24px, 3vw, 48px);
-    align-items:start;
-    padding:clamp(64px, 9vw, 120px) var(--pad);
-    border-top:1px solid rgba(23,19,16,0.12);
-    background:#d1d1cd;
+  /* ── Material showcase — same full-height scroll mechanic as the
+     homepage's studio-intro panels (photo starts scaled up, GSAP
+     scrubs it back down to 1 as the panel scrolls through — the photo
+     "backs away"), reused here in place of a fabricated client quote.
+     One panel burgundy, one gray, per Travis's explicit call. ── */
+  .studio-panel{
+    display:flex;
+    min-height:100vh;
+    align-items:flex-end;
+    padding-bottom:clamp(60px, 10vw, 140px);
+    color:var(--ivory);
   }
-  .testimonial-portrait{
-    width:clamp(120px, 12vw, 180px);
-    aspect-ratio:1;
-    border-radius:3px;
+  .studio-panel--reverse{ flex-direction:row-reverse; }
+  .studio-panel.is-burgundy{ background:var(--burgundy); }
+  .studio-panel.is-gray{ background:#5a5a56; }
+  .studio-panel-media{
+    flex:1 1 50%;
+    height:100vh;
     overflow:hidden;
-    flex:none;
+    position:relative;
   }
-  .testimonial-portrait img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .testimonial-mark{
-    font-family:'Poppins', sans-serif;
-    font-size:clamp(48px, 6vw, 80px);
-    line-height:0.6;
-    opacity:0.2;
+  .studio-panel-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transform:scale(1.35);
+    will-change:transform;
   }
-  /* 42.6px/weight 500 measured off the reference's actual quote at
-     1440px. */
-  .testimonial-quote{
-    font-family:'Poppins', sans-serif;
-    font-weight:500;
-    font-size:clamp(26px, 3vw, 44px);
-    line-height:1.35;
+  .studio-panel-text{
+    flex:1 1 50%;
+    padding:0 clamp(32px, 6vw, 96px);
+  }
+  .studio-mark{
+    height:28px;
+    width:auto;
+    display:block;
+    margin-bottom:1.4em;
+    opacity:0.9;
+  }
+  .studio-copy{
+    font-size:clamp(20px, 2vw, 30px);
+    line-height:1.45;
+    letter-spacing:-0.01em;
     max-width:26em;
   }
-  .testimonial-quote .is-placeholder{ opacity:0.45; font-style:italic; }
-  .testimonial-attribution{
-    margin-top:1.4em;
-    font-size:14px;
-    opacity:0.6;
-    letter-spacing:0.02em;
+  .about-us-btn{
+    margin-top:2.5em;
+    display:inline-flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:32px;
+    min-width:230px;
+    padding:17px 22px;
+    border:1px solid rgba(246,245,244,0.5);
+    border-radius:4px;
+    color:var(--ivory);
+    text-decoration:none;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    transition:border-color 0.3s ease, background 0.3s ease;
   }
-  @media (max-width:700px){
-    .testimonial-section{ grid-template-columns:1fr; }
+  .about-us-btn:hover{
+    border-color:var(--ivory);
+    background:rgba(246,245,244,0.08);
+  }
+  .about-us-btn__icon{
+    position:relative;
+    width:16px; height:16px;
+    display:inline-block;
+  }
+  .about-us-btn__icon span{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+    line-height:1;
+    transition:opacity 0.3s ease, transform 0.3s ease;
+  }
+  .icon-arrow{ opacity:0; transform:translateX(-6px); }
+  .about-us-btn:hover .icon-plus{ opacity:0; transform:translateX(6px); }
+  .about-us-btn:hover .icon-arrow{ opacity:1; transform:translateX(0); }
+  @media (max-width:800px){
+    .studio-panel, .studio-panel--reverse{ flex-direction:column; }
+    .studio-panel-media{ height:60vh; }
+    .studio-panel-text{ padding:48px clamp(20px, 6vw, 48px); }
   }
 
   /* ── Closing about-block — photo + text side by side, same pattern
@@ -767,14 +812,31 @@
     </div>
   </section>
 
-  <section class="testimonial-section">
-    <div class="testimonial-portrait">
-      <img src="assets/gallery/interiors-page/testimonial-portrait.jpg" alt="">
+  <section>
+    <div class="studio-panel is-burgundy">
+      <div class="studio-panel-media">
+        <img src="assets/gallery/interiors-page/showcase-fabric-swatches.jpg" alt="Selecting fabric and material swatches">
+      </div>
+      <div class="studio-panel-text">
+        <img class="studio-mark" src="assets/marlow-m-white.png" alt="">
+        <p class="studio-copy">Material selection is where a project earns its keep, or falls apart in year two. We choose fabrics and finishes for how they wear, not just how they photograph.</p>
+      </div>
     </div>
-    <div>
-      <div class="testimonial-mark">&rdquo;</div>
-      <p class="testimonial-quote"><span class="is-placeholder">Add a real client quote here.</span></p>
-      <p class="testimonial-attribution">Client Name &middot; Private Residence</p>
+    <div class="studio-panel studio-panel--reverse is-gray">
+      <div class="studio-panel-media">
+        <img src="assets/gallery/interiors-page/showcase-material-review.jpg" alt="Reviewing material boards in the studio">
+      </div>
+      <div class="studio-panel-text">
+        <img class="studio-mark" src="assets/marlow-m-white.png" alt="">
+        <p class="studio-copy">Every board is reviewed in person, against real samples, before anything is ordered. Decisions made from a swatch on a screen are the ones clients end up regretting.</p>
+        <a href="#contact-form" class="about-us-btn">
+          <span class="about-us-btn__label">Start a project</span>
+          <span class="about-us-btn__icon">
+            <span class="icon-plus">+</span>
+            <span class="icon-arrow">&rarr;</span>
+          </span>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -945,6 +1007,24 @@
         duration: 1,
         ease: 'power3.out',
         stagger: 0.03
+      });
+    });
+
+    /* Same scrub as the homepage studio-intro panels: image starts
+       scaled up (1.35) and GSAP scrubs it back down to 1 across the
+       panel's own scroll-through, so it reads as the photo "backing
+       away" as you scroll — reversible, tied directly to scroll
+       position rather than a one-shot timed animation. */
+    document.querySelectorAll('.studio-panel-media img').forEach(function(img){
+      gsap.to(img, {
+        scale: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: img.closest('.studio-panel'),
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
       });
     });
   }
