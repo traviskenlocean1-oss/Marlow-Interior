@@ -694,6 +694,17 @@
      fade-out back to 0 happens later, once the reveal mechanism below
      has actually initialized. */
   document.getElementById('cutTransition').style.opacity = '1';
+  /* Force scrollY to 0 on arrival, synchronously, before the wheel-
+     hijack below ever checks it. Some browsers restore a page's prior
+     scroll position on a fresh navigation to it (not just back/
+     forward) — if that landed scrollY above 0, the hijack's own guard
+     (line ~956) would see "already scrolled past the stage" and
+     silently stop hijacking the wheel, while the pinned stage visuals
+     stay stuck rendering targetProgress 0 (the full hero) — a visible
+     mismatch between real scroll position and what's on screen that
+     reads as the page "breaking apart" right on arrival. */
+  if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+  window.scrollTo(0, 0);
 </script>
 
 <div class="hero-nav">
