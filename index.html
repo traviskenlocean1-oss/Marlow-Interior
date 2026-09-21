@@ -14,6 +14,7 @@
     --ink:#171310;
     --bg-fallback:#3a2a22;
     --burgundy:#47262c;
+    --footer-h:clamp(320px, 32vw, 420px);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
@@ -1113,15 +1114,34 @@
     .closing-cta-media{ top:36vh; bottom:36vh; left:12vw; right:12vw; }
   }
 
-  /* ── Footer — same content/component as every discipline page's
-     .site-footer, but position:static here (in normal document flow
-     right after .closing-cta) rather than the fixed-reveal treatment
-     those pages use. This page's whole scroll model (the hand-rolled
-     wheel-hijack stage, several separate pinned/sticky sections) is
-     too delicate to retrofit the fixed-footer + page-content-margin
-     pattern into safely — a plain in-flow footer gives the page a
-     real ending without touching any of that. ── */
+  /* ── Footer — same fixed-reveal pattern as every discipline page:
+     .page-content wraps everything above (hero through .closing-cta)
+     and carries the bottom margin that reserves this footer's own
+     height; .site-footer sits fixed underneath the whole time,
+     surfacing only as that reserved margin scrolls into view at the
+     very end. The last section stays visually still while the footer
+     rises up over its lower edge, stopping at its own fixed height —
+     never covering more than that — rather than the page just
+     revealing a footer already in normal flow. Confirmed safe
+     alongside the wheel-hijack stage: that logic only ever reads
+     window.scrollY, it doesn't care about this wrapper. ── */
+  /* padding-bottom, not margin-bottom — margin here was collapsing
+     away against the fixed-height html/body (both height:100%) and
+     never actually extended the document's scrollable area, so the
+     .closing-cta sticky pin could never release and the footer never
+     revealed. Padding always adds real box height, so it can't
+     collapse. No background needed on this wrapper: every section
+     inside already paints its own opaque background, so the padding-
+     bottom region stays transparent, letting the fixed footer show
+     through exactly where it should. */
+  .page-content{
+    position:relative;
+    z-index:2;
+    padding-bottom:var(--footer-h);
+  }
   .site-footer{
+    position:fixed; bottom:0; left:0; right:0; z-index:1;
+    height:var(--footer-h);
     background:var(--ink);
     color:var(--ivory);
     font-size:14px;
@@ -1184,6 +1204,8 @@
   if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
   window.scrollTo(0, 0);
 </script>
+
+<div class="page-content">
 
 <div class="hero-nav">
   <a href="index.html" id="logoHome" style="display:block;">
@@ -1524,6 +1546,8 @@
   </div>
 </section>
 
+</div>
+
 <footer class="site-footer">
   <div class="footer-grid">
     <div class="footer-logo">Marlow<span>Interior Design Studio</span></div>
@@ -1579,12 +1603,12 @@
   var MAX_SCROLL = (slides.length - 1) * SLIDE_UNIT;
   /* How many scrolls it takes — tune directly (higher = fewer scrolls
      needed). Independent of the smoothing factor below. Bumped from
-     0.65 -> 3 per Travis: at 0.65 a single slide (SLIDE_UNIT 1032) took
-     roughly 12-15 wheel notches to fully reveal; he wanted each
-     transition (hero -> Bayshore -> Coral Gables -> Sunset Harbour) to
-     take about 2-3 scrolls, three most often, on an ordinary mouse
-     wheel (~100-120 deltaY per notch). */
-  var WHEEL_SENSITIVITY = 3;
+     0.65 -> 3 per Travis's original "2-3 scrolls per slide" ask, then
+     dialed back to 2.2 — at 3 (combined with the ±120 per-event clamp
+     added since) it still felt "a little too quick and sensitive" to
+     him. 2.2 keeps each transition fast (roughly 4-5 ordinary wheel
+     notches per slide) without the earlier snappiness. */
+  var WHEEL_SENSITIVITY = 2.2;
   /* How eagerly displayProgress chases targetProgress each frame —
      lower = smoother/more trailing lag, higher = snappier/closer to
      instant. 1 would disable smoothing entirely (back to the patchy
