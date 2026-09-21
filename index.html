@@ -95,19 +95,6 @@
     justify-content:space-between;
     padding:28px clamp(20px, 4vw, 48px);
     background:transparent;
-    transition:background 0.3s ease;
-  }
-  /* Transparent works fine over the stage (short, centered slide
-     titles never actually reach the header), but the studio-intro
-     panels below have real flowing paragraph text that scrolls right
-     underneath during the transition between panels — a transparent
-     header there just overlaps into an unreadable mess of white-on-
-     white text. Toggled on once real scroll passes the stage (see the
-     scroll listener in the script). */
-  .hero-nav.is-solid{
-    background:rgba(20,14,10,0.55);
-    backdrop-filter:blur(6px);
-    -webkit-backdrop-filter:blur(6px);
   }
   .hero-nav img{
     height:68px;
@@ -541,7 +528,7 @@
     width:100%;
     padding-top:34vw;
     min-height:360px;
-    margin-bottom:clamp(32px, 5vw, 80px);
+    margin-bottom:clamp(20px, 3vw, 40px);
   }
   .solution-item:last-child{
     margin-bottom:0;
@@ -559,9 +546,18 @@
      position:absolute children measure inset from the parent's
      padding-box edge, not inside it, so the parent's own padding
      wouldn't actually move these. */
+  /* Starting inset above the photo too, matching the same idea as
+     left/right — the photo starts shorter, with a gap of background
+     visible above it inside the item's own box, then GSAP grows "top"
+     down toward the item's own top edge as you scroll through it
+     (bottom stays anchored at 0 always, since .solution-bar attaches
+     there). Combined with the tighter margin-bottom between items
+     above, a fully-grown item ends up close to the one above it
+     without the two ever actually touching. */
   .solution-media{
     position:absolute;
-    top:0; bottom:0;
+    top:clamp(60px, 10vw, 160px);
+    bottom:0;
     left:clamp(20px, 4vw, 80px);
     right:clamp(20px, 4vw, 80px);
     overflow:hidden;
@@ -968,14 +964,12 @@
      section, back in once scrolled back to the top. */
   var heroContactEl = document.querySelector('.hero-contact');
   var scrollBtnEl = document.getElementById('scrollBtn');
-  var heroNavEl = document.querySelector('.hero-nav');
   window.addEventListener('scroll', function(){
     var pastStage = window.scrollY > 10;
     heroContactEl.style.opacity = pastStage ? '0' : '';
     heroContactEl.style.pointerEvents = pastStage ? 'none' : '';
     scrollBtnEl.style.opacity = pastStage ? '0' : '';
     scrollBtnEl.style.pointerEvents = pastStage ? 'none' : '';
-    heroNavEl.classList.toggle('is-solid', pastStage);
   }, { passive: true });
 
   function easeInOutCubic(t){
@@ -1175,24 +1169,37 @@
     document.querySelectorAll('.solution-item').forEach(function(item){
       var media = item.querySelector('.solution-media');
       var bar = item.querySelector('.solution-bar');
+      var scrollTriggerConfig = {
+        trigger: item,
+        start: 'top bottom',
+        /* "bottom top" (full exit) needs item.height + one whole
+           viewport of scroll room after it — this section is the
+           last thing on the page, so there's nothing after it to
+           supply that room, and the trigger's end became physically
+           unreachable (same bug class as the typo-titles caption
+           earlier). "bottom bottom" only needs the item's own
+           height's worth of scroll, which reliably fits regardless
+           of what (if anything) follows it on the page. */
+        end: 'bottom bottom',
+        scrub: 1.2
+      };
       gsap.to([media, bar], {
         left: 10,
         right: 10,
         ease: 'none',
-        scrollTrigger: {
-          trigger: item,
-          start: 'top bottom',
-          /* "bottom top" (full exit) needs item.height + one whole
-             viewport of scroll room after it — this section is the
-             last thing on the page, so there's nothing after it to
-             supply that room, and the trigger's end became physically
-             unreachable (same bug class as the typo-titles caption
-             earlier). "bottom bottom" only needs the item's own
-             height's worth of scroll, which reliably fits regardless
-             of what (if anything) follows it on the page. */
-          end: 'bottom bottom',
-          scrub: 1.2
-        }
+        scrollTrigger: scrollTriggerConfig
+      });
+      /* Vertical grow, on top of the horizontal grow above — the photo
+         also grows upward (top inset shrinking toward the item's own
+         top edge), not just outward to the sides. Bar isn't included
+         here: it's anchored at bottom:0 and never needs to move
+         vertically. Bigger range than the horizontal tween (150px+ of
+         travel vs. a ~60px shrink) since Travis asked for this
+         specifically to read as more noticeable, not just present. */
+      gsap.to(media, {
+        top: 10,
+        ease: 'none',
+        scrollTrigger: scrollTriggerConfig
       });
     });
 
