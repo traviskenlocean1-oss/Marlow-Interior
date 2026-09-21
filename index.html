@@ -1052,15 +1052,21 @@
     align-items:center;
     justify-content:center;
   }
+  /* Above the photo (not behind it) and genuinely faded, per Travis —
+     the reference's own word sits on top at reduced opacity so it
+     ghosts over the image where they overlap, then fades to nothing
+     as the photo grows (handled in JS below), rather than being fully
+     hidden wherever the photo happens to cover it. */
   .closing-cta-word{
     position:absolute;
-    z-index:1;
+    z-index:3;
     font-family:'Poppins', sans-serif;
     font-weight:500;
     font-size:clamp(60px, 11vw, 190px);
     letter-spacing:-0.01em;
-    color:rgba(246,245,244,0.9);
+    color:rgba(246,245,244,0.35);
     white-space:nowrap;
+    pointer-events:none;
   }
   .closing-cta-media{
     position:absolute;
@@ -1076,7 +1082,7 @@
   }
   .closing-cta-content{
     position:absolute;
-    z-index:3;
+    z-index:4;
     top:clamp(24px, 6vh, 72px);
     left:clamp(20px, 5vw, 80px);
     max-width:26em;
@@ -1106,6 +1112,50 @@
   @media (max-width:800px){
     .closing-cta-media{ top:36vh; bottom:36vh; left:12vw; right:12vw; }
   }
+
+  /* ── Footer — same content/component as every discipline page's
+     .site-footer, but position:static here (in normal document flow
+     right after .closing-cta) rather than the fixed-reveal treatment
+     those pages use. This page's whole scroll model (the hand-rolled
+     wheel-hijack stage, several separate pinned/sticky sections) is
+     too delicate to retrofit the fixed-footer + page-content-margin
+     pattern into safely — a plain in-flow footer gives the page a
+     real ending without touching any of that. ── */
+  .site-footer{
+    background:var(--ink);
+    color:var(--ivory);
+    font-size:14px;
+    padding:clamp(40px, 6vw, 64px) clamp(20px, 4vw, 48px);
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns:auto auto 1fr auto auto;
+    grid-template-rows:1fr auto;
+    grid-template-areas:"logo logo . . ." "contacts address rs legal credits";
+    gap:1em clamp(28px, 3.2vw, 48px);
+    min-height:clamp(220px, 28vw, 320px);
+  }
+  @media (max-width:900px){
+    .footer-grid{ grid-template-columns:1fr; grid-template-rows:auto;
+      grid-template-areas:"logo" "contacts" "address" "rs" "legal" "credits"; }
+  }
+  .footer-grid > *{ display:grid; gap:0.35em; align-content:end; }
+  .footer-grid a{ color:inherit; text-decoration:none; opacity:0.85; }
+  .footer-grid a:hover{ opacity:1; }
+  .footer-logo{
+    grid-area:logo; align-items:start;
+    font-family:'Poppins', sans-serif; font-weight:500;
+    font-size:clamp(40px, 7vw, 96px); letter-spacing:-0.03em; line-height:0.95;
+  }
+  .footer-logo span{
+    display:block; font-family:'Hanken Grotesk', sans-serif; font-weight:400;
+    font-size:clamp(14px, 1.2vw, 18px); letter-spacing:0.02em; opacity:0.7; margin-top:0.2em;
+  }
+  .footer-grid .contacts{ grid-area:contacts; }
+  .footer-grid .address{ grid-area:address; }
+  .footer-grid .rs{ grid-area:rs; }
+  .footer-grid .legal{ grid-area:legal; }
+  .footer-grid .credits{ grid-area:credits; opacity:0.6; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -1474,6 +1524,31 @@
   </div>
 </section>
 
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-logo">Marlow<span>Interior Design Studio</span></div>
+    <div class="contacts">
+      <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>
+      <a href="tel:+13055550148">+1 (305) 555-0148</a>
+    </div>
+    <div class="address">
+      <span>140 NE 39th St</span>
+      <span>Miami, FL 33137</span>
+    </div>
+    <div class="rs">
+      <a href="#" target="_blank" rel="noopener">Instagram</a>
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="legal">
+      <a href="#">Legal Notice</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <div class="credits">
+      <p>&copy; 2026, Marlow Interiors</p>
+    </div>
+  </div>
+</footer>
+
 <script>
   /* No Swiper. Every .swiper-slide element is plain
      position:absolute;inset:0 with zero transform ever applied to
@@ -1550,7 +1625,20 @@
     if (window.scrollY > 0) return;
     if (targetProgress >= MAX_SCROLL && e.deltaY > 0) return;
     e.preventDefault();
-    targetProgress = clamp(targetProgress + e.deltaY * WHEEL_SENSITIVITY, 0, MAX_SCROLL);
+    /* Clamp the raw per-event delta before applying sensitivity —
+       without this, a single momentum/inertia wheel event (trackpads
+       and some mice can deliver a large deltaY in one burst,
+       especially right as real scroll hands back off to this hijack
+       at scrollY 0) could jump targetProgress across an entire slide
+       or more in one frame at WHEEL_SENSITIVITY 3. That's what read as
+       the sequence "glitching"/skipping slides, and as scrolling up
+       from deep in the page landing straight back on the hero instead
+       of replaying Sunset Harbour -> Coral Gables -> Bayshore in
+       reverse. ±120 is a standard single "wheel click" delta, so
+       ordinary discrete scrolling is unaffected — only oversized burst
+       events get capped. */
+    var rawDelta = clamp(e.deltaY, -120, 120);
+    targetProgress = clamp(targetProgress + rawDelta * WHEEL_SENSITIVITY, 0, MAX_SCROLL);
   }, { passive: false });
 
   /* .hero-contact/.scroll-indicator are hero-only chrome — fade them
@@ -1712,6 +1800,13 @@
     setTimeout(function(){
       targetProgress = 0;
       displayProgress = 0;
+      /* Missing before — resetting the reveal progress does nothing
+         visible if the user was scrolled deep into the page (studio
+         intro, reveal section, footer, etc.), since .stage isn't even
+         in view. Travis: "it does the animation and keeps me on the
+         same page." Screen is fully black at this point, so the jump
+         itself is invisible. */
+      window.scrollTo(0, 0);
       setTimeout(function(){
         overlay.style.opacity = '0';
       }, 150);
@@ -1975,6 +2070,7 @@
       var closing = document.querySelector('.closing-cta');
       if (!closing) return;
       var media = closing.querySelector('.closing-cta-media');
+      var word = closing.querySelector('.closing-cta-word');
       var content = closing.querySelector('.closing-cta-content');
       gsap.set(content, { opacity: 0, y: 16 });
 
@@ -1986,8 +2082,13 @@
           scrub: 1
         }
       });
-      tl.to(media, { top: '6vh', bottom: '6vh', left: '6vw', right: '6vw', ease: 'none' }, 0)
-        .to(content, { opacity: 1, y: 0, ease: 'power2.out' }, 0.55);
+      /* Photo grows all the way to full-bleed (0, not a leftover
+         margin) — Travis: "ours doesn't grow throughout the entire
+         screen." Word fades to nothing well before that ("when you
+         scroll, it goes away"), and content arrives after. */
+      tl.to(media, { top: 0, bottom: 0, left: 0, right: 0, ease: 'none' }, 0)
+        .to(word, { opacity: 0, ease: 'none' }, 0)
+        .to(content, { opacity: 1, y: 0, ease: 'power2.out' }, 0.6);
     })();
   }
 </script>
