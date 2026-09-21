@@ -678,6 +678,162 @@
     .solution-bar{ flex-wrap:wrap; row-gap:12px; }
     .solution-about{ display:none; }
   }
+
+  /* ── Cinematic pinned reveal — plugged in from the reference's real
+     .section-reveal (measured directly off halston-architecture-
+     template.webflow.io/): a GSAP-pinned sequence where a full-bleed
+     photo holds while "SERVICES" fades up and off it, then the photo
+     itself shrinks back (revealing this dark background around it)
+     while three lines of giant type — INTERIORS / RENOVATION+STYLING
+     / SOLUTIONS — reveal one after another, plus a small accent photo
+     that slides in from the corner. rgb(46,46,43) is the same dark
+     divider color already used elsewhere on this site, reused here
+     for the section background rather than inventing a new one. ── */
+  .reveal-section{
+    position:relative;
+    height:400vh;
+    background:rgb(46,46,43);
+    color:var(--ivory);
+  }
+  .reveal-pin{
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow:hidden;
+  }
+  .reveal-photo-frame{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+  }
+  .reveal-photo-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .reveal-kicker{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    z-index:3;
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(24px, 2.4vw, 32px);
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--ivory);
+  }
+  .reveal-text-layer{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:clamp(48px, 8vh, 120px) clamp(20px, 4vw, 48px);
+  }
+  .reveal-big-line{
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size:clamp(48px, 8vw, 118px);
+    line-height:1;
+    text-transform:uppercase;
+    letter-spacing:-0.01em;
+    color:rgba(246,245,244,0.9);
+  }
+  .reveal-big-line--split{
+    display:flex;
+    justify-content:space-between;
+  }
+  .reveal-big-line--icon{
+    display:flex;
+    align-items:center;
+    gap:clamp(16px, 2vw, 32px);
+  }
+  .reveal-small-photo{
+    width:clamp(90px, 9vw, 130px);
+    aspect-ratio:4/3;
+    overflow:hidden;
+    flex:none;
+  }
+  .reveal-small-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  @media (max-width:800px){
+    .reveal-big-line{ font-size:clamp(32px, 11vw, 60px); }
+    .reveal-big-line--split{ flex-direction:column; gap:4px; }
+    .reveal-small-photo{ width:70px; }
+  }
+
+  /* ── Services list — reference's real .section-services-fullscreen:
+     plain rows, small always-visible label on the left + a count on
+     the right, a two-half burgundy background that wipes in from
+     whichever side the cursor entered on hover, and the row's own
+     title growing from small to large on top of it. Not a custom
+     cursor (checked their live page for one — there isn't one; it's
+     this background/title hover state, full stop). ── */
+  .services-list-section{
+    background:rgb(46,46,43);
+    color:rgba(246,245,244,0.75);
+  }
+  .service-row{
+    position:relative;
+    border-bottom:1px solid rgba(246,245,244,0.15);
+  }
+  .service-row-link{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:clamp(18px, 2.2vw, 28px) clamp(20px, 4vw, 48px);
+    text-decoration:none;
+    color:inherit;
+    overflow:hidden;
+  }
+  .service-row-bg{
+    position:absolute;
+    top:0; bottom:0;
+    width:50%;
+    background:var(--burgundy);
+    opacity:0;
+    transition:opacity 0.35s ease;
+    z-index:0;
+  }
+  .service-row-bg.is-left{ left:0; }
+  .service-row-bg.is-right{ right:0; }
+  .service-row-link:hover .service-row-bg{ opacity:1; }
+  .service-row-heading{
+    position:relative;
+    z-index:1;
+    font-family:'Hanken Grotesk', sans-serif;
+    font-weight:500;
+    font-size:clamp(15px, 1.2vw, 18px);
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ivory);
+  }
+  .service-row-count{
+    position:relative;
+    z-index:1;
+    font-size:clamp(13px, 1vw, 15px);
+    opacity:0.9;
+  }
+  .service-row-large-title{
+    position:absolute;
+    z-index:1;
+    top:50%; left:clamp(20px, 4vw, 48px);
+    transform:translateY(-50%);
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(28px, 3.2vw, 44px);
+    text-transform:uppercase;
+    color:rgba(246,245,244,0.92);
+    opacity:0;
+    transition:opacity 0.35s ease;
+    pointer-events:none;
+    white-space:nowrap;
+  }
+  .service-row-link:hover .service-row-large-title{ opacity:1; }
+  .service-row-link:hover .service-row-heading,
+  .service-row-link:hover .service-row-count{ opacity:0; transition:opacity 0.2s ease; }
+  @media (max-width:800px){
+    .service-row-large-title{ display:none; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -892,6 +1048,85 @@
         <p>Furniture, art, and finishing touches, chosen with intention</p>
       </div>
       <span class="solution-plus">+</span>
+    </a>
+  </div>
+</section>
+
+<section class="reveal-section">
+  <div class="reveal-pin">
+    <div class="reveal-photo-frame">
+      <img src="assets/gallery/reveal/hero.jpg" alt="Marlow Interiors">
+    </div>
+    <div class="reveal-kicker">Services</div>
+    <div class="reveal-text-layer">
+      <div class="reveal-big-line">Interiors</div>
+      <div class="reveal-big-line reveal-big-line--split">
+        <span>Renovation</span>
+        <span>Styling</span>
+      </div>
+      <div class="reveal-big-line reveal-big-line--icon">
+        <span>Solutions</span>
+        <div class="reveal-small-photo">
+          <img src="assets/gallery/reveal/accent.jpg" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services-list-section">
+  <div class="service-row">
+    <a href="interiors.html" class="service-row-link">
+      <div class="service-row-bg is-left"></div>
+      <div class="service-row-bg is-right"></div>
+      <div class="service-row-heading">Residential Interiors</div>
+      <div class="service-row-count">10+ homes</div>
+      <div class="service-row-large-title">Residential Interiors</div>
+    </a>
+  </div>
+  <div class="service-row">
+    <a href="renovation.html" class="service-row-link">
+      <div class="service-row-bg is-left"></div>
+      <div class="service-row-bg is-right"></div>
+      <div class="service-row-heading">Full Renovations</div>
+      <div class="service-row-count">10+ renovations</div>
+      <div class="service-row-large-title">Full Renovations</div>
+    </a>
+  </div>
+  <div class="service-row">
+    <a href="styling.html" class="service-row-link">
+      <div class="service-row-bg is-left"></div>
+      <div class="service-row-bg is-right"></div>
+      <div class="service-row-heading">Interior Styling</div>
+      <div class="service-row-count">50+ rooms styled</div>
+      <div class="service-row-large-title">Interior Styling</div>
+    </a>
+  </div>
+  <div class="service-row">
+    <a href="interiors.html" class="service-row-link">
+      <div class="service-row-bg is-left"></div>
+      <div class="service-row-bg is-right"></div>
+      <div class="service-row-heading">Hospitality Commissions</div>
+      <div class="service-row-count">Select engagements</div>
+      <div class="service-row-large-title">Hospitality Commissions</div>
+    </a>
+  </div>
+  <div class="service-row">
+    <a href="interiors.html" class="service-row-link">
+      <div class="service-row-bg is-left"></div>
+      <div class="service-row-bg is-right"></div>
+      <div class="service-row-heading">Material Consultation</div>
+      <div class="service-row-count">120+ palettes</div>
+      <div class="service-row-large-title">Material Consultation</div>
+    </a>
+  </div>
+  <div class="service-row">
+    <a href="styling.html" class="service-row-link">
+      <div class="service-row-bg is-left"></div>
+      <div class="service-row-bg is-right"></div>
+      <div class="service-row-heading">Home Staging</div>
+      <div class="service-row-count">Avg. 5 days</div>
+      <div class="service-row-large-title">Home Staging</div>
     </a>
   </div>
 </section>
@@ -1289,6 +1524,52 @@
         stagger: 0.045
       });
     });
+
+    /* Cinematic pinned reveal, plugged in from the reference's real
+       .section-reveal — .reveal-pin is CSS position:sticky (matching
+       their actual technique, confirmed on their live page: this is
+       sticky, not a GSAP pin), so the timeline below just needs to be
+       scrubbed against the tall .reveal-section's own scroll range;
+       the sticking is free. One timeline, scrub tied directly to
+       scroll position so scrolling back up unwinds it exactly, same
+       as every other scrub animation on this page. */
+    (function(){
+      var section = document.querySelector('.reveal-section');
+      if (!section) return;
+      var kicker = section.querySelector('.reveal-kicker');
+      var photo = section.querySelector('.reveal-photo-frame');
+      var lines = section.querySelectorAll('.reveal-big-line');
+      var smallPhoto = section.querySelector('.reveal-small-photo');
+
+      var lineWords = [];
+      lines.forEach(function(line){
+        var spans = line.querySelectorAll(':scope > span');
+        var targets = spans.length ? spans : [line];
+        targets.forEach(function(t){
+          var words = splitWords(t);
+          gsap.set(words, { yPercent: 115, rotate: 6 });
+          lineWords.push(words);
+        });
+      });
+      gsap.set(smallPhoto, { xPercent: 40, opacity: 0 });
+
+      var tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1
+        }
+      });
+
+      tl.to(kicker, { yPercent: -140, opacity: 0, ease: 'none' }, 0)
+        .to(photo, { top: '16vh', left: '9vw', right: '9vw', bottom: '10vh', ease: 'none' }, 0.08)
+        .to(lineWords[0], { yPercent: 0, rotate: 0, stagger: 0.04, ease: 'power2.out' }, 0.32)
+        .to(lineWords[1], { yPercent: 0, rotate: 0, stagger: 0.04, ease: 'power2.out' }, 0.48)
+        .to(lineWords[2], { yPercent: 0, rotate: 0, stagger: 0.04, ease: 'power2.out' }, 0.48)
+        .to(smallPhoto, { xPercent: 0, opacity: 1, ease: 'none' }, 0.55)
+        .to(lineWords[3], { yPercent: 0, rotate: 0, stagger: 0.04, ease: 'power2.out' }, 0.68);
+    })();
   }
 </script>
 
