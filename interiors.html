@@ -179,14 +179,20 @@
      heading+photo layout. */
   /* rgb(209,209,205) measured directly off both #details and #article
      on the reference — same background on both, distinct from the
-     plain --ivory used elsewhere on this page. */
-  .details-facts{
+     plain --ivory used elsewhere on this page. Applied once to the
+     wrapper around both sections (not on each section individually)
+     so there's no seam of the page's default ivory showing through
+     any gap between them. */
+  .details-and-article-wrap{
     background:#d1d1cd;
-    padding:clamp(64px, 9vw, 120px) var(--pad) clamp(48px, 6vw, 80px);
+  }
+  .details-facts{
+    padding:clamp(24px, 3vw, 56px) var(--pad) clamp(48px, 6vw, 80px);
   }
   .details-facts dl{
     display:grid;
     grid-template-columns:max-content 1fr;
+    align-items:end;
     max-width:56em;
   }
   .details-facts dt{
@@ -229,7 +235,6 @@
     align-items:flex-start;
     gap:clamp(24px, 3vw, 56px);
     padding:0 var(--pad);
-    background:#d1d1cd;
   }
   .sticky-media{
     position:sticky;
@@ -608,6 +613,8 @@
     </div>
   </section>
 
+  <div class="details-and-article-wrap">
+
   <div class="details-facts" id="details">
     <dl>
       <dt>About</dt><dd class="is-about reveal-target">Considered interiors for the way people actually live</dd>
@@ -664,6 +671,8 @@
       </div>
 
     </div>
+  </div>
+
   </div>
 
   <section class="clients-section">
