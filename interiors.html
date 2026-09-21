@@ -189,11 +189,16 @@
   .details-facts{
     padding:clamp(24px, 3vw, 56px) var(--pad) clamp(48px, 6vw, 80px);
   }
+  /* max-width:none measured directly off the reference — the grid
+     spans the full section width edge-to-edge (minus the standard
+     side padding), it's only the heading TEXT itself (dd.is-about,
+     below) that has its own max-width to control line-wrapping. My
+     first pass capped the whole grid at 56em, leaving a large dead
+     zone of empty space on the right at wider viewports. */
   .details-facts dl{
     display:grid;
     grid-template-columns:max-content 1fr;
     align-items:end;
-    max-width:56em;
   }
   .details-facts dt{
     grid-column:1;
