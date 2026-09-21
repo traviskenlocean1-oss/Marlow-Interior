@@ -676,10 +676,9 @@
   }
   .submit-btn:hover{ opacity:0.85; }
 
-  /* ── Reuses the homepage solutions-showcase component exactly —
-     same markup/behavior, gray color variant added alongside the
-     existing burgundy for the second teaser (Travis explicitly asked
-     for "one burgundy, one gray"). Only Renovation + Styling shown
+  /* Reuses the homepage solutions-showcase component's structure —
+     plain photo, no color tint over it (Travis explicitly rejected the
+     burgundy/gray overlay this had). Only Renovation + Styling shown
      here (Interiors is this page); both link back to the homepage
      section for now since their own dedicated pages don't exist yet. ── */
   .solution-item{ position:relative; width:100%; min-height:360px; }
@@ -698,9 +697,6 @@
     text-decoration:none;
     color:var(--ivory);
   }
-  .solution-overlay{ position:absolute; inset:0; z-index:0; opacity:0.92; }
-  .solution-overlay.is-burgundy{ background:var(--burgundy); }
-  .solution-overlay.is-gray{ background:#5a5a56; }
   .solution-label{
     position:relative; z-index:2;
     display:flex; align-items:center; gap:8px; flex:none;
@@ -998,7 +994,6 @@
       <img src="assets/gallery/solutions/renovation.jpg" alt="Marlow Interiors — Renovation">
     </div>
     <a href="index.html#solutions" class="solution-bar">
-      <div class="solution-overlay is-burgundy"></div>
       <div class="solution-label">
         <span class="solution-dot"></span>
         <span>Tailored to the space</span>
@@ -1012,7 +1007,6 @@
       <img src="assets/gallery/solutions/styling.jpg" alt="Marlow Interiors — Styling">
     </div>
     <a href="index.html#solutions" class="solution-bar">
-      <div class="solution-overlay is-gray"></div>
       <div class="solution-label">
         <span class="solution-dot"></span>
         <span>Down to the last detail</span>
