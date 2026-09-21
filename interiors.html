@@ -78,23 +78,39 @@
      photo filling the right column. No highlight-box behind the
      title here at all — that box treatment belongs to the homepage's
      hover-teaser card, a different component. */
+  /* Locked to exactly 100vh (measured on the reference: hero height
+     === window.innerHeight precisely) with a column flex layout, so
+     the title takes its natural height and the row below it fills
+     whatever remains — rather than a fixed aspect-ratio photo that
+     could push the whole section taller than one screen, which is
+     what happened the first time (the section ran on past the fold,
+     which read as "too big"). */
   .discipline-hero{
+    height:100vh;
+    min-height:600px;
+    display:flex;
+    flex-direction:column;
     background:var(--burgundy);
     color:var(--ivory);
   }
+  /* weight:500 measured off the reference — my first pass used 700,
+     which is why it read as bulky. */
   .discipline-hero h1{
+    flex:none;
     font-family:'Poppins', sans-serif;
-    font-weight:700;
-    font-size:clamp(48px, 10vw, 144px);
+    font-weight:500;
+    font-size:clamp(40px, 8.5vw, 120px);
     line-height:1;
     text-transform:uppercase;
-    padding:clamp(32px, 5vw, 64px) var(--pad) 0;
+    padding:clamp(28px, 4.5vw, 56px) var(--pad) 0;
   }
   .discipline-hero-row{
+    flex:1 1 auto;
+    min-height:0;
     display:flex;
     align-items:stretch;
     gap:clamp(24px, 3vw, 48px);
-    padding:clamp(32px, 5vw, 64px) var(--pad) 0;
+    padding:clamp(24px, 4vw, 48px) var(--pad) clamp(24px, 4vw, 48px);
   }
   .discipline-hero-text{
     flex:1 1 50%;
@@ -108,14 +124,19 @@
     line-height:1.4;
     margin-bottom:1.6em;
   }
+  /* No aspect-ratio — fills exactly whatever height the row has
+     available (100vh minus the title and padding), same as the
+     reference. */
   .discipline-hero-media{
     flex:1 1 50%;
-    aspect-ratio:4/3;
+    height:100%;
     overflow:hidden;
   }
   .discipline-hero-media img{ width:100%; height:100%; object-fit:cover; display:block; }
   @media (max-width:800px){
+    .discipline-hero{ height:auto; min-height:0; }
     .discipline-hero-row{ flex-direction:column; }
+    .discipline-hero-media{ height:50vh; }
   }
 
   /* Reused for both the hero's "Details" button and the closing
@@ -156,7 +177,11 @@
      first pass). "About" is just the first, larger-styled row in the
      same list as Service/Approach/Highlight/Projects, not a separate
      heading+photo layout. */
+  /* rgb(209,209,205) measured directly off both #details and #article
+     on the reference — same background on both, distinct from the
+     plain --ivory used elsewhere on this page. */
   .details-facts{
+    background:#d1d1cd;
     padding:clamp(64px, 9vw, 120px) var(--pad) clamp(48px, 6vw, 80px);
   }
   .details-facts dl{
@@ -204,6 +229,7 @@
     align-items:flex-start;
     gap:clamp(24px, 3vw, 56px);
     padding:0 var(--pad);
+    background:#d1d1cd;
   }
   .sticky-media{
     position:sticky;
