@@ -538,38 +538,6 @@
     .quote-photo{ flex-basis:120px; }
   }
 
-  /* ── Closing about-block — photo + text side by side, same pattern
-     as the homepage's studio-intro panels. ── */
-  .closing-section{
-    display:flex;
-    align-items:center;
-    gap:clamp(32px, 5vw, 80px);
-    padding:clamp(64px, 9vw, 120px) var(--pad);
-    border-top:1px solid rgba(23,19,16,0.12);
-    background:#d1d1cd;
-  }
-  .closing-media{
-    flex:1 1 45%;
-    aspect-ratio:3/4;
-    max-width:520px;
-    overflow:hidden;
-  }
-  .closing-media img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .closing-text{ flex:1 1 45%; max-width:32em; }
-  /* 26.8px/weight 500 measured off the reference's actual closing
-     heading at 1440px. */
-  .closing-text h2{
-    font-family:'Poppins', sans-serif;
-    font-weight:500;
-    font-size:clamp(20px, 1.9vw, 28px);
-    line-height:1.3;
-    margin-bottom:0.7em;
-  }
-  .closing-text p{ font-size:clamp(15px, 1.1vw, 17px); line-height:1.6; opacity:0.85; }
-  @media (max-width:800px){
-    .closing-section{ flex-direction:column; }
-  }
-
   /* ── Get in touch form ── */
   /* background/no-side-padding measured off the reference's real
      .section-form — the ticker track needs to run edge to edge, so
@@ -952,23 +920,6 @@
       <div class="quote-icon">&rdquo;</div>
       <p class="quote-text"><span class="is-placeholder">Add a real client quote here.</span></p>
       <p class="quote-attribution">Client Name &middot; Private Residence</p>
-    </div>
-  </section>
-
-  <section class="closing-section closing-section--reverse">
-    <div class="closing-text">
-      <h2 class="reveal-target">Rigorous design, considered detail</h2>
-      <p>Every project begins with a thorough understanding of how you actually live day to day. The outcome is a home that performs practically and feels right for years, not just on the day it's photographed.</p>
-      <a href="#contact-form" class="action-button">
-        <span>Get in touch</span>
-        <span class="action-button-icon">
-          <span class="icon-plus">+</span>
-          <span class="icon-arrow">&rarr;</span>
-        </span>
-      </a>
-    </div>
-    <div class="closing-media">
-      <img src="assets/gallery/interiors-page/materials.jpg" alt="Material and finish selection">
     </div>
   </section>
 
