@@ -334,47 +334,52 @@
   .reveal-word{ display:inline-block; overflow:hidden; vertical-align:top; }
   .reveal-word__inner{ display:inline-block; transform-origin:left bottom; }
 
-  /* ── Our Clients ── */
+  /* ── Our Clients — reference's real .section-clients: an "Our /
+     Clients" heading built from the exact same fact-row component as
+     the details list above, then a 2-column grid of landscape cells
+     pinned to the same 58%-wide right-hand column every value on this
+     page uses. Reference alternates real client-logo cells with photo
+     cells; we have no real client logos to show (placeholder-only
+     rule), so those slots just stay empty background the way the
+     reference's own blank cells do — not filled with a fabricated
+     mark. ── */
   .clients-section{
-    padding:clamp(64px, 9vw, 120px) var(--pad);
-    border-top:1px solid rgba(23,19,16,0.12);
+    padding:clamp(48px, 6vw, 80px) var(--pad) clamp(64px, 9vw, 120px);
+    background:#d1d1cd;
   }
-  .clients-kicker{
-    display:inline-flex; align-items:center; gap:8px;
-    font-size:12px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase;
-    opacity:0.55;
-    margin-bottom:clamp(32px, 4vw, 56px);
+  .clients-grid-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-end;
   }
   .clients-grid{
+    flex:0 1 58%;
     display:grid;
-    grid-template-columns:repeat(3, 1fr);
+    grid-template-columns:1fr 1fr;
     gap:var(--gap);
+    margin-top:clamp(24px, 3vw, 40px);
   }
-  .clients-grid > div:nth-child(2){ margin-top:clamp(40px, 6vw, 90px); }
-  .clients-grid > div:nth-child(3){ margin-top:clamp(-20px, -3vw, -40px); }
-  .client-card{ position:relative; aspect-ratio:4/5; overflow:hidden; background:var(--bg-fallback); }
-  .client-card img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .client-mark{
+  .client-cell{
+    position:relative;
+    aspect-ratio:157/100;
+    overflow:hidden;
+  }
+  .client-cell::after{
+    content:'';
     position:absolute;
-    left:14px; bottom:14px;
-    display:flex; align-items:center; gap:8px;
-    padding:7px 12px;
-    background:rgba(246,245,244,0.92);
-    border-radius:999px;
-    font-size:11px;
-    font-weight:500;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    color:var(--ink);
+    left:15%; right:15%; bottom:0;
+    height:1px;
+    background:rgb(184,183,177);
   }
-  .client-mark-dot{
-    width:16px; height:16px; border-radius:50%;
-    border:1.5px solid var(--ink);
-    flex:none;
-  }
+  .client-cell img{ width:100%; height:100%; object-fit:cover; display:block; }
   @media (max-width:800px){
-    .clients-grid{ grid-template-columns:repeat(2, 1fr); }
-    .clients-grid > div:nth-child(2), .clients-grid > div:nth-child(3){ margin-top:0; }
+    .clients-grid{ grid-template-columns:1fr; flex-basis:100%; }
+    .clients-grid-wrap{ justify-content:stretch; }
+    /* The empty/photo alternation only reads as intentional negative
+       space next to a neighboring photo in the 2-col desktop grid —
+       stacked single-column on mobile it just looks like broken gaps,
+       so mobile shows the photos only. */
+    .client-cell.is-empty{ display:none; }
   }
 
   /* ── Testimonial ── */
@@ -385,6 +390,7 @@
     align-items:start;
     padding:clamp(64px, 9vw, 120px) var(--pad);
     border-top:1px solid rgba(23,19,16,0.12);
+    background:#d1d1cd;
   }
   .testimonial-portrait{
     width:clamp(120px, 12vw, 180px);
@@ -428,6 +434,7 @@
     gap:clamp(32px, 5vw, 80px);
     padding:clamp(64px, 9vw, 120px) var(--pad);
     border-top:1px solid rgba(23,19,16,0.12);
+    background:#d1d1cd;
   }
   .closing-media{
     flex:1 1 45%;
@@ -720,40 +727,21 @@
   </div>
 
   <section class="clients-section">
-    <div class="clients-kicker">
-      <span class="discipline-dot" style="background:currentColor;width:6px;height:6px;border-radius:50%;display:inline-block;"></span>
-      Our clients
+    <div class="details-facts" style="padding-bottom:0;">
+      <dl><div class="fact-row"><dt>Our</dt><dd>Clients</dd></div></dl>
     </div>
-    <div class="clients-grid">
-      <div>
-        <div class="client-card">
-          <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
-          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
-        </div>
-      </div>
-      <div>
-        <div class="client-card">
-          <img src="assets/gallery/project2-banner.jpg" alt="Coral Gables Residence">
-          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
-        </div>
-      </div>
-      <div>
-        <div class="client-card">
-          <img src="assets/gallery/project3-banner.jpg" alt="Sunset Harbour Residence">
-          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
-        </div>
-      </div>
-      <div>
-        <div class="client-card">
-          <img src="assets/gallery/brickell-loft/banner.jpg" alt="Brickell Loft Residence">
-          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
-        </div>
-      </div>
-      <div>
-        <div class="client-card">
-          <img src="assets/gallery/pinecrest/banner.jpg" alt="Pinecrest Residence">
-          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
-        </div>
+    <div class="clients-grid-wrap">
+      <div class="clients-grid">
+        <div class="client-cell is-empty"></div>
+        <div class="client-cell"><img src="assets/gallery/project1-banner.jpg" alt="Private residential project"></div>
+        <div class="client-cell"><img src="assets/gallery/project2-banner.jpg" alt="Private residential project"></div>
+        <div class="client-cell is-empty"></div>
+        <div class="client-cell is-empty"></div>
+        <div class="client-cell"><img src="assets/gallery/project3-banner.jpg" alt="Private residential project"></div>
+        <div class="client-cell"><img src="assets/gallery/brickell-loft/banner.jpg" alt="Private residential project"></div>
+        <div class="client-cell is-empty"></div>
+        <div class="client-cell is-empty"></div>
+        <div class="client-cell"><img src="assets/gallery/pinecrest/banner.jpg" alt="Private residential project"></div>
       </div>
     </div>
   </section>
