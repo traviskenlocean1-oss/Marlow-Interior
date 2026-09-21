@@ -69,98 +69,100 @@
      hover-gated) burgundy info bar. This is literally the destination
      of the homepage's "Interiors" hover card, so everything that card
      only reveals on hover is just permanently shown here. ── */
+  /* ── Hero — rebuilt to match the reference's ACTUAL structure
+     (verified against their live DOM, not the homepage's hover-card
+     styling I mistakenly copied here the first time): a true split
+     layout, not a full-bleed photo with a bottom overlay bar. Giant
+     title spans the full width at the top on solid burgundy; below
+     it, a two-column row — paragraph + "Details" button on the left,
+     photo filling the right column. No highlight-box behind the
+     title here at all — that box treatment belongs to the homepage's
+     hover-teaser card, a different component. */
   .discipline-hero{
-    position:relative;
-    height:82vh;
-    min-height:520px;
-    overflow:hidden;
-    background:var(--bg-fallback);
-  }
-  .discipline-hero img{
-    position:absolute; inset:0;
-    width:100%; height:100%; object-fit:cover;
-  }
-  .discipline-bar{
-    position:absolute;
-    left:0; right:0; bottom:0;
-    z-index:2;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:clamp(16px, 2vw, 32px);
-    padding:clamp(24px, 3vw, 40px) var(--pad);
     background:var(--burgundy);
     color:var(--ivory);
   }
-  .discipline-label{
-    display:flex; align-items:center; gap:8px;
-    flex:none;
-    font-size:12px; font-weight:500;
-    letter-spacing:0.08em; text-transform:uppercase;
-    border:1px solid rgba(246,245,244,0.5);
-    padding:9px 16px; border-radius:999px;
-  }
-  .discipline-dot{ width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; }
-  .discipline-title{
-    position:relative;
-    background:rgba(246,245,244,0.16);
-    padding:0.15em 0.35em;
-  }
-  .discipline-title h1{
+  .discipline-hero h1{
     font-family:'Poppins', sans-serif;
     font-weight:700;
-    font-size:clamp(32px, 4.4vw, 62px);
+    font-size:clamp(48px, 10vw, 144px);
     line-height:1;
     text-transform:uppercase;
-    white-space:nowrap;
+    padding:clamp(32px, 5vw, 64px) var(--pad) 0;
   }
-  .discipline-about{
-    flex:none;
-    max-width:20em;
-    font-size:13px;
-    font-weight:500;
-    letter-spacing:0.02em;
-    text-transform:uppercase;
-    text-align:right;
-  }
-  @media (max-width:800px){
-    .discipline-bar{ flex-direction:column; align-items:flex-start; gap:16px; }
-    .discipline-about{ text-align:left; max-width:none; }
-  }
-
-  /* ── Details strip ── */
-  .details-strip{
+  .discipline-hero-row{
     display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:clamp(32px, 5vw, 80px);
-    padding:clamp(64px, 9vw, 120px) var(--pad) clamp(48px, 6vw, 80px);
+    align-items:stretch;
+    gap:clamp(24px, 3vw, 48px);
+    padding:clamp(32px, 5vw, 64px) var(--pad) 0;
   }
-  /* 28.64px/weight 600 measured directly off the reference at 1440px
-     — my first pass used clamp(28px,3.4vw,48px), which resolves to
-     ~49px there, nearly double the real size. */
-  .details-heading{
-    font-family:'Poppins', sans-serif;
-    font-weight:600;
-    font-size:clamp(22px, 2vw, 30px);
-    line-height:1.3;
-    max-width:16em;
+  .discipline-hero-text{
+    flex:1 1 50%;
+    max-width:28em;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
   }
-  .details-image{
-    flex:none;
-    width:clamp(160px, 20vw, 320px);
-    height:clamp(120px, 15vw, 240px);
-    border-radius:3px;
+  .discipline-hero-text p{
+    font-size:clamp(18px, 1.6vw, 24px);
+    line-height:1.4;
+    margin-bottom:1.6em;
+  }
+  .discipline-hero-media{
+    flex:1 1 50%;
+    aspect-ratio:4/3;
     overflow:hidden;
   }
-  .details-image img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .discipline-hero-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+  @media (max-width:800px){
+    .discipline-hero-row{ flex-direction:column; }
+  }
+
+  /* Reused for both the hero's "Details" button and the closing
+     section's "Get in touch" button — same rounded-rect shape and
+     hover icon-swap already built for the homepage's About Us button. */
+  .action-button{
+    margin-top:0.5em;
+    display:inline-flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:32px;
+    min-width:200px;
+    padding:16px 22px;
+    border:1px solid currentColor;
+    border-radius:4px;
+    text-decoration:none;
+    color:inherit;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    transition:opacity 0.2s ease;
+  }
+  .action-button:hover{ opacity:0.7; }
+  .action-button-icon{ position:relative; width:16px; height:16px; flex:none; }
+  .action-button-icon span{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity 0.3s ease, transform 0.3s ease;
+  }
+  .action-button-icon .icon-arrow{ opacity:0; transform:translateX(-6px); }
+  .action-button:hover .icon-plus{ opacity:0; transform:translateX(6px); }
+  .action-button:hover .icon-arrow{ opacity:1; transform:translateX(0); }
+
+  /* ── Details section — a pure repeating label/value row list,
+     matching the reference's actual .detail-block pattern exactly:
+     no photo in this section at all (that was a fabrication in my
+     first pass). "About" is just the first, larger-styled row in the
+     same list as Service/Approach/Highlight/Projects, not a separate
+     heading+photo layout. */
   .details-facts{
-    padding:0 var(--pad) clamp(48px, 6vw, 80px);
+    padding:clamp(64px, 9vw, 120px) var(--pad) clamp(48px, 6vw, 80px);
   }
   .details-facts dl{
     display:grid;
     grid-template-columns:max-content 1fr;
-    max-width:44em;
+    max-width:56em;
   }
   .details-facts dt{
     grid-column:1;
@@ -168,20 +170,28 @@
     letter-spacing:0.08em;
     text-transform:uppercase;
     opacity:0.55;
-    padding:0.9em 2em 0.9em 0;
+    padding:1.1em 2em 1.1em 0;
     border-top:1px solid rgba(23,19,16,0.12);
   }
   .details-facts dd{
     grid-column:2;
-    font-family:'Poppins', sans-serif;
-    font-weight:500;
     font-size:clamp(16px, 1.3vw, 19px);
     text-transform:uppercase;
-    padding:0.9em 0;
+    padding:1.1em 0;
     border-top:1px solid rgba(23,19,16,0.12);
   }
   .details-facts dt:last-of-type, .details-facts dd:last-of-type{
     border-bottom:1px solid rgba(23,19,16,0.12);
+  }
+  /* First row ("About") is the one exception — bigger, weight 600,
+     matching the reference's measured 28.64px. */
+  .details-facts dd.is-about{
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size:clamp(22px, 2vw, 30px);
+    line-height:1.3;
+    text-transform:none;
+    max-width:16em;
   }
 
   /* ── Sticky-photo section — the photo pins in place while the
@@ -230,25 +240,12 @@
     line-height:1.6;
     opacity:0.85;
   }
-  .chapter .get-in-touch-btn{
-    margin-top:1.6em;
-    display:inline-flex;
-    align-items:center;
-    gap:14px;
-    padding:14px 24px;
-    border:1px solid rgba(23,19,16,0.35);
-    border-radius:4px;
-    text-decoration:none;
-    font-size:13px;
-    font-weight:500;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    transition:background 0.3s ease, color 0.3s ease;
+  .sticky-chapters > p{
+    font-size:clamp(16px, 1.15vw, 18px);
+    line-height:1.8;
+    opacity:0.85;
   }
-  .chapter .get-in-touch-btn:hover{
-    background:var(--ink);
-    color:var(--ivory);
-  }
+  .sticky-chapters > ul{ margin-bottom:1.7em; }
   @media (max-width:800px){
     .sticky-section{ flex-direction:column; }
     .sticky-media{ position:relative; flex:none; width:100%; height:50vh; top:auto; }
@@ -567,28 +564,27 @@
 <div class="page-content">
 
   <section class="discipline-hero">
-    <img src="assets/gallery/solutions/interiors.jpg" alt="Marlow Interiors — Interiors">
-    <div class="discipline-bar">
-      <div class="discipline-label">
-        <span class="discipline-dot"></span>
-        <span>Concept to completion</span>
+    <h1>Interiors</h1>
+    <div class="discipline-hero-row">
+      <div class="discipline-hero-text">
+        <p>End-to-end interior design from concept through installation, for private residential clients.</p>
+        <a href="#details" class="action-button">
+          <span>Details</span>
+          <span class="action-button-icon">
+            <span class="icon-plus">+</span>
+            <span class="icon-arrow">&rarr;</span>
+          </span>
+        </a>
       </div>
-      <div class="discipline-title">
-        <h1>Interiors</h1>
+      <div class="discipline-hero-media">
+        <img src="assets/gallery/solutions/interiors.jpg" alt="Marlow Interiors — Interiors">
       </div>
-      <div class="discipline-about">Considered interiors for the way people actually live</div>
     </div>
   </section>
 
-  <div class="details-strip">
-    <h2 class="details-heading reveal-target">Considered interiors for the way people actually live</h2>
-    <div class="details-image">
-      <img src="assets/gallery/solutions/interiors.jpg" alt="">
-    </div>
-  </div>
-
-  <div class="details-facts">
+  <div class="details-facts" id="details">
     <dl>
+      <dt>About</dt><dd class="is-about reveal-target">Considered interiors for the way people actually live</dd>
       <dt>Service</dt><dd>Interiors</dd>
       <dt>Approach</dt><dd>Considered material selection</dd>
       <dt>Highlight</dt><dd>Concept to completion</dd>
@@ -596,11 +592,20 @@
     </dl>
   </div>
 
-  <div class="sticky-section">
+  <div class="sticky-section" id="article">
     <div class="sticky-media">
-      <img src="assets/gallery/interiors-page/materials.jpg" alt="Material and finish selection">
+      <img src="assets/gallery/solutions/interiors.jpg" alt="Marlow Interiors — Interiors">
     </div>
     <div class="sticky-chapters">
+
+      <p>Marlow is appointed by private residential clients, and takes on select hospitality commissions where the brief and client relationship justify the studio's full engagement. Every project begins with a real conversation about how the space is actually used, not just how it should look.</p>
+      <ul style="padding-left:1.2em; margin-top:1.2em; font-size:clamp(16px, 1.15vw, 18px); line-height:1.8; opacity:0.85;">
+        <li>Full residential interiors, from single rooms to whole-home projects</li>
+        <li>Kitchen and bath renovation, coordinated with contractors on your behalf</li>
+        <li>Furniture, fixture, and material specification integrated from concept</li>
+        <li>Styling and finishing touches once construction is complete</li>
+        <li>Ongoing care for repeat clients across multiple properties</li>
+      </ul>
 
       <div class="chapter">
         <h2 class="reveal-target">Design rooted in place</h2>
@@ -630,12 +635,6 @@
       <div class="chapter">
         <h2 class="reveal-target">Working with the wider team</h2>
         <p>Interior design is a collaborative act. We coordinate with contractors, upholsterers, and specialty tradespeople, and manage that relationship on your behalf. A well-run project is as much about clear communication between everyone involved as it is about the design itself.</p>
-      </div>
-
-      <div class="chapter">
-        <h2 class="reveal-target">Rigorous design, considered detail</h2>
-        <p>Every project begins with a thorough understanding of how you actually live day to day. The outcome is a home that performs practically and feels right for years, not just on the day it's photographed.</p>
-        <a href="#contact-form" class="get-in-touch-btn">Get in touch</a>
       </div>
 
     </div>
@@ -698,6 +697,23 @@
     <div class="closing-text">
       <h2 class="reveal-target">Our designers lead every project from initial consultation through installation and styling.</h2>
       <p>Engaged from brief to handover. The person you meet at the first conversation is the person who sees the project through to the end.</p>
+    </div>
+  </section>
+
+  <section class="closing-section closing-section--reverse">
+    <div class="closing-text">
+      <h2 class="reveal-target">Rigorous design, considered detail</h2>
+      <p>Every project begins with a thorough understanding of how you actually live day to day. The outcome is a home that performs practically and feels right for years, not just on the day it's photographed.</p>
+      <a href="#contact-form" class="action-button">
+        <span>Get in touch</span>
+        <span class="action-button-icon">
+          <span class="icon-plus">+</span>
+          <span class="icon-arrow">&rarr;</span>
+        </span>
+      </a>
+    </div>
+    <div class="closing-media">
+      <img src="assets/gallery/interiors-page/materials.jpg" alt="Material and finish selection">
     </div>
   </section>
 
