@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interiors | Marlow Interiors</title>
+<meta name="description" content="Considered interiors for the way people actually live — Marlow Interiors' interior design service, Miami, FL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#f6f5f4;
+    --ink:#171310;
+    --bg-fallback:#3a2a22;
+    --burgundy:#47262c;
+    --pad:clamp(20px, 4vw, 48px);
+    --gap:clamp(14px, 1.6vw, 24px);
+    --footer-h:clamp(320px, 32vw, 420px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:auto;}
+  body{
+    font-family:'Hanken Grotesk', sans-serif;
+    background:var(--ivory);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  a{ color:inherit; }
+
+  /* ── Header — transparent over the hero photo, same pattern as
+     every project detail page on this site. ── */
+  .site-header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:28px var(--pad);
+  }
+  .site-header img{ height:56px; width:auto; display:block; cursor:pointer; }
+  .site-header nav{ display:flex; align-items:center; gap:clamp(20px, 2.6vw, 40px); }
+  .site-header nav a{
+    color:var(--ivory);
+    text-decoration:none;
+    font-size:clamp(15px, 1.4vw, 20px);
+    font-weight:400;
+    letter-spacing:-0.02em;
+    opacity:0.88;
+    transition:opacity 0.2s ease;
+  }
+  .site-header nav a:hover{ opacity:1; }
+  @media (max-width:640px){ .site-header nav{ display:none; } }
+
+  .cut-transition{
+    position:fixed; inset:0; z-index:100;
+    background:#000; opacity:0; pointer-events:none;
+  }
+
+  .page-content{
+    position:relative;
+    z-index:2;
+    background:var(--ivory);
+    margin-bottom:var(--footer-h);
+  }
+
+  /* ── Hero — full-bleed photo with the static (always-visible, not
+     hover-gated) burgundy info bar. This is literally the destination
+     of the homepage's "Interiors" hover card, so everything that card
+     only reveals on hover is just permanently shown here. ── */
+  .discipline-hero{
+    position:relative;
+    height:82vh;
+    min-height:520px;
+    overflow:hidden;
+    background:var(--bg-fallback);
+  }
+  .discipline-hero img{
+    position:absolute; inset:0;
+    width:100%; height:100%; object-fit:cover;
+  }
+  .discipline-bar{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:clamp(16px, 2vw, 32px);
+    padding:clamp(24px, 3vw, 40px) var(--pad);
+    background:var(--burgundy);
+    color:var(--ivory);
+  }
+  .discipline-label{
+    display:flex; align-items:center; gap:8px;
+    flex:none;
+    font-size:12px; font-weight:500;
+    letter-spacing:0.08em; text-transform:uppercase;
+    border:1px solid rgba(246,245,244,0.5);
+    padding:9px 16px; border-radius:999px;
+  }
+  .discipline-dot{ width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; }
+  .discipline-title{
+    position:relative;
+    background:rgba(246,245,244,0.16);
+    padding:0.15em 0.35em;
+  }
+  .discipline-title h1{
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+    font-size:clamp(32px, 4.4vw, 62px);
+    line-height:1;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .discipline-about{
+    flex:none;
+    max-width:20em;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    text-align:right;
+  }
+  @media (max-width:800px){
+    .discipline-bar{ flex-direction:column; align-items:flex-start; gap:16px; }
+    .discipline-about{ text-align:left; max-width:none; }
+  }
+
+  /* ── Details strip ── */
+  .details-strip{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:clamp(32px, 5vw, 80px);
+    padding:clamp(64px, 9vw, 120px) var(--pad) clamp(48px, 6vw, 80px);
+  }
+  /* 28.64px/weight 600 measured directly off the reference at 1440px
+     — my first pass used clamp(28px,3.4vw,48px), which resolves to
+     ~49px there, nearly double the real size. */
+  .details-heading{
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size:clamp(22px, 2vw, 30px);
+    line-height:1.3;
+    max-width:16em;
+  }
+  .details-image{
+    flex:none;
+    width:clamp(160px, 20vw, 320px);
+    height:clamp(120px, 15vw, 240px);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .details-image img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .details-facts{
+    padding:0 var(--pad) clamp(48px, 6vw, 80px);
+  }
+  .details-facts dl{
+    display:grid;
+    grid-template-columns:max-content 1fr;
+    max-width:44em;
+  }
+  .details-facts dt{
+    grid-column:1;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    opacity:0.55;
+    padding:0.9em 2em 0.9em 0;
+    border-top:1px solid rgba(23,19,16,0.12);
+  }
+  .details-facts dd{
+    grid-column:2;
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(16px, 1.3vw, 19px);
+    text-transform:uppercase;
+    padding:0.9em 0;
+    border-top:1px solid rgba(23,19,16,0.12);
+  }
+  .details-facts dt:last-of-type, .details-facts dd:last-of-type{
+    border-bottom:1px solid rgba(23,19,16,0.12);
+  }
+
+  /* ── Sticky-photo section — the photo pins in place while the
+     chapters scroll past beside it. position:sticky, not fixed, so it
+     naturally releases once its own column has scrolled past — same
+     real technique the reference itself uses (.parallax-wrap uses
+     sticky, confirmed from their CSS bundle). ── */
+  .sticky-section{
+    display:flex;
+    align-items:flex-start;
+    gap:clamp(24px, 3vw, 56px);
+    padding:0 var(--pad);
+  }
+  .sticky-media{
+    position:sticky;
+    top:0;
+    flex:0 0 44%;
+    height:100vh;
+    overflow:hidden;
+  }
+  .sticky-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+  /* Measured directly off the reference's live DOM, not eyeballed:
+     these "chapters" are not big display headings at all — each one
+     is a <p><strong> lead-in followed by a plain <p>, both at the
+     SAME body-copy size (17.4px at their 1440px viewport), just bold
+     vs regular weight, with ~25px between blocks — a continuous
+     flowing column, not airy separated sections. My first pass built
+     these as 24-34px Poppins headings with 9vh gaps between them,
+     which read far bigger/looser than the real thing. */
+  .sticky-chapters{
+    flex:1 1 auto;
+    max-width:36em;
+    padding:8vh 0;
+  }
+  .chapter{ max-width:36em; }
+  .chapter + .chapter{ margin-top:1.7em; }
+  .chapter h2{
+    font-family:'Hanken Grotesk', sans-serif;
+    font-weight:600;
+    font-size:clamp(16px, 1.15vw, 18px);
+    line-height:1.6;
+    margin-bottom:0.2em;
+  }
+  .chapter p{
+    font-size:clamp(16px, 1.15vw, 18px);
+    line-height:1.6;
+    opacity:0.85;
+  }
+  .chapter .get-in-touch-btn{
+    margin-top:1.6em;
+    display:inline-flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 24px;
+    border:1px solid rgba(23,19,16,0.35);
+    border-radius:4px;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    transition:background 0.3s ease, color 0.3s ease;
+  }
+  .chapter .get-in-touch-btn:hover{
+    background:var(--ink);
+    color:var(--ivory);
+  }
+  @media (max-width:800px){
+    .sticky-section{ flex-direction:column; }
+    .sticky-media{ position:relative; flex:none; width:100%; height:50vh; top:auto; }
+  }
+
+  /* ── Word-by-word reveal — same technique as the Ironclad build and
+     every other reveal on this site, but ONE-SHOT here (toggleActions
+     "play none none none" — fires once on the way in, never reverses)
+     since Travis was explicit this section should stay revealed on
+     scroll-back, unlike the homepage panels. ── */
+  .reveal-word{ display:inline-block; overflow:hidden; vertical-align:top; }
+  .reveal-word__inner{ display:inline-block; transform-origin:left bottom; }
+
+  /* ── Our Clients ── */
+  .clients-section{
+    padding:clamp(64px, 9vw, 120px) var(--pad);
+    border-top:1px solid rgba(23,19,16,0.12);
+  }
+  .clients-kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase;
+    opacity:0.55;
+    margin-bottom:clamp(32px, 4vw, 56px);
+  }
+  .clients-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:var(--gap);
+  }
+  .clients-grid > div:nth-child(2){ margin-top:clamp(40px, 6vw, 90px); }
+  .clients-grid > div:nth-child(3){ margin-top:clamp(-20px, -3vw, -40px); }
+  .client-card{ position:relative; aspect-ratio:4/5; overflow:hidden; background:var(--bg-fallback); }
+  .client-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .client-mark{
+    position:absolute;
+    left:14px; bottom:14px;
+    display:flex; align-items:center; gap:8px;
+    padding:7px 12px;
+    background:rgba(246,245,244,0.92);
+    border-radius:999px;
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink);
+  }
+  .client-mark-dot{
+    width:16px; height:16px; border-radius:50%;
+    border:1.5px solid var(--ink);
+    flex:none;
+  }
+  @media (max-width:800px){
+    .clients-grid{ grid-template-columns:repeat(2, 1fr); }
+    .clients-grid > div:nth-child(2), .clients-grid > div:nth-child(3){ margin-top:0; }
+  }
+
+  /* ── Testimonial ── */
+  .testimonial-section{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:clamp(24px, 3vw, 48px);
+    align-items:start;
+    padding:clamp(64px, 9vw, 120px) var(--pad);
+    border-top:1px solid rgba(23,19,16,0.12);
+  }
+  .testimonial-portrait{
+    width:clamp(120px, 12vw, 180px);
+    aspect-ratio:1;
+    border-radius:3px;
+    overflow:hidden;
+    flex:none;
+  }
+  .testimonial-portrait img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .testimonial-mark{
+    font-family:'Poppins', sans-serif;
+    font-size:clamp(48px, 6vw, 80px);
+    line-height:0.6;
+    opacity:0.2;
+  }
+  /* 42.6px/weight 500 measured off the reference's actual quote at
+     1440px. */
+  .testimonial-quote{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(26px, 3vw, 44px);
+    line-height:1.35;
+    max-width:26em;
+  }
+  .testimonial-quote .is-placeholder{ opacity:0.45; font-style:italic; }
+  .testimonial-attribution{
+    margin-top:1.4em;
+    font-size:14px;
+    opacity:0.6;
+    letter-spacing:0.02em;
+  }
+  @media (max-width:700px){
+    .testimonial-section{ grid-template-columns:1fr; }
+  }
+
+  /* ── Closing about-block — photo + text side by side, same pattern
+     as the homepage's studio-intro panels. ── */
+  .closing-section{
+    display:flex;
+    align-items:center;
+    gap:clamp(32px, 5vw, 80px);
+    padding:clamp(64px, 9vw, 120px) var(--pad);
+    border-top:1px solid rgba(23,19,16,0.12);
+  }
+  .closing-media{
+    flex:1 1 45%;
+    aspect-ratio:3/4;
+    max-width:520px;
+    overflow:hidden;
+  }
+  .closing-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .closing-text{ flex:1 1 45%; max-width:32em; }
+  /* 26.8px/weight 500 measured off the reference's actual closing
+     heading at 1440px. */
+  .closing-text h2{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(20px, 1.9vw, 28px);
+    line-height:1.3;
+    margin-bottom:0.7em;
+  }
+  .closing-text p{ font-size:clamp(15px, 1.1vw, 17px); line-height:1.6; opacity:0.85; }
+  @media (max-width:800px){
+    .closing-section{ flex-direction:column; }
+  }
+
+  /* ── Get in touch form ── */
+  .contact-section{
+    padding:clamp(64px, 9vw, 120px) var(--pad);
+    border-top:1px solid rgba(23,19,16,0.12);
+  }
+  .contact-heading{
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+    font-size:clamp(40px, 6.5vw, 110px);
+    line-height:0.95;
+    text-transform:uppercase;
+    margin-bottom:clamp(32px, 5vw, 56px);
+  }
+  .contact-form{
+    max-width:44em;
+    display:grid;
+    gap:28px;
+  }
+  .contact-form label{
+    display:block;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    opacity:0.55;
+    margin-bottom:0.6em;
+  }
+  .contact-form input[type="text"],
+  .contact-form input[type="tel"],
+  .contact-form input[type="email"],
+  .contact-form textarea{
+    width:100%;
+    border:none;
+    border-bottom:1px solid rgba(23,19,16,0.3);
+    background:transparent;
+    font-family:inherit;
+    font-size:16px;
+    color:var(--ink);
+    padding:0.5em 0;
+  }
+  .contact-form textarea{ resize:vertical; min-height:80px; }
+  .contact-form input:focus, .contact-form textarea:focus{
+    outline:none;
+    border-bottom-color:var(--ink);
+  }
+  .service-pills{ display:flex; flex-wrap:wrap; gap:12px; }
+  .service-pill{
+    padding:12px 22px;
+    border:1px solid rgba(23,19,16,0.3);
+    border-radius:999px;
+    font-size:14px;
+    cursor:pointer;
+    background:none;
+    font-family:inherit;
+    color:var(--ink);
+    transition:background 0.2s ease, color 0.2s ease;
+  }
+  .service-pill.is-selected{ background:var(--ink); color:var(--ivory); border-color:var(--ink); }
+  .consent-row{ display:flex; align-items:center; gap:10px; font-size:14px; opacity:0.75; }
+  .submit-btn{
+    justify-self:start;
+    padding:18px 32px;
+    background:var(--burgundy);
+    color:var(--ivory);
+    border:none;
+    border-radius:4px;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:opacity 0.2s ease;
+  }
+  .submit-btn:hover{ opacity:0.85; }
+
+  /* ── Reuses the homepage solutions-showcase component exactly —
+     same markup/behavior, gray color variant added alongside the
+     existing burgundy for the second teaser (Travis explicitly asked
+     for "one burgundy, one gray"). Only Renovation + Styling shown
+     here (Interiors is this page); both link back to the homepage
+     section for now since their own dedicated pages don't exist yet. ── */
+  .solution-item{ position:relative; width:100%; min-height:360px; }
+  .solution-item + .solution-item{ margin-top:clamp(10px, 1.5vw, 20px); }
+  .solution-media{ position:absolute; inset:0; overflow:hidden; }
+  .solution-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .solution-bar{
+    position:absolute; inset:0;
+    z-index:2;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:clamp(16px, 2vw, 32px);
+    padding:clamp(18px, 2.4vw, 32px) var(--pad);
+    border-top:1px solid rgba(246,245,244,0.5);
+    text-decoration:none;
+    color:var(--ivory);
+  }
+  .solution-overlay{ position:absolute; inset:0; z-index:0; opacity:0.92; }
+  .solution-overlay.is-burgundy{ background:var(--burgundy); }
+  .solution-overlay.is-gray{ background:#5a5a56; }
+  .solution-label{
+    position:relative; z-index:2;
+    display:flex; align-items:center; gap:8px; flex:none;
+    font-size:12px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase;
+    border:1px solid rgba(246,245,244,0.5);
+    padding:9px 16px; border-radius:999px;
+  }
+  .solution-dot{ width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; }
+  .solution-title h2{
+    position:relative; z-index:1;
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(28px, 4vw, 56px);
+    line-height:1;
+    text-transform:uppercase;
+    margin:0;
+  }
+  .solution-about{
+    position:relative; z-index:2;
+    flex:none; max-width:20em;
+    font-size:13px; font-weight:500; letter-spacing:0.02em; text-transform:uppercase;
+    text-align:right;
+  }
+  @media (max-width:700px){
+    .solution-bar{ flex-wrap:wrap; align-items:flex-start; }
+    .solution-about{ display:none; }
+  }
+
+  .site-footer{
+    position:fixed; bottom:0; left:0; right:0; z-index:1;
+    height:var(--footer-h);
+    font-size:14px;
+    color:var(--ivory);
+    background:var(--ink);
+    padding:var(--pad);
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns:auto auto 1fr auto auto;
+    grid-template-rows:1fr auto;
+    grid-template-areas:"logo logo . . ." "contacts address rs legal credits";
+    gap:1em calc(var(--gap) * 2);
+    min-height:clamp(220px, 28vw, 320px);
+  }
+  @media (max-width:900px){
+    .footer-grid{ grid-template-columns:1fr; grid-template-rows:auto;
+      grid-template-areas:"logo" "contacts" "address" "rs" "legal" "credits"; }
+  }
+  .footer-grid > *{ display:grid; gap:0.35em; align-content:end; }
+  .footer-grid a{ color:inherit; text-decoration:none; opacity:0.85; }
+  .footer-grid a:hover{ opacity:1; }
+  .footer-logo{
+    grid-area:logo; align-items:start;
+    font-family:'Poppins', sans-serif; font-weight:500;
+    font-size:clamp(40px, 7vw, 96px); letter-spacing:-0.03em; line-height:0.95;
+  }
+  .footer-logo span{
+    display:block; font-family:'Hanken Grotesk', sans-serif; font-weight:400;
+    font-size:clamp(14px, 1.2vw, 18px); letter-spacing:0.02em; opacity:0.7; margin-top:0.2em;
+  }
+  .contacts{ grid-area:contacts; }
+  .address{ grid-area:address; }
+  .rs{ grid-area:rs; }
+  .legal{ grid-area:legal; }
+  .credits{ grid-area:credits; opacity:0.6; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+<div class="cut-transition" id="cutTransition"></div>
+
+<header class="site-header">
+  <a href="index.html" id="logoHome" style="display:block;">
+    <img src="assets/marlow-logo-white.png" alt="Marlow Interiors" draggable="false" style="cursor:pointer;display:block;-webkit-user-drag:none;">
+  </a>
+  <nav>
+    <a href="projects.html">Projects</a>
+    <a href="archive.html">Archive</a>
+    <a href="studio.html">Studio</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<div class="page-content">
+
+  <section class="discipline-hero">
+    <img src="assets/gallery/solutions/interiors.jpg" alt="Marlow Interiors — Interiors">
+    <div class="discipline-bar">
+      <div class="discipline-label">
+        <span class="discipline-dot"></span>
+        <span>Concept to completion</span>
+      </div>
+      <div class="discipline-title">
+        <h1>Interiors</h1>
+      </div>
+      <div class="discipline-about">Considered interiors for the way people actually live</div>
+    </div>
+  </section>
+
+  <div class="details-strip">
+    <h2 class="details-heading reveal-target">Considered interiors for the way people actually live</h2>
+    <div class="details-image">
+      <img src="assets/gallery/solutions/interiors.jpg" alt="">
+    </div>
+  </div>
+
+  <div class="details-facts">
+    <dl>
+      <dt>Service</dt><dd>Interiors</dd>
+      <dt>Approach</dt><dd>Considered material selection</dd>
+      <dt>Highlight</dt><dd>Concept to completion</dd>
+      <dt>Projects</dt><dd>10+</dd>
+    </dl>
+  </div>
+
+  <div class="sticky-section">
+    <div class="sticky-media">
+      <img src="assets/gallery/interiors-page/materials.jpg" alt="Material and finish selection">
+    </div>
+    <div class="sticky-chapters">
+
+      <div class="chapter">
+        <h2 class="reveal-target">Design rooted in place</h2>
+        <p>Every home has a story before we arrive. Our interior work begins with reading that story carefully, then deciding what the space actually needs — more light, less clutter, a material that will age well rather than one that just photographs well.</p>
+      </div>
+
+      <div class="chapter">
+        <h2 class="reveal-target">Detail that defines the experience</h2>
+        <p>The difference between a nice room and a considered one is in the detail. We choose joinery, hardware, and finishes with the same care as the overall layout. How a drawer closes, where a pendant hangs, the grain direction on a counter — these are the things felt every day, long after the big moves are forgotten.</p>
+      </div>
+
+      <div class="chapter">
+        <h2 class="reveal-target">A studio you can speak to</h2>
+        <p>The person who takes the first call is the same person who signs off on the last install. There's no handoff to a junior team once the contract is signed — that continuity protects both the design intent and your time.</p>
+      </div>
+
+      <div class="chapter">
+        <h2 class="reveal-target">How a project unfolds</h2>
+        <p>Our work moves through clear stages: consultation, concept, material selection, and installation. At each stage we present real samples and layouts so decisions are made with full understanding, never under pressure. You always know where the project stands and what it means for cost and timeline.</p>
+      </div>
+
+      <div class="chapter">
+        <h2 class="reveal-target">Sustainability as a starting point</h2>
+        <p>Durable materials and honest construction are designed in from the first sketch, not added at the end. We favor solid wood and natural stone over anything that needs replacing in five years — pieces that are comfortable to live with and inexpensive to maintain.</p>
+      </div>
+
+      <div class="chapter">
+        <h2 class="reveal-target">Working with the wider team</h2>
+        <p>Interior design is a collaborative act. We coordinate with contractors, upholsterers, and specialty tradespeople, and manage that relationship on your behalf. A well-run project is as much about clear communication between everyone involved as it is about the design itself.</p>
+      </div>
+
+      <div class="chapter">
+        <h2 class="reveal-target">Rigorous design, considered detail</h2>
+        <p>Every project begins with a thorough understanding of how you actually live day to day. The outcome is a home that performs practically and feels right for years, not just on the day it's photographed.</p>
+        <a href="#contact-form" class="get-in-touch-btn">Get in touch</a>
+      </div>
+
+    </div>
+  </div>
+
+  <section class="clients-section">
+    <div class="clients-kicker">
+      <span class="discipline-dot" style="background:currentColor;width:6px;height:6px;border-radius:50%;display:inline-block;"></span>
+      Our clients
+    </div>
+    <div class="clients-grid">
+      <div>
+        <div class="client-card">
+          <img src="assets/gallery/project1-banner.jpg" alt="Bayshore Residence">
+          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
+        </div>
+      </div>
+      <div>
+        <div class="client-card">
+          <img src="assets/gallery/project2-banner.jpg" alt="Coral Gables Residence">
+          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
+        </div>
+      </div>
+      <div>
+        <div class="client-card">
+          <img src="assets/gallery/project3-banner.jpg" alt="Sunset Harbour Residence">
+          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
+        </div>
+      </div>
+      <div>
+        <div class="client-card">
+          <img src="assets/gallery/brickell-loft/banner.jpg" alt="Brickell Loft Residence">
+          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
+        </div>
+      </div>
+      <div>
+        <div class="client-card">
+          <img src="assets/gallery/pinecrest/banner.jpg" alt="Pinecrest Residence">
+          <span class="client-mark"><span class="client-mark-dot"></span>Private Client</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="testimonial-section">
+    <div class="testimonial-portrait">
+      <img src="assets/gallery/interiors-page/testimonial-portrait.jpg" alt="">
+    </div>
+    <div>
+      <div class="testimonial-mark">&rdquo;</div>
+      <p class="testimonial-quote"><span class="is-placeholder">Add a real client quote here.</span></p>
+      <p class="testimonial-attribution">Client Name &middot; Private Residence</p>
+    </div>
+  </section>
+
+  <section class="closing-section">
+    <div class="closing-media">
+      <img src="assets/gallery/interiors-page/studio-review.jpg" alt="Marlow Interiors, reviewing a project">
+    </div>
+    <div class="closing-text">
+      <h2 class="reveal-target">Our designers lead every project from initial consultation through installation and styling.</h2>
+      <p>Engaged from brief to handover. The person you meet at the first conversation is the person who sees the project through to the end.</p>
+    </div>
+  </section>
+
+  <section class="contact-section" id="contact-form">
+    <h2 class="contact-heading">Schedule an<br>expert consultation</h2>
+    <form class="contact-form" onsubmit="event.preventDefault(); this.querySelector('.submit-btn').textContent='Thank you — we\'ll be in touch';">
+      <div>
+        <label for="cf-name">Name</label>
+        <input type="text" id="cf-name" name="name" required>
+      </div>
+      <div>
+        <label for="cf-location">Location</label>
+        <input type="text" id="cf-location" name="location">
+      </div>
+      <div>
+        <label for="cf-phone">Phone</label>
+        <input type="tel" id="cf-phone" name="phone">
+      </div>
+      <div>
+        <label for="cf-email">Email</label>
+        <input type="email" id="cf-email" name="email" required>
+      </div>
+      <div>
+        <label for="cf-message">Message</label>
+        <textarea id="cf-message" name="message"></textarea>
+      </div>
+      <div>
+        <label>Service type</label>
+        <div class="service-pills">
+          <button type="button" class="service-pill">Interiors</button>
+          <button type="button" class="service-pill">Renovation</button>
+          <button type="button" class="service-pill">Styling</button>
+        </div>
+      </div>
+      <label class="consent-row">
+        <input type="checkbox" required>
+        I agree to the processing of my personal data.
+      </label>
+      <button type="submit" class="submit-btn">Schedule a private consultation</button>
+    </form>
+  </section>
+
+  <div class="solution-item">
+    <div class="solution-media">
+      <img src="assets/gallery/solutions/renovation.jpg" alt="Marlow Interiors — Renovation">
+    </div>
+    <a href="index.html#solutions" class="solution-bar">
+      <div class="solution-overlay is-burgundy"></div>
+      <div class="solution-label">
+        <span class="solution-dot"></span>
+        <span>Tailored to the space</span>
+      </div>
+      <div class="solution-title"><h2>Renovation</h2></div>
+      <div class="solution-about">Full renovations that respect what's already working</div>
+    </a>
+  </div>
+  <div class="solution-item">
+    <div class="solution-media">
+      <img src="assets/gallery/solutions/styling.jpg" alt="Marlow Interiors — Styling">
+    </div>
+    <a href="index.html#solutions" class="solution-bar">
+      <div class="solution-overlay is-gray"></div>
+      <div class="solution-label">
+        <span class="solution-dot"></span>
+        <span>Down to the last detail</span>
+      </div>
+      <div class="solution-title"><h2>Styling</h2></div>
+      <div class="solution-about">Furniture, art, and finishing touches, chosen with intention</div>
+    </a>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-logo">Marlow<span>Interior Design Studio</span></div>
+    <div class="contacts">
+      <a href="mailto:hello@marlowinteriors.com">hello@marlowinteriors.com</a>
+      <a href="tel:+13055550148">+1 (305) 555-0148</a>
+    </div>
+    <div class="address">
+      <span>140 NE 39th St</span>
+      <span>Miami, FL 33137</span>
+    </div>
+    <div class="rs">
+      <a href="#" target="_blank" rel="noopener">Instagram</a>
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="legal">
+      <a href="#">Legal Notice</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <div class="credits">
+      <p>&copy; 2026, Marlow Interiors</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('logoHome').addEventListener('click', function(e){
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    var overlay = document.getElementById('cutTransition');
+    overlay.style.transition = 'opacity 0.5s ease';
+    overlay.style.opacity = '1';
+    setTimeout(function(){ window.location.href = 'index.html'; }, 500);
+  });
+
+  document.querySelectorAll('.service-pill').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btn.classList.toggle('is-selected');
+    });
+  });
+
+  if (window.gsap && window.ScrollTrigger){
+    gsap.registerPlugin(ScrollTrigger);
+
+    function splitWords(el){
+      var words = el.textContent.trim().split(/\s+/);
+      el.innerHTML = words.map(function(w){
+        return '<span class="reveal-word"><span class="reveal-word__inner">' + w + '</span></span>';
+      }).join(' ');
+      return el.querySelectorAll('.reveal-word__inner');
+    }
+
+    /* One-shot reveal — toggleActions "play none none none" fires
+       once on the way down and never reverses, per explicit
+       instruction that this section shouldn't re-hide on scroll-up. */
+    document.querySelectorAll('.reveal-target').forEach(function(el){
+      var words = splitWords(el);
+      gsap.set(words, { yPercent: 115, rotate: 8 });
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }).to(words, {
+        yPercent: 0,
+        rotate: 0,
+        duration: 1,
+        ease: 'power3.out',
+        stagger: 0.03
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
