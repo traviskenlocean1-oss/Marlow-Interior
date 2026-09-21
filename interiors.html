@@ -486,6 +486,58 @@
     .studio-panel-text{ padding:48px clamp(20px, 6vw, 48px); }
   }
 
+  /* ── Client testimonial — reference's real .section-quote: a small
+     fixed photo top-left, a divider line + big quote mark + two-tone
+     quote text on the right, attribution below. Placeholder copy
+     only, per the "no fabricated client identity" rule — real quote
+     text/attribution swap in once Travis has one. ── */
+  .quote-section{
+    display:flex;
+    gap:clamp(32px, 5vw, 56px);
+    padding:clamp(64px, 9vw, 120px) var(--pad);
+    border-top:1px solid rgba(23,19,16,0.12);
+    background:#dbdbd8;
+  }
+  .quote-photo{
+    flex:0 0 clamp(120px, 12vw, 175px);
+    aspect-ratio:1;
+    overflow:hidden;
+  }
+  .quote-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .quote-content{ flex:1 1 auto; padding-top:clamp(0px, 1vw, 8px); }
+  .quote-line{
+    height:1px;
+    background:rgb(46,46,43);
+    margin-bottom:clamp(24px, 4vw, 56px);
+  }
+  .quote-icon{
+    font-family:'Poppins', sans-serif;
+    font-size:clamp(48px, 6vw, 72px);
+    font-weight:700;
+    line-height:0.5;
+    margin-bottom:0.3em;
+  }
+  /* 42.6px/weight 500 measured off the reference's actual quote at
+     1440px. */
+  .quote-text{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(24px, 3vw, 43px);
+    line-height:1.35;
+    max-width:26em;
+  }
+  .quote-text .is-placeholder{ opacity:0.45; font-style:italic; }
+  .quote-attribution{
+    margin-top:1.4em;
+    font-size:14px;
+    opacity:0.6;
+    letter-spacing:0.02em;
+  }
+  @media (max-width:700px){
+    .quote-section{ flex-direction:column; }
+    .quote-photo{ flex-basis:120px; }
+  }
+
   /* ── Closing about-block — photo + text side by side, same pattern
      as the homepage's studio-intro panels. ── */
   .closing-section{
@@ -519,19 +571,70 @@
   }
 
   /* ── Get in touch form ── */
+  /* background/no-side-padding measured off the reference's real
+     .section-form — the ticker track needs to run edge to edge, so
+     the section itself carries no horizontal padding and each child
+     (ticker track aside) re-applies var(--pad) itself. */
   .contact-section{
-    padding:clamp(64px, 9vw, 120px) var(--pad);
+    padding:0 0 clamp(64px, 9vw, 120px);
     border-top:1px solid rgba(23,19,16,0.12);
+    background:#dbdbd8;
+    overflow:hidden;
   }
-  .contact-heading{
-    font-family:'Poppins', sans-serif;
-    font-weight:700;
-    font-size:clamp(40px, 6.5vw, 110px);
-    line-height:0.95;
+  .schedule-ticker{
+    overflow:hidden;
+    border-bottom:1px solid rgba(23,19,16,0.12);
+    padding:10px 0;
+  }
+  .schedule-ticker-track{
+    display:flex;
+    width:max-content;
+    animation:schedule-ticker-scroll 22s linear infinite;
+  }
+  .schedule-ticker-track span{
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:0.04em;
     text-transform:uppercase;
-    margin-bottom:clamp(32px, 5vw, 56px);
+    opacity:0.9;
+    padding:0 28px;
+    white-space:nowrap;
   }
+  @keyframes schedule-ticker-scroll{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+  /* 158.4px/weight 500 measured off the reference's actual heading at
+     1440px — "AN"/"EXPERT" sit at the same 0.7 opacity used for every
+     other secondary/lighter text on this page, not a separate gray. */
+  .schedule-heading{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size:clamp(40px, 8vw, 110px);
+    line-height:1.05;
+    text-transform:uppercase;
+    padding:clamp(24px, 4vw, 48px) var(--pad) clamp(40px, 6vw, 72px);
+  }
+  .schedule-heading .is-dim{ opacity:0.7; }
+  .schedule-heading-row{
+    display:flex;
+    align-items:center;
+    gap:clamp(16px, 2vw, 32px);
+    flex-wrap:wrap;
+  }
+  .schedule-photo{
+    width:clamp(120px, 15vw, 216px);
+    aspect-ratio:216/115;
+    border-radius:3px;
+    overflow:hidden;
+    flex:none;
+    will-change:transform;
+  }
+  /* Oversized + object-fit:cover so the parallax translate (JS) never
+     exposes empty space at the top/bottom edge of the frame. */
+  .schedule-photo img{ width:100%; height:140%; position:relative; top:-20%; object-fit:cover; display:block; }
   .contact-form{
+    padding:0 var(--pad);
     max-width:44em;
     display:grid;
     gap:28px;
@@ -840,13 +943,15 @@
     </div>
   </section>
 
-  <section class="closing-section">
-    <div class="closing-media">
-      <img src="assets/gallery/interiors-page/studio-review.jpg" alt="Marlow Interiors, reviewing a project">
+  <section class="quote-section">
+    <div class="quote-photo">
+      <img src="assets/gallery/interiors-page/testimonial-portrait.jpg" alt="">
     </div>
-    <div class="closing-text">
-      <h2 class="reveal-target">Our designers lead every project from initial consultation through installation and styling.</h2>
-      <p>Engaged from brief to handover. The person you meet at the first conversation is the person who sees the project through to the end.</p>
+    <div class="quote-content">
+      <div class="quote-line"></div>
+      <div class="quote-icon">&rdquo;</div>
+      <p class="quote-text"><span class="is-placeholder">Add a real client quote here.</span></p>
+      <p class="quote-attribution">Client Name &middot; Private Residence</p>
     </div>
   </section>
 
@@ -868,7 +973,23 @@
   </section>
 
   <section class="contact-section" id="contact-form">
-    <h2 class="contact-heading">Schedule an<br>expert consultation</h2>
+    <div class="schedule-ticker">
+      <div class="schedule-ticker-track">
+        <span>Get in touch with us</span><span>Get in touch with us</span><span>Get in touch with us</span><span>Get in touch with us</span><span>Get in touch with us</span><span>Get in touch with us</span>
+        <span>Get in touch with us</span><span>Get in touch with us</span><span>Get in touch with us</span><span>Get in touch with us</span><span>Get in touch with us</span><span>Get in touch with us</span>
+      </div>
+    </div>
+    <h2 class="schedule-heading">
+      Schedule
+      <div class="schedule-heading-row">
+        <span class="is-dim">An</span>
+        <div class="schedule-photo">
+          <img src="assets/gallery/interiors-page/materials.jpg" alt="">
+        </div>
+        <span class="is-dim">Expert</span>
+      </div>
+      Consultation
+    </h2>
     <form class="contact-form" onsubmit="event.preventDefault(); this.querySelector('.submit-btn').textContent='Thank you — we\'ll be in touch';">
       <div>
         <label for="cf-name">Name</label>
@@ -1027,6 +1148,26 @@
         }
       });
     });
+
+    /* Small parallax on the inline "Schedule an [photo] Expert" photo —
+       Travis specifically asked for it to "move in the screen when you
+       scroll" rather than sit static like the rest of the heading. */
+    var schedulePhoto = document.querySelector('.schedule-photo img');
+    if (schedulePhoto){
+      gsap.fromTo(schedulePhoto,
+        { yPercent: -18 },
+        {
+          yPercent: 18,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: schedulePhoto.closest('.schedule-heading'),
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        }
+      );
+    }
   }
 </script>
 
