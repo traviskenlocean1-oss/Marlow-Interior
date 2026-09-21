@@ -689,6 +689,15 @@
      that slides in from the corner. rgb(46,46,43) is the same dark
      divider color already used elsewhere on this site, reused here
      for the section background rather than inventing a new one. ── */
+  /* Plain breathing room between the last solution teaser and this
+     section — Travis was explicit it read as "part of it" without a
+     real gap. Same light tone as .solutions-section above it, not the
+     reveal-section's dark background, so the seam reads as an actual
+     pause rather than a continuation. */
+  .reveal-spacer{
+    height:clamp(100px, 14vw, 220px);
+    background:#dbdbd8;
+  }
   .reveal-section{
     position:relative;
     height:400vh;
@@ -785,18 +794,21 @@
     color:inherit;
     overflow:hidden;
   }
+  /* transform (scaleX from the outer edge) instead of a flat opacity
+     cross-fade — reads as the color actively wiping in from whichever
+     side, not just blinking on. */
   .service-row-bg{
     position:absolute;
     top:0; bottom:0;
     width:50%;
     background:var(--burgundy);
-    opacity:0;
-    transition:opacity 0.35s ease;
+    transform:scaleX(0);
+    transition:transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     z-index:0;
   }
-  .service-row-bg.is-left{ left:0; }
-  .service-row-bg.is-right{ right:0; }
-  .service-row-link:hover .service-row-bg{ opacity:1; }
+  .service-row-bg.is-left{ left:0; transform-origin:left center; }
+  .service-row-bg.is-right{ right:0; transform-origin:right center; }
+  .service-row-link:hover .service-row-bg{ transform:scaleX(1); }
   .service-row-heading{
     position:relative;
     z-index:1;
@@ -806,31 +818,41 @@
     letter-spacing:0.04em;
     text-transform:uppercase;
     color:var(--ivory);
+    transition:opacity 0.3s ease, transform 0.3s ease;
   }
   .service-row-count{
     position:relative;
     z-index:1;
     font-size:clamp(13px, 1vw, 15px);
     opacity:0.9;
+    transition:opacity 0.3s ease, transform 0.3s ease;
   }
   .service-row-large-title{
     position:absolute;
     z-index:1;
     top:50%; left:clamp(20px, 4vw, 48px);
-    transform:translateY(-50%);
+    transform:translateY(-50%) translateX(-14px);
     font-family:'Poppins', sans-serif;
     font-weight:500;
     font-size:clamp(28px, 3.2vw, 44px);
     text-transform:uppercase;
     color:rgba(246,245,244,0.92);
     opacity:0;
-    transition:opacity 0.35s ease;
+    transition:opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.08s,
+               transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
     pointer-events:none;
     white-space:nowrap;
   }
-  .service-row-link:hover .service-row-large-title{ opacity:1; }
+  .service-row-link:hover .service-row-large-title{
+    opacity:1;
+    transform:translateY(-50%) translateX(0);
+  }
   .service-row-link:hover .service-row-heading,
-  .service-row-link:hover .service-row-count{ opacity:0; transition:opacity 0.2s ease; }
+  .service-row-link:hover .service-row-count{
+    opacity:0;
+    transform:translateX(10px);
+    transition:opacity 0.2s ease, transform 0.2s ease;
+  }
   @media (max-width:800px){
     .service-row-large-title{ display:none; }
   }
@@ -1051,6 +1073,8 @@
     </a>
   </div>
 </section>
+
+<div class="reveal-spacer"></div>
 
 <section class="reveal-section">
   <div class="reveal-pin">
@@ -1547,7 +1571,7 @@
         var targets = spans.length ? spans : [line];
         targets.forEach(function(t){
           var words = splitWords(t);
-          gsap.set(words, { yPercent: 115, rotate: 6 });
+          gsap.set(words, { yPercent: 115, rotate: 5, opacity: 0 });
           lineWords.push(words);
         });
       });
@@ -1562,13 +1586,19 @@
         }
       });
 
+      /* Explicit duration + power3.out (the same ease every other
+         word-reveal on this site uses) + a wider stagger, rather than
+         GSAP's default 0.5 snap — Travis said the words needed to come
+         in "more elegantly." Each phase also gets more of the scrub
+         range to play across, so the motion reads as a real cascade
+         instead of a quick pop. */
       tl.to(kicker, { yPercent: -140, opacity: 0, ease: 'none' }, 0)
         .to(photo, { top: '16vh', left: '9vw', right: '9vw', bottom: '10vh', ease: 'none' }, 0.08)
-        .to(lineWords[0], { yPercent: 0, rotate: 0, stagger: 0.04, ease: 'power2.out' }, 0.32)
-        .to(lineWords[1], { yPercent: 0, rotate: 0, stagger: 0.04, ease: 'power2.out' }, 0.48)
-        .to(lineWords[2], { yPercent: 0, rotate: 0, stagger: 0.04, ease: 'power2.out' }, 0.48)
-        .to(smallPhoto, { xPercent: 0, opacity: 1, ease: 'none' }, 0.55)
-        .to(lineWords[3], { yPercent: 0, rotate: 0, stagger: 0.04, ease: 'power2.out' }, 0.68);
+        .to(lineWords[0], { yPercent: 0, rotate: 0, opacity: 1, duration: 0.32, stagger: 0.07, ease: 'power3.out' }, 0.3)
+        .to(lineWords[1], { yPercent: 0, rotate: 0, opacity: 1, duration: 0.32, stagger: 0.07, ease: 'power3.out' }, 0.46)
+        .to(lineWords[2], { yPercent: 0, rotate: 0, opacity: 1, duration: 0.32, stagger: 0.07, ease: 'power3.out' }, 0.5)
+        .to(smallPhoto, { xPercent: 0, opacity: 1, duration: 0.3, ease: 'power2.out' }, 0.56)
+        .to(lineWords[3], { yPercent: 0, rotate: 0, opacity: 1, duration: 0.32, stagger: 0.07, ease: 'power3.out' }, 0.68);
     })();
   }
 </script>
