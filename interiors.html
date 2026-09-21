@@ -364,6 +364,21 @@
     aspect-ratio:157/100;
     overflow:hidden;
   }
+  /* Reference fills its empty-photo slots with the client's own logo,
+     centered in the cell. We don't have real client logos to show, so
+     these are generic abstract placeholder marks — never a fabricated
+     company name. */
+  .client-cell.is-empty{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .client-logo-mark{
+    width:clamp(28px, 2.8vw, 40px);
+    height:clamp(28px, 2.8vw, 40px);
+    color:var(--ink);
+    opacity:0.55;
+  }
   .client-cell::after{
     content:'';
     position:absolute;
@@ -732,16 +747,22 @@
     </div>
     <div class="clients-grid-wrap">
       <div class="clients-grid">
-        <div class="client-cell is-empty"></div>
+        <div class="client-cell is-empty">
+          <svg class="client-logo-mark" viewBox="0 0 48 48" fill="none"><path d="M24 6 L38 24 L24 42 L10 24 Z" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
         <div class="client-cell"><img src="assets/gallery/project1-banner.jpg" alt="Private residential project"></div>
         <div class="client-cell"><img src="assets/gallery/project2-banner.jpg" alt="Private residential project"></div>
-        <div class="client-cell is-empty"></div>
-        <div class="client-cell is-empty"></div>
+        <div class="client-cell is-empty">
+          <svg class="client-logo-mark" viewBox="0 0 48 48" fill="none"><circle cx="18" cy="24" r="11" stroke="currentColor" stroke-width="2"/><circle cx="30" cy="24" r="11" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <div class="client-cell is-empty">
+          <svg class="client-logo-mark" viewBox="0 0 48 48" fill="none"><path d="M6 30 Q16 10 24 24 Q32 38 42 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
         <div class="client-cell"><img src="assets/gallery/project3-banner.jpg" alt="Private residential project"></div>
         <div class="client-cell"><img src="assets/gallery/brickell-loft/banner.jpg" alt="Private residential project"></div>
-        <div class="client-cell is-empty"></div>
-        <div class="client-cell is-empty"></div>
-        <div class="client-cell"><img src="assets/gallery/pinecrest/banner.jpg" alt="Private residential project"></div>
+        <div class="client-cell is-empty">
+          <svg class="client-logo-mark" viewBox="0 0 48 48" fill="none"><path d="M24 5 L29 19 L44 19 L32 28 L37 43 L24 34 L11 43 L16 28 L4 19 L19 19 Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
       </div>
     </div>
   </section>
