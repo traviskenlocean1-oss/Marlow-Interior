@@ -528,7 +528,7 @@
     width:100%;
     padding-top:34vw;
     min-height:360px;
-    margin-bottom:clamp(20px, 3vw, 40px);
+    margin-bottom:clamp(10px, 1.5vw, 20px);
   }
   .solution-item:last-child{
     margin-bottom:0;
@@ -1165,7 +1165,15 @@
        the image at all. .solution-bar is animated in lockstep so the
        info bar's edges always match the photo's. scrub:1.2 (a lag in
        seconds, not an instant 1:1 tie) for the same smoothing reason
-       as before — Travis found the plain 1:1 version too sensitive. */
+       as before — Travis found the plain 1:1 version too sensitive.
+       scrub bumped 1.2 -> 2 on top of that per the follow-up: the lag
+       is what makes the grow readable at a normal scroll speed — the
+       tweened value trails behind and keeps catching up smoothly after
+       the wheel input stops, rather than snapping straight to wherever
+       the scroll position already is. This has nothing to do with how
+       fast the page itself scrolls (that's the homepage's own wheel
+       handler, untouched) — only how eagerly these specific tweened
+       values chase the scroll position. */
     document.querySelectorAll('.solution-item').forEach(function(item){
       var media = item.querySelector('.solution-media');
       var bar = item.querySelector('.solution-bar');
@@ -1181,11 +1189,11 @@
            height's worth of scroll, which reliably fits regardless
            of what (if anything) follows it on the page. */
         end: 'bottom bottom',
-        scrub: 1.2
+        scrub: 2
       };
       gsap.to([media, bar], {
-        left: 10,
-        right: 10,
+        left: 4,
+        right: 4,
         ease: 'none',
         scrollTrigger: scrollTriggerConfig
       });
@@ -1193,11 +1201,12 @@
          also grows upward (top inset shrinking toward the item's own
          top edge), not just outward to the sides. Bar isn't included
          here: it's anchored at bottom:0 and never needs to move
-         vertically. Bigger range than the horizontal tween (150px+ of
-         travel vs. a ~60px shrink) since Travis asked for this
-         specifically to read as more noticeable, not just present. */
+         vertically. End value tightened 10 -> 4, and the fixed gap
+         between items (.solution-item's margin-bottom, above) tightened
+         too — Travis said the grown state still had too much space
+         left over above the neighboring item. */
       gsap.to(media, {
-        top: 10,
+        top: 4,
         ease: 'none',
         scrollTrigger: scrollTriggerConfig
       });
