@@ -135,6 +135,12 @@
   .discipline-hero-media img{ width:100%; height:100%; object-fit:cover; display:block; }
   @media (max-width:800px){
     .discipline-hero{ height:auto; min-height:0; }
+    /* The site-header logo (fixed, ~112px tall including its own
+       padding) was colliding with this h1 at narrow widths — the h1's
+       own top padding clamps down to 28px there, which isn't enough
+       clearance, so "INTERIORS"/"RENOVATION"/"STYLING" rendered
+       directly under the "MARLOW" logo. */
+    .discipline-hero h1{ padding-top:120px; }
     .discipline-hero-row{ flex-direction:column; }
     .discipline-hero-media{ height:50vh; }
   }
